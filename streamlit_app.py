@@ -1,4 +1,3 @@
-from random import random
 import math
 import statsmodels.stats.api as sms
 import streamlit as st
@@ -17,12 +16,12 @@ st.set_page_config(
 )
 
 # Hide top right menu and "Made with Streamlit" footer
-hide_menu_style = """
-        <style>
-        #MainMenu {visibility: hidden; }
-        footer {visibility: hidden;}
-        </style>
-        """
+hide_menu_style = '''
+	<style>
+	#MainMenu {visibility: hidden; }
+	footer {visibility: hidden;}
+	</style>
+'''
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 st.title('A/B Tester')
@@ -43,9 +42,10 @@ sensitivity = st.number_input(
 	step=0.1,
 	format='%.1f')
 
-hypothesis = st.radio(
+alternative = st.radio(
     label='Hypothesis',
     options=('One-sided', 'Two-sided'),
+    index=1,
     key='pre-test')
 
 confidence_level = st.slider(
@@ -63,18 +63,66 @@ power = st.slider(
     value=80,
     format='%d%%')
 
+# Format the variables according to the function requirements
 control_conversion = control_conversion/100
-treatment_conversion = control_conversion*(1 + sensitivity/100)
-alpha = 1 - confidence_level/100
+sensitivity = sensitivity/100
+treatment_conversion = control_conversion*(1 + sensitivity)
+if alternative == 'One-sided':
+	alternative = 'smaller'
+else:
+	alternative = 'two-sided'
+confidence_level = confidence_level/100
+alpha = 1 - confidence_level
 power = power/100
 
 if not(st.button('Calculate minimum sample size')):
 	# st.stop()
 	pass
 
-es = sms.proportion_effectsize(control_conversion, treatment_conversion)
-min_sample = math.ceil(sms.NormalIndPower().solve_power(es, power=power, alpha=alpha, ratio=1))
+effect_size = sms.proportion_effectsize(control_conversion,
+									   treatment_conversion)
+# analysis = sms.TTestIndPower()
+analysis = sms.NormalIndPower()
+min_sample = math.ceil(analysis.solve_power(effect_size,
+											power=power,
+											alpha=alpha,
+											ratio=1,
+											alternative=alternative))
+
 st.subheader(min_sample)
+st.container()
+
+code = f'''
+# Import libraries
+import math
+import statsmodels.stats.api as sms
+
+# Define parameters
+control_conversion = {control_conversion}
+sensitivity = {sensitivity}
+treatment_conversion = control_conversion*(1 + sensitivity)
+alternative = '{alternative}'
+confidence_level = {confidence_level}
+alpha = 1 - confidence_level
+power = {power}
+
+# Calculate minimum sample
+effect_size = sms.proportion_effectsize(
+	control_conversion,
+	treatment_conversion
+)
+analysis = sms.NormalIndPower()
+min_sample = math.ceil(analysis.solve_power(
+	effect_size,
+	power=power,
+	alpha=alpha,
+	ratio=1,
+	alternative=alternative
+))
+'''
+
+with st.expander('See the code'):
+	st.code(code, language='python')
 
 st.header('Result')
 
@@ -109,6 +157,7 @@ treatment_conversion_2 = st.number_input(
 hypothesis2 = st.radio(
     label='Hypothesis',
     options=('One-sided', 'Two-sided'),
+    index=1,
     key='post-test')
 
 confidence_level2 = st.slider(
