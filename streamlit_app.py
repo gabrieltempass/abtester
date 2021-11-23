@@ -1,21 +1,25 @@
+import random
 import math
+import numpy as np
+import pandas as pd
 import statsmodels.stats.api as sms
 import streamlit as st
 
-# Set browser tab title, favicon and sidebar initial state
+# Set browser tab title, favicon and link to get help
 st.set_page_config(
     page_title='A/B Tester',
     # page_icon=':heart:',
-    initial_sidebar_state='expanded',
     menu_items={
-        'Get help': 'https://im.xiaojukeji.com/channel?uid=74266&token=36cf8a878dfbd9658b08224ad09ded00&id=721670773793655296',
+        'Get help': None,
+        'Report a bug': 'https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.',
+        'About': 'This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).'
     }
 )
 
 # Hide top right menu and "Made with Streamlit" footer
 hide_menu_style = '''
 	<style>
-	#MainMenu {visibility: hidden; }
+	MainMenu {visibility: hidden; }
 	footer {visibility: hidden;}
 	</style>
 '''
@@ -84,8 +88,7 @@ if option == 'Calculate the minimum sample size':
 
 	effect_size = sms.proportion_effectsize(control_conversion,
 										   treatment_conversion)
-	# analysis = sms.TTestIndPower()
-	analysis = sms.NormalIndPower()
+	analysis = sms.TTestIndPower()
 	min_sample = math.ceil(analysis.solve_power(effect_size,
 												power=power,
 												alpha=alpha,
@@ -95,35 +98,35 @@ if option == 'Calculate the minimum sample size':
 	st.subheader(min_sample)
 
 	code = f'''
-	# Import the libraries
-	import math
-	import statsmodels.stats.api as sms
+# Import the libraries
+import math
+import statsmodels.stats.api as sms
 
-	# Define the parameters
-	control_conversion = {control_conversion}
-	sensitivity = {sensitivity}
-	treatment_conversion = control_conversion*(1 + sensitivity)
-	alternative = '{alternative}'
-	confidence_level = {confidence_level}
-	alpha = 1 - confidence_level
-	power = {power}
+# Define the parameters
+control_conversion = {control_conversion}
+sensitivity = {sensitivity}
+treatment_conversion = control_conversion*(1 + sensitivity)
+alternative = '{alternative}'
+confidence_level = {confidence_level}
+alpha = 1 - confidence_level
+power = {power}
 
-	# Calculate the minimum sample
-	effect_size = sms.proportion_effectsize(
-		control_conversion,
-		treatment_conversion
-	)
-	analysis = sms.NormalIndPower()
-	min_sample = math.ceil(analysis.solve_power(
-		effect_size,
-		power=power,
-		alpha=alpha,
-		ratio=1,
-		alternative=alternative
-	))
+# Calculate the minimum sample
+effect_size = sms.proportion_effectsize(
+    control_conversion,
+    treatment_conversion
+)
+analysis = sms.TTestIndPower()
+min_sample = math.ceil(analysis.solve_power(
+    effect_size,
+    power=power,
+    alpha=alpha,
+    ratio=1,
+    alternative=alternative
+))
 
-	# Show the result
-	print(min_sample)
+# Show the result
+print(min_sample)
 	'''
 
 	with st.expander('Show the code'):
@@ -144,29 +147,19 @@ if option == 'Evaluate the statistical significance':
 		value=30000,
 		step=1)
 
-	control_conversion_2 = st.number_input(
-		label='Conversion rate from the control (%)',
-		min_value=0.0,
-		max_value=100.0,
-		value=15.0,
-		step=0.1,
-		format='%.1f')
+	control_conversions = st.number_input(
+		label='Conversions from the control',
+		min_value=0,
+		value=1219,
+		step=1)
 
-	treatment_conversion_2 = st.number_input(
-		label='Conversion rate from the treatment (%)',
-		min_value=0.0,
-		max_value=100.0,
-		value=17.0,
-		step=0.1,
-		format='%.1f')
+	treatment_conversions = st.number_input(
+		label='Conversions from the treatment',
+		min_value=0,
+		value=1247,
+		step=1)
 
-	hypothesis2 = st.radio(
-	    label='Hypothesis',
-	    options=('One-sided', 'Two-sided'),
-	    index=1,
-	    key='post-test')
-
-	confidence_level2 = st.slider(
+	confidence_level = st.slider(
 	    label='Confidence level',
 	    min_value=70,
 	    max_value=99,
@@ -174,44 +167,99 @@ if option == 'Evaluate the statistical significance':
 	    format='%d%%',
 	    key='post-test')
 
+	confidence_level = confidence_level/100
+	alpha = 1 - confidence_level
+
 	if not(st.button('Calculate')):
 		st.stop()
 
 	def perm_fun(x, nA, nB):
 	    n = nA + nB
-	    idx_B = set(random.sample(range(n), nB))
-	    idx_A = set(range(n)) - idx_B
+	    idx_A = set(random.sample(range(n), nB))
+	    idx_B = set(range(n)) - idx_A
 	    return x.loc[idx_B].mean() - x.loc[idx_A].mean()
 
+	control_effect = control_conversions/control_users
+	treatment_effect = treatment_conversions/treatment_users
+	observed_diff = treatment_effect - control_effect
 
-	code2 = f'''
-	# Import libraries
-	import math
-	import statsmodels.stats.api as sms
+	conversion = [0]*(control_users + treatment_users)
+	conversion.extend([1]*(control_conversions + treatment_conversions))
+	conversion = pd.Series(conversion)
 
-	# Define parameters
-	control_conversion = {control_conversion}
-	sensitivity = {sensitivity}
-	treatment_conversion = control_conversion*(1 + sensitivity)
-	alternative = '{alternative}'
-	confidence_level = {confidence_level}
-	alpha = 1 - confidence_level
-	power = {power}
+	perm_diffs = []
+	i = 100
+	my_bar = st.progress(0)
+	for percent_complete in range(i):
+		perm_diffs.append(perm_fun(
+			conversion,
+			control_users + control_conversions,
+			treatment_users + treatment_conversions))
+		my_bar.progress((percent_complete + 1)/i)
 
-	# Calculate minimum sample
-	effect_size = sms.proportion_effectsize(
-		control_conversion,
-		treatment_conversion
-	)
-	analysis = sms.NormalIndPower()
-	min_sample = math.ceil(analysis.solve_power(
-		effect_size,
-		power=power,
-		alpha=alpha,
-		ratio=1,
-		alternative=alternative
-	))
+	p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+
+	if p_value <= alpha:
+		st.subheader(f'The difference is statistically significant')
+	else:
+		st.subheader(f'The difference is not statistically significant')
+	st.write(f'Control conversion: {control_effect:.2%}')
+	st.write(f'Treatment conversion: {treatment_effect:.2%}')
+	st.write(f'Observed difference: {observed_diff*100:+.2f} p.p. ({observed_diff/control_effect:+.2%})')
+	st.write(f'p-value: {p_value:.2f}')
+
+	code = f'''
+# Import the libraries
+import random
+import numpy as np
+import pandas as pd
+
+# Declare the permutation function
+def perm_fun(x, nA, nB):
+    n = nA + nB
+    idx_A = set(random.sample(range(n), nB))
+    idx_B = set(range(n)) - idx_A
+    return x.loc[idx_B].mean() - x.loc[idx_A].mean()
+
+# Define the parameters
+control_users = {control_users}
+treatment_users = {treatment_users}
+control_conversions = {control_conversions}
+treatment_conversions = {treatment_conversions}
+confidence_level = {confidence_level}
+alpha = 1 - confidence_level
+
+# Calculate the observed difference
+control_effect = control_conversions/control_users
+treatment_effect = treatment_conversions/treatment_users
+observed_diff = treatment_effect - control_effect
+
+# Create the pool to draw the samples
+conversion = [0]*(control_users + treatment_users)
+conversion.extend([1]*(control_conversions + treatment_conversions))
+conversion = pd.Series(conversion)
+
+# Execute the permutation test
+perm_diffs = []
+for percent_complete in range(1000):
+    perm_diffs.append(perm_fun(
+        conversion,
+        control_users + control_conversions,
+        treatment_users + treatment_conversions))
+
+# Calculate the p-value
+p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+
+# Show the result
+if p_value <= alpha:
+    print(f'The difference is statistically significant')
+else:
+    print(f'The difference is not statistically significant')
+print(f'Control conversion: {{control_effect:.2%}}')
+print(f'Treatment conversion: {{treatment_effect:.2%}}')
+print(f'Observed difference: {{observed_diff*100:+.2f}} p.p. ({{observed_diff/control_effect:+.2%}})')
+print(f'p-value: {{p_value:.2f}}')
 	'''
 
 	with st.expander('Show the code'):
-		st.code(code2, language='python')
+		st.code(code, language='python')
