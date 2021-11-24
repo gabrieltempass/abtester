@@ -2,6 +2,7 @@ import random
 import math
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
 import statsmodels.stats.api as sms
 import streamlit as st
 
@@ -10,7 +11,7 @@ st.set_page_config(
     page_title='A/B Tester',
     # page_icon=':heart:',
     menu_items={
-        'Get help': None,
+        'Get help': 'https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link',
         'Report a bug': 'https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.',
         'About': 'This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).'
     }
@@ -35,69 +36,79 @@ option = st.selectbox(
 if option == 'Calculate the minimum sample size':
 	st.header('Sample size')
 
-	control_conversion = st.number_input(
-		label='Baseline conversion rate (%)',
-		min_value=0.0,
-		max_value=100.0,
-		value=15.0,
-		step=0.1,
-		format='%.1f')
+	test = st.radio(
+	    label='Test',
+	    options=('Proportions', 'Means'),
+	    index=0)
 
-	sensitivity = st.number_input(
-		label='Sensitivity (%)',
-		min_value=0.0,
-		value=10.0,
-		step=0.1,
-		format='%.1f')
+	if test == 'Proportions':
 
-	alternative = st.radio(
-	    label='Hypothesis',
-	    options=('One-sided', 'Two-sided'),
-	    index=1,
-	    key='pre-test')
+		control_conversion = st.number_input(
+			label='Baseline conversion rate (%)',
+			min_value=0.0,
+			max_value=100.0,
+			value=15.0,
+			step=0.1,
+			format='%.1f')
 
-	confidence_level = st.slider(
-	    label='Confidence level',
-	    min_value=70,
-	    max_value=99,
-	    value=95,
-	    format='%d%%',
-	    key='pre-test')
+		sensitivity = st.number_input(
+			label='Sensitivity (%)',
+			min_value=0.0,
+			value=10.0,
+			step=0.1,
+			format='%.1f')
 
-	power = st.slider(
-	    label='Power',
-	    min_value=70, 
-	    max_value=99,
-	    value=80,
-	    format='%d%%')
+		alternative = st.radio(
+		    label='Hypothesis',
+		    options=('One-sided', 'Two-sided'),
+		    index=1,
+		    key='pre-test')
 
-	# Format the variables according to the function requirements
-	control_conversion = control_conversion/100
-	sensitivity = sensitivity/100
-	treatment_conversion = control_conversion*(1 + sensitivity)
-	if alternative == 'One-sided':
-		alternative = 'smaller'
-	else:
-		alternative = 'two-sided'
-	confidence_level = confidence_level/100
-	alpha = 1 - confidence_level
-	power = power/100
+		confidence_level = st.slider(
+		    label='Confidence level',
+		    min_value=70,
+		    max_value=99,
+		    value=95,
+		    format='%d%%',
+		    key='pre-test')
 
-	if not(st.button('Calculate')):
-		st.stop()
+		power = st.slider(
+		    label='Power',
+		    min_value=70, 
+		    max_value=99,
+		    value=80,
+		    format='%d%%')
 
-	effect_size = sms.proportion_effectsize(control_conversion,
-										   treatment_conversion)
-	analysis = sms.TTestIndPower()
-	min_sample = math.ceil(analysis.solve_power(effect_size,
-												power=power,
-												alpha=alpha,
-												ratio=1,
-												alternative=alternative))
+		# Format the variables according to the function requirements
+		control_conversion = control_conversion/100
+		sensitivity = sensitivity/100
+		treatment_conversion = control_conversion*(1 + sensitivity)
+		if alternative == 'One-sided':
+			alternative = 'smaller'
+		else:
+			alternative = 'two-sided'
+		confidence_level = confidence_level/100
+		alpha = 1 - confidence_level
+		power = power/100
 
-	st.subheader(min_sample)
+		if not(st.button('Calculate')):
+			st.stop()
 
-	code = f'''
+		effect_size = sms.proportion_effectsize(control_conversion,
+											    treatment_conversion)
+		analysis = sms.TTestIndPower()
+		min_sample = math.ceil(analysis.solve_power(effect_size,
+													power=power,
+													alpha=alpha,
+													ratio=1,
+													alternative=alternative))
+
+		st.subheader('Result')
+		st.write(f'Minimum sample for the control group: {min_sample}')
+		st.write(f'Minimum sample for the treatment group: {min_sample}')
+		st.write(f'Total minimum sample for the experiment: {min_sample*2}')
+
+		code = f'''
 # Import the libraries
 import math
 import statsmodels.stats.api as sms
@@ -126,11 +137,117 @@ min_sample = math.ceil(analysis.solve_power(
 ))
 
 # Show the result
-print(min_sample)
+print(f'Minimum sample for the control group: {{min_sample}}')
+print(f'Minimum sample for the treatment group: {{min_sample}}')
+print(f'Total minimum sample for the experiment: {{min_sample*2}}')
 	'''
 
-	with st.expander('Show the code'):
-		st.code(code, language='python')
+		with st.expander('Show the code'):
+			st.code(code, language='python')
+
+	else:  # test == 'Means'
+
+		uploaded_file = st.file_uploader("Choose a file")
+		if uploaded_file is not None:
+		    dataframe = pd.read_csv(uploaded_file)
+		    st.write('File uploaded. Preview of the first 10 rows:')
+		    st.dataframe(dataframe.head(10), height=1000)
+		else:
+			st.write('The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:')
+			sample = pd.read_csv('data_sample.csv')
+			st.dataframe(sample, height=1000)
+
+		sensitivity = st.number_input(
+			label='Sensitivity (%)',
+			min_value=0.0,
+			value=10.0,
+			step=0.1,
+			format='%.1f')
+
+		confidence_level = st.slider(
+		    label='Confidence level',
+		    min_value=70,
+		    max_value=99,
+		    value=95,
+		    format='%d%%',
+		    key='pre-test')
+
+		power = st.slider(
+		    label='Power',
+		    min_value=70, 
+		    max_value=99,
+		    value=80,
+		    format='%d%%')
+
+		# Format the variables according to the function requirements
+		sensitivity = sensitivity/100
+		alternative = 'two-sided'
+		confidence_level = confidence_level/100
+		alpha = 1 - confidence_level
+		power = power/100
+		beta = 1 - power
+
+		if not(st.button('Calculate')):
+			st.stop()
+
+		control_users = dataframe[dataframe['group'] == 'control'].shape[0]
+		treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
+		total_users = (control_users + treatment_users)
+
+		std = dataframe[dataframe['group'] == 'control']['measurement'].std()
+		# std = 2
+
+		q0 = control_users/total_users
+		q1 = treatment_users/total_users
+		z_alpha = norm.ppf(1 - alpha/2)
+		z_beta = norm.ppf(1 - beta)
+		a = 1/q1 + 1/q0
+		b = pow(z_alpha + z_beta, 2)
+
+		min_sample = math.ceil(a*b/pow(sensitivity/std, 2))
+
+		st.subheader('Result')
+		st.write(f'Minimum sample for the control group: {min_sample}')
+		st.write(f'Minimum sample for the treatment group: {min_sample}')
+		st.write(f'Total minimum sample for the experiment: {min_sample*2}')
+
+		code = f'''
+# Import the libraries
+import math
+import pandas as pd
+from scipy.stats import norm
+
+# Define the parameters
+sensitivity = {sensitivity}
+alternative = 'two-sided'
+confidence_level = {confidence_level}
+alpha = 1 - confidence_level
+power = {power}
+beta = 1 - power
+
+# Count the users and get the standard deviation
+control_users = dataframe[dataframe['group'] == 'control'].shape[0]
+treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
+total_users = (control_users + treatment_users)
+std = dataframe[dataframe['group'] == 'control']['measurement'].std()
+
+# Calculate the minimum sample
+q0 = control_users/total_users
+q1 = treatment_users/total_users
+z_alpha = norm.ppf(1 - alpha/2)
+z_beta = norm.ppf(1 - beta)
+a = 1/q1 + 1/q0
+b = pow(z_alpha + z_beta, 2)
+min_sample = math.ceil(a*b/pow(sensitivity/std, 2))
+
+# Show the result
+print(f'Minimum sample for the control group: {{min_sample}}')
+print(f'Minimum sample for the treatment group: {{min_sample}}')
+print(f'Total minimum sample for the experiment: {{min_sample*2}}')
+	'''
+
+		with st.expander('Show the code'):
+			st.code(code, language='python')
 
 if option == 'Evaluate the statistical significance':
 	st.header('Statistical significance')
@@ -272,7 +389,7 @@ print(f'p-value: {{p_value:.2f}}')
 		with st.expander('Show the code'):
 			st.code(code, language='python')
 
-	else:
+	else:  # test == 'Means'
 
 		uploaded_file = st.file_uploader("Choose a file")
 		if uploaded_file is not None:
