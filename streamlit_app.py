@@ -1,3 +1,4 @@
+from PIL import Image
 import random
 import math
 import numpy as np
@@ -6,10 +7,12 @@ from scipy.stats import norm
 import statsmodels.stats.api as sms
 import streamlit as st
 
+page_icon = Image.open('images/favicon.png')
+
 # Set browser tab title, favicon and link to get help
 st.set_page_config(
     page_title='A/B Tester',
-    # page_icon=':heart:',
+    page_icon=page_icon,
     menu_items={
         'Get help': 'https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link',
         'Report a bug': 'https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.',
