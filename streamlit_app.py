@@ -39,7 +39,8 @@ if option == 'Calculate the minimum sample size':
 	test = st.radio(
 	    label='Test',
 	    options=('Proportions', 'Means'),
-	    index=0)
+	    index=0,
+	    key='sample-size')
 
 	if test == 'Proportions':
 
@@ -190,28 +191,32 @@ print(f'Total minimum sample for the experiment: {{min_sample*2}}')
 		if not(st.button('Calculate')):
 			st.stop()
 
-		control_users = dataframe[dataframe['group'] == 'control'].shape[0]
-		treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
-		total_users = (control_users + treatment_users)
+		if uploaded_file is None:
+			st.error('You must choose a file to be able to calculate the minimum sample.')
 
-		std = dataframe[dataframe['group'] == 'control']['measurement'].std()
-		# std = 2
+		else:
+			control_users = dataframe[dataframe['group'] == 'control'].shape[0]
+			treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
+			total_users = (control_users + treatment_users)
 
-		q0 = control_users/total_users
-		q1 = treatment_users/total_users
-		z_alpha = norm.ppf(1 - alpha/2)
-		z_beta = norm.ppf(1 - beta)
-		a = 1/q1 + 1/q0
-		b = pow(z_alpha + z_beta, 2)
+			std = dataframe[dataframe['group'] == 'control']['measurement'].std()
+			# std = 2
 
-		min_sample = math.ceil(a*b/pow(sensitivity/std, 2))
+			q0 = control_users/total_users
+			q1 = treatment_users/total_users
+			z_alpha = norm.ppf(1 - alpha/2)
+			z_beta = norm.ppf(1 - beta)
+			a = 1/q1 + 1/q0
+			b = pow(z_alpha + z_beta, 2)
 
-		st.subheader('Result')
-		st.write(f'Minimum sample for the control group: {min_sample}')
-		st.write(f'Minimum sample for the treatment group: {min_sample}')
-		st.write(f'Total minimum sample for the experiment: {min_sample*2}')
+			min_sample = math.ceil(a*b/pow(sensitivity/std, 2))
 
-		code = f'''
+			st.subheader('Result')
+			st.write(f'Minimum sample for the control group: {min_sample}')
+			st.write(f'Minimum sample for the treatment group: {min_sample}')
+			st.write(f'Total minimum sample for the experiment: {min_sample*2}')
+
+			code = f'''
 # Import the libraries
 import math
 import pandas as pd
@@ -246,8 +251,8 @@ print(f'Minimum sample for the treatment group: {{min_sample}}')
 print(f'Total minimum sample for the experiment: {{min_sample*2}}')
 	'''
 
-		with st.expander('Show the code'):
-			st.code(code, language='python')
+			with st.expander('Show the code'):
+				st.code(code, language='python')
 
 if option == 'Evaluate the statistical significance':
 	st.header('Statistical significance')
@@ -261,7 +266,8 @@ if option == 'Evaluate the statistical significance':
 	test = st.radio(
 	    label='Test',
 	    options=('Proportions', 'Means'),
-	    index=0)
+	    index=0,
+	    key='statistical-significance')
 
 	if test == 'Proportions':
 
@@ -280,13 +286,13 @@ if option == 'Evaluate the statistical significance':
 		control_conversions = st.number_input(
 			label='Conversions from the control',
 			min_value=0,
-			value=1219,
+			value=1215,
 			step=1)
 
 		treatment_conversions = st.number_input(
 			label='Conversions from the treatment',
 			min_value=0,
-			value=1247,
+			value=1294,
 			step=1)
 
 		confidence_level = st.slider(
@@ -312,7 +318,7 @@ if option == 'Evaluate the statistical significance':
 		conversion = pd.Series(conversion)
 
 		perm_diffs = []
-		i = 100
+		i = 1000
 		my_bar = st.progress(0)
 		for percent_complete in range(i):
 			perm_diffs.append(perm_fun(
@@ -415,37 +421,41 @@ print(f'p-value: {{p_value:.2f}}')
 		if not(st.button('Calculate')):
 			st.stop()
 
-		measurements = dataframe['measurement']
-		control_users = dataframe[dataframe['group'] == 'control'].shape[0]
-		treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
+		if uploaded_file is None:
+			st.error('You must choose a file to be able to calculate the statistical significance.')
 
-		control_mean = dataframe[dataframe['group'] == 'control']['measurement'].mean()
-		treatment_mean = dataframe[dataframe['group'] == 'treatment']['measurement'].mean()
-		observed_diff = treatment_mean - control_mean
-
-		perm_diffs = []
-		i = 100
-		my_bar = st.progress(0)
-		for percent_complete in range(i):
-			perm_diffs.append(perm_fun(
-				measurements,
-				control_users,
-				treatment_users))
-			my_bar.progress((percent_complete + 1)/i)
-
-		p_value = np.mean(perm_diffs > observed_diff)
-
-		st.subheader('Result')
-		if p_value <= alpha:
-			st.success('The difference is statistically significant')
 		else:
-			st.error('The difference is not statistically significant')
-		st.write(f'Control mean: {control_mean:.2f}')
-		st.write(f'Treatment mean: {treatment_mean:.2f}')
-		st.write(f'Observed difference: {observed_diff/control_mean:+.2%}')
-		st.write(f'p-value: {p_value:.2f}')
+			measurements = dataframe['measurement']
+			control_users = dataframe[dataframe['group'] == 'control'].shape[0]
+			treatment_users = dataframe[dataframe['group'] == 'treatment'].shape[0]
 
-		code = f'''
+			control_mean = dataframe[dataframe['group'] == 'control']['measurement'].mean()
+			treatment_mean = dataframe[dataframe['group'] == 'treatment']['measurement'].mean()
+			observed_diff = treatment_mean - control_mean
+
+			perm_diffs = []
+			i = 1000
+			my_bar = st.progress(0)
+			for percent_complete in range(i):
+				perm_diffs.append(perm_fun(
+					measurements,
+					control_users,
+					treatment_users))
+				my_bar.progress((percent_complete + 1)/i)
+
+			p_value = np.mean(perm_diffs > observed_diff)
+
+			st.subheader('Result')
+			if p_value <= alpha:
+				st.success('The difference is statistically significant')
+			else:
+				st.error('The difference is not statistically significant')
+			st.write(f'Control mean: {control_mean:.2f}')
+			st.write(f'Treatment mean: {treatment_mean:.2f}')
+			st.write(f'Observed difference: {observed_diff/control_mean:+.2%}')
+			st.write(f'p-value: {p_value:.2f}')
+
+			code = f'''
 # Import the libraries
 import random
 import numpy as np
@@ -494,5 +504,5 @@ print(f'Observed difference: {{observed_diff/control_mean:+.2%}}')
 print(f'p-value: {{p_value:.2f}}')
 		'''
 
-		with st.expander('Show the code'):
-			st.code(code, language='python')
+			with st.expander('Show the code'):
+				st.code(code, language='python')
