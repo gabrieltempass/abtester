@@ -36,6 +36,19 @@ option = st.selectbox(
      'Calculate the minimum sample size',
      'Evaluate the statistical significance'))
 
+help_test = """A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when converts it is one).
+
+A means test is when the data is continuous. For example: the time spent in a web page."""
+help_control_conversion = 'The conversion rate expected for the control. To help you set this value, you could use similar historical data. However, if that it is not available, make a guess based on your experience.'
+help_sensitivity = 'The minimum effect size that you want to be able to measure. A rule of thumb is to use 10% (meaning that you want to be able to detect at least a 10% difference for the treatment over the control).'
+help_alternative = 'A one-sided hypothesis is to test whether one group has distribution greater then the other. While a two-sided is to test whether one group has distribution smaller or greater then the other. If you are not sure about which one to use, choose the two-sided (more conservative).'
+help_confidence_level = 'The probability of detecting a true negative. That is, detecting that there is not a statistically significant difference between the control and the treatment, when this difference indeed does not exists. A rule of thumb is to use 95%.'
+help_power = 'The probability of detecting a true positive. That is, detecting that there is a statistically significant difference between the control and the treatment, when this difference indeed exists. A rule of thumb is to use 80%.'
+help_control_users = 'The number of users in the control group.'
+help_treatment_users = 'The number of users in the treatment group.'
+help_control_conversions = 'The number of users in the control group that converted. For example, if the control group received an email, the conversions could the number of users that clicked in an ad inside it.'
+help_treatment_conversions = 'The number of users in the treatment group that converted. For example, if the treatment group received an email, the conversions could the number of users that clicked in an ad inside it.'
+
 if option == 'Calculate the minimum sample size':
 	st.header('Sample size')
 
@@ -43,7 +56,8 @@ if option == 'Calculate the minimum sample size':
 	    label='Test',
 	    options=('Proportions', 'Means'),
 	    index=0,
-	    key='sample-size')
+	    key='sample-size',
+	    help=help_test)
 
 	if test == 'Proportions':
 
@@ -53,20 +67,23 @@ if option == 'Calculate the minimum sample size':
 			max_value=100.0,
 			value=15.0,
 			step=0.1,
-			format='%.1f')
+			format='%.1f',
+			help=help_control_conversion)
 
 		sensitivity = st.number_input(
 			label='Sensitivity (%)',
 			min_value=0.0,
 			value=10.0,
 			step=0.1,
-			format='%.1f')
+			format='%.1f',
+			help=help_sensitivity)
 
 		alternative = st.radio(
 		    label='Hypothesis',
 		    options=('One-sided', 'Two-sided'),
 		    index=1,
-		    key='pre-test')
+		    key='pre-test',
+		    help=help_alternative)
 
 		confidence_level = st.slider(
 		    label='Confidence level',
@@ -74,14 +91,16 @@ if option == 'Calculate the minimum sample size':
 		    max_value=99,
 		    value=95,
 		    format='%d%%',
-		    key='pre-test')
+		    key='pre-test',
+		    help=help_confidence_level)
 
 		power = st.slider(
 		    label='Power',
 		    min_value=70, 
 		    max_value=99,
 		    value=80,
-		    format='%d%%')
+		    format='%d%%',
+		    help=help_power)
 
 		# Format the variables according to the function requirements
 		control_conversion = control_conversion/100
@@ -166,7 +185,8 @@ print(f'Total minimum sample for the experiment: {{min_sample*2}}')
 			min_value=0.0,
 			value=10.0,
 			step=0.1,
-			format='%.1f')
+			format='%.1f',
+			help=help_sensitivity)
 
 		confidence_level = st.slider(
 		    label='Confidence level',
@@ -174,14 +194,16 @@ print(f'Total minimum sample for the experiment: {{min_sample*2}}')
 		    max_value=99,
 		    value=95,
 		    format='%d%%',
-		    key='pre-test')
+		    key='pre-test',
+		    help=help_confidence_level)
 
 		power = st.slider(
 		    label='Power',
 		    min_value=70, 
 		    max_value=99,
 		    value=80,
-		    format='%d%%')
+		    format='%d%%',
+		    help=help_power)
 
 		# Format the variables according to the function requirements
 		sensitivity = sensitivity/100
@@ -270,7 +292,8 @@ if option == 'Evaluate the statistical significance':
 	    label='Test',
 	    options=('Proportions', 'Means'),
 	    index=0,
-	    key='statistical-significance')
+	    key='statistical-significance',
+	    help=help_test)
 
 	if test == 'Proportions':
 
@@ -278,25 +301,29 @@ if option == 'Evaluate the statistical significance':
 			label='Users in the control',
 			min_value=0,
 			value=30000,
-			step=1)
+			step=1,
+			help=help_control_users)
 
 		treatment_users = st.number_input(
 			label='Users in the treatment',
 			min_value=0,
 			value=30000,
-			step=1)
+			step=1,
+			help=help_treatment_users)
 
 		control_conversions = st.number_input(
 			label='Conversions from the control',
 			min_value=0,
 			value=1215,
-			step=1)
+			step=1,
+			help=help_control_conversions)
 
 		treatment_conversions = st.number_input(
 			label='Conversions from the treatment',
 			min_value=0,
 			value=1294,
-			step=1)
+			step=1,
+			help=help_treatment_conversions)
 
 		confidence_level = st.slider(
 		    label='Confidence level',
@@ -304,7 +331,8 @@ if option == 'Evaluate the statistical significance':
 		    max_value=99,
 		    value=95,
 		    format='%d%%',
-		    key='post-test')
+		    key='post-test',
+		    help=help_confidence_level)
 
 		confidence_level = confidence_level/100
 		alpha = 1 - confidence_level
@@ -416,7 +444,8 @@ print(f'p-value: {{p_value:.2f}}')
 		    max_value=99,
 		    value=95,
 		    format='%d%%',
-		    key='post-test')
+		    key='post-test',
+		    help=help_confidence_level)
 
 		confidence_level = confidence_level/100
 		alpha = 1 - confidence_level
