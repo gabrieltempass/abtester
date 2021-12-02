@@ -36,12 +36,10 @@ option = st.selectbox(
      'Calculate the minimum sample size',
      'Evaluate the statistical significance'))
 
-help_test = """A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when converts it is one).
-
-A means test is when the data is continuous. For example: the time spent in a web page."""
+help_test = 'A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when he or she converts it is a one).\n\nA means test is when the data is continuous. For example: the time spent in a web page.'
 help_control_conversion = 'The conversion rate expected for the control. To help you set this value, you could use similar historical data. However, if that it is not available, make a guess based on your experience.'
 help_sensitivity = 'The minimum effect size that you want to be able to measure. A rule of thumb is to use 10% (meaning that you want to be able to detect at least a 10% difference for the treatment over the control).'
-help_alternative = 'A one-sided hypothesis is to test whether one group has distribution greater then the other. While a two-sided is to test whether one group has distribution smaller or greater then the other. If you are not sure about which one to use, choose the two-sided (more conservative).'
+help_alternative = 'A one-sided hypothesis is to test whether one group has a distribution greater then the other. While a two-sided is to test whether one group has a distribution smaller or greater then the other. If you are not sure about which one to use, choose the two-sided (more conservative).'
 help_confidence_level = 'The probability of detecting a true negative. That is, detecting that there is not a statistically significant difference between the control and the treatment, when this difference indeed does not exists. A rule of thumb is to use 95%.'
 help_power = 'The probability of detecting a true positive. That is, detecting that there is a statistically significant difference between the control and the treatment, when this difference indeed exists. A rule of thumb is to use 80%.'
 help_control_users = 'The number of users in the control group.'
