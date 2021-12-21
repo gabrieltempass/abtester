@@ -59,11 +59,7 @@ for _ in range(1000):
     ))
 
 # Calculate the p-value
-{% if test == 'Proportions' %}
 p_value = np.mean([diff > observed_diff for diff in perm_diffs])
-{% elif test == 'Means' %}
-p_value = np.mean(perm_diffs > observed_diff)
-{% endif %}
 
 # Show the result
 if p_value <= alpha:
