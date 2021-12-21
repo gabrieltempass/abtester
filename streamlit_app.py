@@ -451,7 +451,7 @@ if option == 'Evaluate the statistical significance':
 					treatment_users))
 				my_bar.progress((percent_complete + 1)/i)
 
-			p_value = np.mean(perm_diffs > observed_diff)
+			p_value = np.mean([diff > observed_diff for diff in perm_diffs])
 
 			st.subheader('Result')
 			if p_value <= alpha:
