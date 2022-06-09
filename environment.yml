@@ -10,4 +10,4 @@ dependencies:
   - python=3.7.9
   - statsmodels=0.13.1
   - pip:
-    - streamlit==1.8.1
+    - streamlit==1.10.0
