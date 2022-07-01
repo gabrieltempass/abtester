@@ -22,6 +22,7 @@ def beta(power):
 
 
 # def proportion_ttest(control_conversion, treatment_conversion, power, alpha, alternative):
+#   # Cohen's h
 # 	effect_size = sms.proportion_effectsize(control_conversion,
 # 										    treatment_conversion)
 # 	analysis = sms.TTestIndPower()
@@ -125,6 +126,7 @@ if option == "Calculate the minimum sample size":
         options=("Proportions", "Means"),
         index=0,
         key="sample-size",
+        horizontal=True,
         help=description["test"],
     )
 
@@ -137,6 +139,7 @@ if option == "Calculate the minimum sample size":
             value=15.0,
             step=0.1,
             format="%.1f",
+            # format="%d%%",
             help=description["control_conversion"],
         )
 
@@ -149,11 +152,18 @@ if option == "Calculate the minimum sample size":
             help=description["sensitivity"],
         )
 
+        alternative_options = {
+            "smaller": "One-sided",
+            "two-sided": "Two-sided",
+        }
+
         alternative = st.radio(
             label="Hypothesis",
-            options=("One-sided", "Two-sided"),
+            options=("smaller", "two-sided"),
             index=1,
             key="pre-test",
+            horizontal=True,
+            format_func=lambda x: alternative_options.get(x),
             help=description["alternative"],
         )
 
@@ -180,10 +190,6 @@ if option == "Calculate the minimum sample size":
         control_conversion = percentage(control_conversion)
         sensitivity = percentage(sensitivity)
         treatment_conversion = control_conversion * (1 + sensitivity)
-        if alternative == "One-sided":
-            alternative = "smaller"
-        else:
-            alternative = "two-sided"
         confidence_level = percentage(confidence_level)
         alpha = alpha(confidence_level)
         power = percentage(power)
