@@ -21,41 +21,19 @@ def beta(power):
     return 1 - power
 
 
-# def proportion_ttest(control_conversion, treatment_conversion, power, alpha, alternative):
-#   # Cohen's h
-# 	effect_size = sms.proportion_effectsize(control_conversion,
-# 										    treatment_conversion)
-# 	analysis = sms.TTestIndPower()
-# 	sample = math.ceil(analysis.solve_power(
-# 		effect_size,
-# 		power=power,
-# 		alpha=alpha,
-# 		ratio=1,
-# 		alternative=alternative
-# 	))
-
-# def mean_ztest(df, sensitivity, alpha, beta):
-# 	control_users = df[df['group'] == 'control'].shape[0]
-# 	treatment_users = df[df['group'] == 'treatment'].shape[0]
-# 	total_users = (control_users + treatment_users)
-# 	std = df[df['group'] == 'control']['measurement'].std()
-
-# 	q0 = control_users/total_users
-# 	q1 = treatment_users/total_users
-# 	z_alpha = norm.ppf(1 - alpha/2)
-# 	z_beta = norm.ppf(1 - beta)
-# 	a = 1/q1 + 1/q0
-# 	b = pow(z_alpha + z_beta, 2)
-
-# 	sample = math.ceil(a*b/pow(sensitivity/std, 2))
-# 	return sample
-
-# def calculate_sample(test):
-# 	if test == 'Proportions':
-# 		sample = proportion_ttest()
-# 	elif test == 'Means':
-# 		sample = mean_ztest()
-# 	return sample
+def proportion_ttest(control_conversion, treatment_conversion, alternative, alpha, power):
+    # Cohen's h
+    effect_size = sms.proportion_effectsize(control_conversion,
+                                            treatment_conversion)
+    analysis = sms.TTestIndPower()
+    sample = math.ceil(analysis.solve_power(
+        effect_size,
+        alternative=alternative,
+        alpha=alpha,
+        power=power,
+        ratio=1,
+    ))
+    return sample
 
 
 def permutation(x, nA, nB):
@@ -63,6 +41,31 @@ def permutation(x, nA, nB):
     idx_A = set(random.sample(range(n), nB))
     idx_B = set(range(n)) - idx_A
     return x.loc[idx_B].mean() - x.loc[idx_A].mean()
+
+
+# def mean_ztest(df, sensitivity, alpha, beta):
+# 	control_users = df[df['group'] == 'control'].shape[0]
+# 	treatment_users = df[df['group'] == 'treatment'].shape[0]
+# 	total_users = (control_users + treatment_users)
+# 	std = df[df['group'] == 'control']['measurement'].std()
+#   
+# 	q0 = control_users/total_users
+# 	q1 = treatment_users/total_users
+# 	z_alpha = norm.ppf(1 - alpha/2)
+# 	z_beta = norm.ppf(1 - beta)
+# 	a = 1/q1 + 1/q0
+# 	b = pow(z_alpha + z_beta, 2)
+#   
+# 	sample = math.ceil(a*b/pow(sensitivity/std, 2))
+# 	return sample
+
+
+# def calculate_sample(test):
+# 	if test == 'Proportions':
+# 		sample = proportion_ttest()
+# 	elif test == 'Means':
+# 		sample = mean_ztest()
+# 	return sample
 
 
 # def evaluate_significance():
@@ -132,30 +135,28 @@ if option == "Calculate the minimum sample size":
 
     if test == "Proportions":
 
-        control_conversion = st.number_input(
-            label="Baseline conversion rate (%)",
-            min_value=0.0,
-            max_value=100.0,
-            value=15.0,
-            step=0.1,
-            format="%.1f",
-            # format="%d%%",
-            help=description["control_conversion"],
+        control_conversion = percentage(
+            st.number_input(
+                label="Baseline conversion rate (%)",
+                min_value=0.0,
+                max_value=100.0,
+                value=15.0,
+                step=0.1,
+                format="%.1f",
+                help=description["control_conversion"],
+            )
         )
 
-        sensitivity = st.number_input(
-            label="Sensitivity (%)",
-            min_value=0.0,
-            value=10.0,
-            step=0.1,
-            format="%.1f",
-            help=description["sensitivity"],
+        sensitivity = percentage(
+            st.number_input(
+                label="Sensitivity (%)",
+                min_value=0.0,
+                value=10.0,
+                step=0.1,
+                format="%.1f",
+                help=description["sensitivity"],
+            )
         )
-
-        alternative_options = {
-            "smaller": "One-sided",
-            "two-sided": "Two-sided",
-        }
 
         alternative = st.radio(
             label="Hypothesis",
@@ -163,48 +164,45 @@ if option == "Calculate the minimum sample size":
             index=1,
             key="pre-test",
             horizontal=True,
-            format_func=lambda x: alternative_options.get(x),
+            format_func=lambda x: {"smaller": "One-sided", "two-sided": "Two-sided"}.get(x),
             help=description["alternative"],
         )
 
-        confidence_level = st.slider(
-            label="Confidence level",
-            min_value=70,
-            max_value=99,
-            value=95,
-            format="%d%%",
-            key="pre-test",
-            help=description["confidence_level"],
+        confidence_level = percentage(
+            st.slider(
+                label="Confidence level",
+                min_value=70,
+                max_value=99,
+                value=95,
+                format="%d%%",
+                key="pre-test",
+                help=description["confidence_level"],
+            )
         )
 
-        power = st.slider(
-            label="Power",
-            min_value=70,
-            max_value=99,
-            value=80,
-            format="%d%%",
-            help=description["power"],
+        power = percentage(
+            st.slider(
+                label="Power",
+                min_value=70,
+                max_value=99,
+                value=80,
+                format="%d%%",
+                help=description["power"],
+            )
         )
 
-        # Format the variables according to the function requirements
-        control_conversion = percentage(control_conversion)
-        sensitivity = percentage(sensitivity)
         treatment_conversion = control_conversion * (1 + sensitivity)
-        confidence_level = percentage(confidence_level)
         alpha = alpha(confidence_level)
-        power = percentage(power)
 
         if not (st.button("Calculate")):
             st.stop()
 
-        effect_size = sms.proportion_effectsize(
-            control_conversion, treatment_conversion
-        )
-        analysis = sms.TTestIndPower()
-        sample = math.ceil(
-            analysis.solve_power(
-                effect_size, power=power, alpha=alpha, ratio=1, alternative=alternative
-            )
+        sample = proportion_ttest(
+            control_conversion=control_conversion,
+            treatment_conversion=treatment_conversion,
+            alternative=alternative,
+            alpha=alpha,
+            power=power
         )
 
         st.subheader("Result")
