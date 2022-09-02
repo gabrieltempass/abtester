@@ -175,7 +175,7 @@ if option == "Calculate the minimum sample size":
                 max_value=99,
                 value=95,
                 format="%d%%",
-                key="pre-test",
+                key="pre-test-proportions",
                 help=description["confidence_level"],
             )
         )
@@ -250,7 +250,7 @@ if option == "Calculate the minimum sample size":
             max_value=99,
             value=95,
             format="%d%%",
-            key="pre-test",
+            key="pre-test-means",
             help=description["confidence_level"],
         )
 
@@ -363,7 +363,7 @@ if option == "Evaluate the statistical significance":
             max_value=99,
             value=95,
             format="%d%%",
-            key="post-test",
+            key="post-test-proportions",
             help=description["confidence_level"],
         )
 
@@ -439,7 +439,7 @@ if option == "Evaluate the statistical significance":
             max_value=99,
             value=95,
             format="%d%%",
-            key="post-test",
+            key="post-test-means",
             help=description["confidence_level"],
         )
 
