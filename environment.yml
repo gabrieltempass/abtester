@@ -2,7 +2,6 @@ name: ab-tester
 channels:
   - defaults
 dependencies:
-  - python=3.8
   - scipy=1.7.3
   - statsmodels=0.13.2
   - pandas=1.4.2
