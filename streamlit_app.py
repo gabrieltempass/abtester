@@ -320,6 +320,7 @@ if option == "Evaluate the statistical significance":
         options=("Proportions", "Means"),
         index=0,
         key="statistical-significance",
+        horizontal=True,
         help=description["test"],
     )
 
