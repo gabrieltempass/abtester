@@ -2,10 +2,8 @@ name: ab-tester
 channels:
   - defaults
 dependencies:
-  - statsmodels=0.13.2
-  - pandas=1.4.3
-  - pip=22.1.2
-  - python=3.8
+  - statsmodels
+  - pandas
   - pip:
-    - streamlit==1.12.2
-    - scipy==1.9.1
+    - streamlit
+    - scipy
