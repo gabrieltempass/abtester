@@ -22,13 +22,14 @@
   .then(function (){
     return Promise.resolve(true)
   
-    .then( function(){return logger.log(1,"Open URL https://gabrieltempass-ab-tester-streamlit-app-ko7u9p.streamlitapp.com/","Sample Size for Proportions"),$browser.get("https://gabrieltempass-ab-tester-streamlit-app-ko7u9p.streamlitapp.com/").then(e=>e)})
+    .then( function(){return logger.log(1,"Open URL https://abtester.app/","Sample Size for Proportions"),$browser.get("https://abtester.app/").then(e=>e)})
     .then( function(){return logger.log(2,"Set Window Size Width=1440 Height=875","Sample Size for Proportions"),$browser.manage().window().setSize(1440,875).then(e=>e)})
-    .then( function(){return logger.log(3,"Switch to Frame Index 0","Sample Size for Proportions"),Promise.resolve($browser.switchTo().frame(0))})
-    .then( function(){return logger.log(4,"Click By.css(\".st-bw\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css(".st-bw"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
-    .then( function(){return logger.log(5,"Click By.css(\"#bui-8__anchor .css-8ojfln\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css("#bui-8__anchor .css-8ojfln"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
+    .then( function(){return logger.log(3,"Waiting 5 seconds to load the web app","Sample Size for Proportions"),$webDriver.sleep(5000)})
+    .then( function(){return logger.log(4,"Switch to Frame Index 0","Sample Size for Proportions"),Promise.resolve($browser.switchTo().frame(0))})
+    .then( function(){return logger.log(5,"Click By.css(\".st-bw\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css(".st-bw"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
+    .then( function(){return logger.log(6,"Click By.css(\"#bui-8__anchor .css-8ojfln\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css("#bui-8__anchor .css-8ojfln"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
     // reusable RUN() scripts not supported
-    .then( function(){return logger.log(6,"Click By.css(\".css-z2nz7u\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css(".css-z2nz7u"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
+    .then( function(){return logger.log(7,"Click By.css(\".css-z2nz7u\")","Sample Size for Proportions"),$browser.waitForAndFindElement(By.css(".css-z2nz7u"),DefaultTimeout).then(e=>(e.click(),Promise.resolve(!0)))})
     // reusable RUN() scripts not supported
     .then(function() {
       logger.endTestCase("Sample Size for Proportions");
@@ -38,4 +39,4 @@
     });
   
   })
-  
+
