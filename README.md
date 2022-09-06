@@ -6,7 +6,7 @@ A web application to help design and evaluate the results of A/B tests.
 
 ## Useful links
 
-- A/B Tester: https://share.streamlit.io/gabrieltempass/ab-tester
+- A/B Tester: https://abtester.app
 - Get help: [https://gitter.im/ab-tester-app/community](https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 - Report a bug: [https://github.com/gabrieltempass/ab-tester/issues/new](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here)
 
