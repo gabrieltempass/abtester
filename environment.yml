@@ -1,9 +1,0 @@
-name: ab-tester
-channels:
-  - defaults
-dependencies:
-  - statsmodels
-  - pandas
-  - pip:
-    - streamlit
-    - scipy
