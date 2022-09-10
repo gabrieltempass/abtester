@@ -22,13 +22,13 @@ git clone git@github.com:gabrieltempass/ab-tester.git
 3. Create the environment:
 
 ```
-conda env create -f environment.yml
+pipenv install
 ```
 
 4. Activate the environment:
 
 ```
-conda activate ab-tester
+pipenv shell
 ```
 
 5. Run the application:
