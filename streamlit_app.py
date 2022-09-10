@@ -70,17 +70,19 @@ def permutation(x, nA, nB):
 
 # def evaluate_significance():
 
+# Set browser tab title, favicon and menu options
+about = """
+This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).
 
-page_icon = Image.open("images/favicon.png")
-
-# Set browser tab title, favicon and link to get help
+If you would like to provide feedback, learn more about the A/B Tester, or anything else, feel free to send an email to contact@abtester.app.
+"""
 st.set_page_config(
     page_title="A/B Tester",
-    page_icon=page_icon,
+    page_icon=Image.open("images/favicon.png"),
     menu_items={
         "Get help": "https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link",
         "Report a bug": "https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.",
-        "About": "This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).",
+        "About": about,
     },
 )
 
