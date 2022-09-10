@@ -229,13 +229,13 @@ if option == "Calculate the minimum sample size":
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
             st.write("File uploaded. Preview of the first 10 rows:")
-            st.dataframe(df.head(10), height=1000)
+            st.table(df.head(10))
         else:
             st.write(
                 'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
             )
             data_sample = pd.read_csv("data_sample.csv")
-            st.dataframe(data_sample, height=1000)
+            st.table(data_sample)
 
         sensitivity = st.number_input(
             label="Sensitivity (%)",
@@ -428,13 +428,13 @@ if option == "Evaluate the statistical significance":
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
             st.write("File uploaded. Preview of the first 10 rows:")
-            st.dataframe(df.head(10), height=1000)
+            st.table(df.head(10))
         else:
             st.write(
                 'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
             )
             data_sample = pd.read_csv("data_sample.csv")
-            st.dataframe(data_sample, height=1000)
+            st.table(data_sample)
 
         confidence_level = st.slider(
             label="Confidence level",
