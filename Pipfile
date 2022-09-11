@@ -9,6 +9,7 @@ scipy = "==1.7.3"
 statsmodels = "==0.13.2"
 
 [dev-packages]
+jupyterlab = "*"
 
 [requires]
 python_version = "3.9"
