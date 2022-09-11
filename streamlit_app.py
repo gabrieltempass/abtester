@@ -13,12 +13,33 @@ def percentage(number):
     return number / 100
 
 
-def alpha(confidence_level):
+def get_alpha(confidence_level):
     return 1 - confidence_level
 
 
-def beta(power):
+def get_beta(power):
     return 1 - power
+
+
+def calculate_proportions_sample(
+    control_conversion,
+    sensitivity,
+    alternative,
+    confidence_level,
+    power,
+):
+    treatment_conversion = control_conversion * (1 + sensitivity)
+    alpha = get_alpha(confidence_level)
+
+    treatment_sample = proportion_ttest(
+        control_conversion=control_conversion,
+        treatment_conversion=treatment_conversion,
+        alternative=alternative,
+        alpha=alpha,
+        power=power,
+    )
+    control_sample = treatment_sample
+    return control_sample, treatment_sample
 
 
 def proportion_ttest(control_conversion, treatment_conversion, alternative, alpha, power):
@@ -36,7 +57,7 @@ def proportion_ttest(control_conversion, treatment_conversion, alternative, alph
     return sample
 
 
-def show_min_sample_result(control_sample, treatment_sample):
+def show_sample_result(control_sample, treatment_sample):
     st.subheader("Result")
     st.write(f"Minimum sample for the control group: {control_sample}")
     st.write(f"Minimum sample for the treatment group: {treatment_sample}")
@@ -237,22 +258,21 @@ if option == "Calculate the minimum sample size":
             )
         )
 
-        treatment_conversion = control_conversion * (1 + sensitivity)
-        alpha = alpha(confidence_level)
+        # treatment_conversion = control_conversion * (1 + sensitivity)
+        # alpha = get_alpha(confidence_level)
 
         if not (st.button("Calculate")):
             st.stop()
 
-        treatment_sample = proportion_ttest(
+        control_sample, treatment_sample = calculate_proportions_sample(
             control_conversion=control_conversion,
-            treatment_conversion=treatment_conversion,
+            sensitivity=sensitivity,
             alternative=alternative,
-            alpha=alpha,
+            confidence_level=confidence_level,
             power=power
         )
-        control_sample = treatment_sample
 
-        show_min_sample_result(control_sample, treatment_sample)
+        show_sample_result(control_sample, treatment_sample)
 
         code = template.render(
             test=test,
@@ -306,7 +326,7 @@ if option == "Calculate the minimum sample size":
             format="%.1f",
             help=description["control_ratio"],
         )
-        
+
         treatment_ratio = col2.number_input(
             label="Treatment ratio (%)",
             min_value=0.1,
@@ -351,9 +371,9 @@ if option == "Calculate the minimum sample size":
             # Format the variables according to the function requirements
             sensitivity = percentage(sensitivity)
             confidence_level = percentage(confidence_level)
-            alpha = alpha(confidence_level)
+            alpha = get_alpha(confidence_level)
             power = percentage(power)
-            beta = beta(power)
+            beta = get_beta(power)
             control_ratio = percentage(control_ratio)
             treatment_ratio = percentage(treatment_ratio)
 
@@ -366,7 +386,7 @@ if option == "Calculate the minimum sample size":
             control_sample = math.ceil(total_sample * control_ratio)
             treatment_sample = math.ceil(total_sample * treatment_ratio)
 
-            show_min_sample_result(control_sample, treatment_sample)
+            show_sample_result(control_sample, treatment_sample)
 
             code = template.render(
                 test=test,
@@ -437,7 +457,7 @@ if option == "Evaluate the statistical significance":
         )
 
         confidence_level = percentage(confidence_level)
-        alpha = alpha(confidence_level)
+        alpha = get_alpha(confidence_level)
 
         if not (st.button("Calculate")):
             st.stop()
@@ -529,7 +549,7 @@ if option == "Evaluate the statistical significance":
 
         else:
             confidence_level = percentage(confidence_level)
-            alpha = alpha(confidence_level)
+            alpha = get_alpha(confidence_level)
 
             measurements = df["measurement"]
             control_users = df[df["group"] == "control"].shape[0]
