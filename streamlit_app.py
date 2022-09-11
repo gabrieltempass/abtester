@@ -36,6 +36,48 @@ def proportion_ttest(control_conversion, treatment_conversion, alternative, alph
     return sample
 
 
+def show_min_sample_result(control_sample, treatment_sample):
+    st.subheader("Result")
+    st.write(f"Minimum sample for the control group: {control_sample}")
+    st.write(f"Minimum sample for the treatment group: {treatment_sample}")
+    st.write(f"Total minimum sample for the experiment: {control_sample + treatment_sample}")
+
+
+def show_file_summary(df, option):
+    st.write("**File summary**")
+    st.write(f"Size: {df.shape[0]} rows and {df.shape[1]} columns")
+
+    if option == "Evaluate the statistical significance":
+        control_users = df[df["group"] == "control"].shape[0]
+        treatment_users = df[df["group"] == "treatment"].shape[0]
+        total_users = control_users + treatment_users
+
+        control_ratio = control_users / total_users
+        treatment_ratio = treatment_users / total_users
+        st.write(f"Ratio: {control_users} control users ({control_ratio:.2%}) and {treatment_users} treatment users ({treatment_ratio:.2%})")
+
+    st.write("Preview of the first 5 rows:")
+    st.table(df.head(5))
+    st.write("And the last 5 rows:")
+    st.table(df.tail(5))
+
+
+def show_download_button(name, path, file):
+    df = pd.read_csv(path+file)
+    df = convert_df(df)
+    st.download_button(
+        label=f"Download {name}",
+        data=df,
+        file_name=file,
+        mime="text/csv",
+    )
+
+
+@st.cache
+def convert_df(df):
+    return df.to_csv(index=False).encode("utf-8")
+
+
 def permutation(x, nA, nB):
     n = nA + nB
     idx_A = set(random.sample(range(n), nB))
@@ -116,6 +158,8 @@ description = {
     "treatment_users": "The number of users in the treatment group.",
     "control_conversions": "The number of users in the control group that converted. For example, if the control group received an email, the conversions could the number of users that clicked in an ad inside it.",
     "treatment_conversions": "The number of users in the treatment group that converted. For example, if the treatment group received an email, the conversions could the number of users that clicked in an ad inside it.",
+    "control_ratio": "The percentage of users from the entire experiment who are part of the control group.",
+    "treatment_ratio": "The percentage of users from the entire experiment who are part of the treatment group.",
 }
 
 loader = FileSystemLoader("templates")
@@ -199,18 +243,16 @@ if option == "Calculate the minimum sample size":
         if not (st.button("Calculate")):
             st.stop()
 
-        sample = proportion_ttest(
+        treatment_sample = proportion_ttest(
             control_conversion=control_conversion,
             treatment_conversion=treatment_conversion,
             alternative=alternative,
             alpha=alpha,
             power=power
         )
+        control_sample = treatment_sample
 
-        st.subheader("Result")
-        st.write(f"Minimum sample for the control group: {sample}")
-        st.write(f"Minimum sample for the treatment group: {sample}")
-        st.write(f"Total minimum sample for the experiment: {sample*2}")
+        show_min_sample_result(control_sample, treatment_sample)
 
         code = template.render(
             test=test,
@@ -224,18 +266,6 @@ if option == "Calculate the minimum sample size":
             st.code(code, language="python")
 
     elif test == "Means":
-
-        uploaded_file = st.file_uploader("Choose a file")
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-            st.write("File uploaded. Preview of the first 10 rows:")
-            st.table(df.head(10))
-        else:
-            st.write(
-                'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
-            )
-            data_sample = pd.read_csv("data_sample.csv")
-            st.table(data_sample)
 
         sensitivity = st.number_input(
             label="Sensitivity (%)",
@@ -265,13 +295,47 @@ if option == "Calculate the minimum sample size":
             help=description["power"],
         )
 
-        # Format the variables according to the function requirements
-        sensitivity = percentage(sensitivity)
-        alternative = "two-sided"
-        confidence_level = percentage(confidence_level)
-        alpha = alpha(confidence_level)
-        power = percentage(power)
-        beta = beta(power)
+        col1, col2 = st.columns(2)
+
+        control_ratio = col1.number_input(
+            label="Control ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=50.0,
+            step=0.1,
+            format="%.1f",
+            help=description["control_ratio"],
+        )
+        
+        treatment_ratio = col2.number_input(
+            label="Treatment ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=100.0 - control_ratio,
+            step=0.1,
+            format="%.1f",
+            help=description["treatment_ratio"],
+            disabled=True,
+        )
+
+        uploaded_file = st.file_uploader("Choose a CSV file")
+        if uploaded_file is not None:
+            df = pd.read_csv(uploaded_file)
+            show_file_summary(df, option)
+        else:
+            st.write(
+                'The file must have each row with a unique user. And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
+            )
+
+            path = "sample_datasets/minimum_sample/"
+            df_format = pd.read_csv(f"{path}format.csv")
+            st.table(df_format)
+
+            st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
+
+            show_download_button("dataset A", path, "dataset_a.csv")
+            show_download_button("dataset B", path, "dataset_b.csv")
+            show_download_button("dataset C", path, "dataset_c.csv")
 
         if not (st.button("Calculate")):
             st.stop()
@@ -282,32 +346,34 @@ if option == "Calculate the minimum sample size":
             )
 
         else:
-            control_users = df[df["group"] == "control"].shape[0]
-            treatment_users = df[df["group"] == "treatment"].shape[0]
-            total_users = control_users + treatment_users
+            std_dev = df["measurement"].std()
 
-            std = df[df["group"] == "control"]["measurement"].std()
-            # std = 2
+            # Format the variables according to the function requirements
+            sensitivity = percentage(sensitivity)
+            confidence_level = percentage(confidence_level)
+            alpha = alpha(confidence_level)
+            power = percentage(power)
+            beta = beta(power)
+            control_ratio = percentage(control_ratio)
+            treatment_ratio = percentage(treatment_ratio)
 
-            q0 = control_users / total_users
-            q1 = treatment_users / total_users
             z_alpha = norm.ppf(1 - alpha / 2)
             z_beta = norm.ppf(1 - beta)
-            a = 1 / q1 + 1 / q0
+            a = 1 / control_ratio + 1 / treatment_ratio
             b = pow(z_alpha + z_beta, 2)
 
-            sample = math.ceil(a * b / pow(sensitivity / std, 2))
+            total_sample = math.ceil(a * b / pow(sensitivity / std_dev, 2))
+            control_sample = math.ceil(total_sample * control_ratio)
+            treatment_sample = math.ceil(total_sample * treatment_ratio)
 
-            st.subheader("Result")
-            st.write(f"Minimum sample for the control group: {sample}")
-            st.write(f"Minimum sample for the treatment group: {sample}")
-            st.write(f"Total minimum sample for the experiment: {sample*2}")
+            show_min_sample_result(control_sample, treatment_sample)
 
             code = template.render(
                 test=test,
                 sensitivity=sensitivity,
                 confidence_level=confidence_level,
                 power=power,
+                control_ratio=control_ratio,
             )
             with st.expander("Show the code"):
                 st.code(code, language="python")
@@ -407,7 +473,7 @@ if option == "Evaluate the statistical significance":
         st.write(f"Control conversion: {control_effect:.2%}")
         st.write(f"Treatment conversion: {treatment_effect:.2%}")
         st.write(
-            f"Observed difference: {observed_diff*100:+.2f} p.p. ({observed_diff/control_effect:+.2%})"
+            f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_effect:+.2%})"
         )
         st.write(f"p-value: {p_value:.2f}")
 
@@ -424,18 +490,6 @@ if option == "Evaluate the statistical significance":
 
     elif test == "Means":
 
-        uploaded_file = st.file_uploader("Choose a file")
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-            st.write("File uploaded. Preview of the first 10 rows:")
-            st.table(df.head(10))
-        else:
-            st.write(
-                'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
-            )
-            data_sample = pd.read_csv("data_sample.csv")
-            st.table(data_sample)
-
         confidence_level = st.slider(
             label="Confidence level",
             min_value=70,
@@ -446,8 +500,24 @@ if option == "Evaluate the statistical significance":
             help=description["confidence_level"],
         )
 
-        confidence_level = percentage(confidence_level)
-        alpha = alpha(confidence_level)
+        uploaded_file = st.file_uploader("Choose a CSV file")
+        if uploaded_file is not None:
+            df = pd.read_csv(uploaded_file)
+            show_file_summary(df, option)
+        else:
+            st.write(
+                'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
+            )
+
+            path = "sample_datasets/statistical_significance/"
+            df_format = pd.read_csv(f"{path}format.csv")
+            st.table(df_format)
+
+            st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
+
+            show_download_button("dataset 1", path, "dataset_1.csv")
+            show_download_button("dataset 2", path, "dataset_2.csv")
+            show_download_button("dataset 3", path, "dataset_3.csv")
 
         if not (st.button("Calculate")):
             st.stop()
@@ -458,6 +528,9 @@ if option == "Evaluate the statistical significance":
             )
 
         else:
+            confidence_level = percentage(confidence_level)
+            alpha = alpha(confidence_level)
+
             measurements = df["measurement"]
             control_users = df[df["group"] == "control"].shape[0]
             treatment_users = df[df["group"] == "treatment"].shape[0]
@@ -475,7 +548,7 @@ if option == "Evaluate the statistical significance":
                 )
                 my_bar.progress((percent_complete + 1) / i)
 
-            p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+            p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
 
             st.subheader("Result")
             if p_value <= alpha:
@@ -484,7 +557,7 @@ if option == "Evaluate the statistical significance":
                 st.error("The difference is not statistically significant")
             st.write(f"Control mean: {control_mean:.2f}")
             st.write(f"Treatment mean: {treatment_mean:.2f}")
-            st.write(f"Observed difference: {observed_diff/control_mean:+.2%}")
+            st.write(f"Observed difference: {observed_diff / control_mean:+.2%}")
             st.write(f"p-value: {p_value:.2f}")
 
             code = template.render(test=test, confidence_level=confidence_level)
