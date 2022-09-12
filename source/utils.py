@@ -59,6 +59,7 @@ def convert_df(df):
 
 
 def permutation(x, nA, nB):
+    random.seed(0)
     n = nA + nB
     idx_A = set(random.sample(range(n), nB))
     idx_B = set(range(n)) - idx_A
