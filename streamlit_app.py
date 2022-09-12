@@ -72,6 +72,40 @@ def calculate_means_sample(
     return control_sample, treatment_sample
 
 
+def evaluate_proportions_significance(
+    control_users,
+    treatment_users,
+    control_conversions,
+    treatment_conversions,
+    confidence_level,
+):
+    alpha = get_alpha(confidence_level)
+    control_effect = control_conversions / control_users
+    treatment_effect = treatment_conversions / treatment_users
+    observed_diff = treatment_effect - control_effect
+
+    conversion = [0] * (control_users + treatment_users)
+    conversion.extend([1] * (control_conversions + treatment_conversions))
+    conversion = pd.Series(conversion)
+
+    perm_diffs = []
+    i = 1000
+    my_bar = st.progress(0)
+    for percent_complete in range(i):
+        perm_diffs.append(
+            permutation(
+                conversion,
+                control_users + control_conversions,
+                treatment_users + treatment_conversions,
+            )
+        )
+        my_bar.progress((percent_complete + 1) / i)
+
+    p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+
+    return control_effect, treatment_effect, observed_diff, alpha, p_value
+
+
 def show_sample_result(control_sample, treatment_sample):
     st.subheader("Result")
     st.write(f"Minimum sample for the control group: {control_sample}")
@@ -432,44 +466,34 @@ if option == "Evaluate the statistical significance":
             help=description["treatment_conversions"],
         )
 
-        confidence_level = st.slider(
-            label="Confidence level",
-            min_value=70,
-            max_value=99,
-            value=95,
-            format="%d%%",
-            key="post-test-proportions",
-            help=description["confidence_level"],
+        confidence_level = percentage(
+            st.slider(
+                label="Confidence level",
+                min_value=70,
+                max_value=99,
+                value=95,
+                format="%d%%",
+                key="post-test-proportions",
+                help=description["confidence_level"],
+            )
         )
-
-        confidence_level = percentage(confidence_level)
-        alpha = get_alpha(confidence_level)
 
         if not (st.button("Calculate")):
             st.stop()
 
-        control_effect = control_conversions / control_users
-        treatment_effect = treatment_conversions / treatment_users
-        observed_diff = treatment_effect - control_effect
-
-        conversion = [0] * (control_users + treatment_users)
-        conversion.extend([1] * (control_conversions + treatment_conversions))
-        conversion = pd.Series(conversion)
-
-        perm_diffs = []
-        i = 1000
-        my_bar = st.progress(0)
-        for percent_complete in range(i):
-            perm_diffs.append(
-                permutation(
-                    conversion,
-                    control_users + control_conversions,
-                    treatment_users + treatment_conversions,
-                )
-            )
-            my_bar.progress((percent_complete + 1) / i)
-
-        p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+        (
+            control_effect,
+            treatment_effect,
+            observed_diff,
+            alpha,
+            p_value,
+        ) = evaluate_proportions_significance(
+            control_users=control_users,
+            treatment_users=treatment_users,
+            control_conversions=control_conversions,
+            treatment_conversions=treatment_conversions,
+            confidence_level=confidence_level,
+        )
 
         st.subheader("Result")
         if p_value <= alpha:
