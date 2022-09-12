@@ -31,30 +31,45 @@ def calculate_proportions_sample(
     treatment_conversion = control_conversion * (1 + sensitivity)
     alpha = get_alpha(confidence_level)
 
-    treatment_sample = proportion_ttest(
-        control_conversion=control_conversion,
-        treatment_conversion=treatment_conversion,
-        alternative=alternative,
-        alpha=alpha,
-        power=power,
-    )
-    control_sample = treatment_sample
-    return control_sample, treatment_sample
-
-
-def proportion_ttest(control_conversion, treatment_conversion, alternative, alpha, power):
     # Cohen's h
     effect_size = sms.proportion_effectsize(control_conversion,
                                             treatment_conversion)
     analysis = sms.TTestIndPower()
-    sample = math.ceil(analysis.solve_power(
+    treatment_sample = math.ceil(analysis.solve_power(
         effect_size,
         alternative=alternative,
         alpha=alpha,
         power=power,
         ratio=1,
     ))
-    return sample
+    control_sample = treatment_sample
+
+    return control_sample, treatment_sample
+
+
+def calculate_means_sample(
+    sensitivity,
+    confidence_level,
+    power,
+    control_ratio,
+    treatment_ratio,
+    df,
+):
+    alpha = get_alpha(confidence_level)
+    beta = get_beta(power)
+
+    z_alpha = norm.ppf(1 - alpha / 2)
+    z_beta = norm.ppf(1 - beta)
+    a = 1 / control_ratio + 1 / treatment_ratio
+    b = pow(z_alpha + z_beta, 2)
+
+    std_dev = df["measurement"].std()
+
+    total_sample = math.ceil(a * b / pow(sensitivity / std_dev, 2))
+    control_sample = math.ceil(total_sample * control_ratio)
+    treatment_sample = math.ceil(total_sample * treatment_ratio)
+
+    return control_sample, treatment_sample
 
 
 def show_sample_result(control_sample, treatment_sample):
@@ -105,33 +120,6 @@ def permutation(x, nA, nB):
     idx_B = set(range(n)) - idx_A
     return x.loc[idx_B].mean() - x.loc[idx_A].mean()
 
-
-# def mean_ztest(df, sensitivity, alpha, beta):
-# 	control_users = df[df['group'] == 'control'].shape[0]
-# 	treatment_users = df[df['group'] == 'treatment'].shape[0]
-# 	total_users = (control_users + treatment_users)
-# 	std = df[df['group'] == 'control']['measurement'].std()
-#   
-# 	q0 = control_users/total_users
-# 	q1 = treatment_users/total_users
-# 	z_alpha = norm.ppf(1 - alpha/2)
-# 	z_beta = norm.ppf(1 - beta)
-# 	a = 1/q1 + 1/q0
-# 	b = pow(z_alpha + z_beta, 2)
-#   
-# 	sample = math.ceil(a*b/pow(sensitivity/std, 2))
-# 	return sample
-
-
-# def calculate_sample(test):
-# 	if test == 'Proportions':
-# 		sample = proportion_ttest()
-# 	elif test == 'Means':
-# 		sample = mean_ztest()
-# 	return sample
-
-
-# def evaluate_significance():
 
 # Set browser tab title, favicon and menu options
 about = """
@@ -258,9 +246,6 @@ if option == "Calculate the minimum sample size":
             )
         )
 
-        # treatment_conversion = control_conversion * (1 + sensitivity)
-        # alpha = get_alpha(confidence_level)
-
         if not (st.button("Calculate")):
             st.stop()
 
@@ -287,58 +272,69 @@ if option == "Calculate the minimum sample size":
 
     elif test == "Means":
 
-        sensitivity = st.number_input(
-            label="Sensitivity (%)",
-            min_value=0.0,
-            value=10.0,
-            step=0.1,
-            format="%.1f",
-            help=description["sensitivity"],
+        sensitivity = percentage(
+            st.number_input(
+                label="Sensitivity (%)",
+                min_value=0.0,
+                value=10.0,
+                step=0.1,
+                format="%.1f",
+                help=description["sensitivity"],
+            )
         )
 
-        confidence_level = st.slider(
-            label="Confidence level",
-            min_value=70,
-            max_value=99,
-            value=95,
-            format="%d%%",
-            key="pre-test-means",
-            help=description["confidence_level"],
+        confidence_level = percentage(
+            st.slider(
+                label="Confidence level",
+                min_value=70,
+                max_value=99,
+                value=95,
+                format="%d%%",
+                key="pre-test-means",
+                help=description["confidence_level"],
+            )
         )
 
-        power = st.slider(
-            label="Power",
-            min_value=70,
-            max_value=99,
-            value=80,
-            format="%d%%",
-            help=description["power"],
+        power = percentage(
+            st.slider(
+                label="Power",
+                min_value=70,
+                max_value=99,
+                value=80,
+                format="%d%%",
+                help=description["power"],
+            )
         )
 
-        col1, col2 = st.columns(2)
+        col_1, col_2 = st.columns(2)
 
-        control_ratio = col1.number_input(
-            label="Control ratio (%)",
-            min_value=0.1,
-            max_value=99.9,
-            value=50.0,
-            step=0.1,
-            format="%.1f",
-            help=description["control_ratio"],
+        control_ratio = percentage(
+            col_1.number_input(
+                label="Control ratio (%)",
+                min_value=0.1,
+                max_value=99.9,
+                value=50.0,
+                step=0.1,
+                format="%.1f",
+                help=description["control_ratio"],
+            )
         )
 
-        treatment_ratio = col2.number_input(
-            label="Treatment ratio (%)",
-            min_value=0.1,
-            max_value=99.9,
-            value=100.0 - control_ratio,
-            step=0.1,
-            format="%.1f",
-            help=description["treatment_ratio"],
-            disabled=True,
+        treatment_ratio = percentage(
+            col_2.number_input(
+                label="Treatment ratio (%)",
+                min_value=0.1,
+                max_value=99.9,
+                value=100.0 - control_ratio * 100,
+                step=0.1,
+                format="%.1f",
+                help=description["treatment_ratio"],
+                disabled=True,
+            )
         )
 
         uploaded_file = st.file_uploader("Choose a CSV file")
+
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
             show_file_summary(df, option)
@@ -366,25 +362,15 @@ if option == "Calculate the minimum sample size":
             )
 
         else:
-            std_dev = df["measurement"].std()
 
-            # Format the variables according to the function requirements
-            sensitivity = percentage(sensitivity)
-            confidence_level = percentage(confidence_level)
-            alpha = get_alpha(confidence_level)
-            power = percentage(power)
-            beta = get_beta(power)
-            control_ratio = percentage(control_ratio)
-            treatment_ratio = percentage(treatment_ratio)
-
-            z_alpha = norm.ppf(1 - alpha / 2)
-            z_beta = norm.ppf(1 - beta)
-            a = 1 / control_ratio + 1 / treatment_ratio
-            b = pow(z_alpha + z_beta, 2)
-
-            total_sample = math.ceil(a * b / pow(sensitivity / std_dev, 2))
-            control_sample = math.ceil(total_sample * control_ratio)
-            treatment_sample = math.ceil(total_sample * treatment_ratio)
+            control_sample, treatment_sample = calculate_means_sample(
+                sensitivity=sensitivity,
+                confidence_level=confidence_level,
+                power=power,
+                control_ratio=control_ratio,
+                treatment_ratio=treatment_ratio,
+                df=df,
+            )
 
             show_sample_result(control_sample, treatment_sample)
 
