@@ -6,7 +6,7 @@ def get_proportions_sample_inputs():
     control_conversion = percentage(
         st.number_input(
             label="Baseline conversion rate (%)",
-            min_value=0.0,
+            min_value=0.1,
             max_value=100.0,
             value=15.0,
             step=0.1,
@@ -18,7 +18,7 @@ def get_proportions_sample_inputs():
     sensitivity = percentage(
         st.number_input(
             label="Sensitivity (%)",
-            min_value=0.0,
+            min_value=0.1,
             value=10.0,
             step=0.1,
             format="%.1f",
@@ -66,7 +66,7 @@ def get_means_sample_inputs():
     sensitivity = percentage(
         st.number_input(
             label="Sensitivity (%)",
-            min_value=0.0,
+            min_value=0.1,
             value=10.0,
             step=0.1,
             format="%.1f",
@@ -139,7 +139,7 @@ def get_means_sample_inputs():
 def get_proportions_significance_inputs():
     control_users = st.number_input(
         label="Users in the control",
-        min_value=0,
+        min_value=1,
         value=30000,
         step=1,
         help=description["control_users"],
@@ -147,7 +147,7 @@ def get_proportions_significance_inputs():
 
     treatment_users = st.number_input(
         label="Users in the treatment",
-        min_value=0,
+        min_value=1,
         value=30000,
         step=1,
         help=description["treatment_users"],
@@ -209,7 +209,6 @@ def get_means_significance_inputs():
 
 
 description = {
-    "test": "A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when he or she converts it is a one).\n\nA means test is when the data is continuous. For example: the time spent in a web page.",
     "control_conversion": "The conversion rate expected for the control. To help you set this value, you could use similar historical data. However, if that it is not available, make a guess based on your experience.",
     "sensitivity": "The minimum effect size that you want to be able to measure. A rule of thumb is to use 10% (meaning that you want to be able to detect at least a 10% difference for the treatment over the control).",
     "alternative": "A one-sided hypothesis is to test whether one group has a distribution greater then the other. While a two-sided is to test whether one group has a distribution smaller or greater then the other. If you are not sure about which one to use, choose the two-sided (more conservative).",
