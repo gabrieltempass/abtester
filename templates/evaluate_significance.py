@@ -66,8 +66,17 @@ p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
 # Show the result
 if p_value <= alpha:
     print("The difference is statistically significant")
+    comparison = {
+        "direction": "less than or equal to",
+        "significance": "is"
+    }
 else:
     print("The difference is not statistically significant")
+    comparison = {
+        "direction": "greater than",
+        "significance": "is not"
+    }
+prefix = "~" if round(p_value, 4) == 0 else ""
 {% if test == "Proportions" %}
 print(f"Control conversion: {control_effect:.2%}")
 print(f"Treatment conversion: {treatment_effect:.2%}")
@@ -77,4 +86,6 @@ print(f"Control mean: {control_mean:.2f}")
 print(f"Treatment mean: {treatment_mean:.2f}")
 print(f"Observed difference: {observed_diff / control_mean:+.2%}")
 {% endif %}
-print(f"p-value: {p_value:.2f}")
+print(f"Alpha: {alpha:.4f}")
+print(f"p-value: {prefix}{p_value:.4f}")
+print(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")

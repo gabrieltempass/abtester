@@ -215,14 +215,24 @@ if option == "Evaluate the statistical significance":
         st.subheader("Result")
         if p_value <= alpha:
             st.success("The difference is statistically significant")
+            comparison = {
+                "direction": "less than or equal to",
+                "significance": "is"
+            }
         else:
             st.error("The difference is not statistically significant")
+            comparison = {
+                "direction": "greater than",
+                "significance": "is not"
+            }
+
+        prefix = "~" if round(p_value, 4) == 0 else ""
         st.write(f"Control conversion: {control_effect:.2%}")
         st.write(f"Treatment conversion: {treatment_effect:.2%}")
-        st.write(
-            f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_effect:+.2%})"
-        )
-        st.write(f"p-value: {p_value:.2f}")
+        st.write(f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_effect:+.2%})")
+        st.write(f"Alpha: {alpha:.4f}")
+        st.write(f"p-value: {prefix}{p_value:.4f}")
+        st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
         code = template.render(
             test=test,
@@ -281,12 +291,24 @@ if option == "Evaluate the statistical significance":
             st.subheader("Result")
             if p_value <= alpha:
                 st.success("The difference is statistically significant")
+                comparison = {
+                    "direction": "less than or equal to",
+                    "significance": "is"
+                }
             else:
                 st.error("The difference is not statistically significant")
+                comparison = {
+                    "direction": "greater than",
+                    "significance": "is not"
+                }
+
+            prefix = "~" if round(p_value, 4) == 0 else ""
             st.write(f"Control mean: {control_mean:.2f}")
             st.write(f"Treatment mean: {treatment_mean:.2f}")
             st.write(f"Observed difference: {observed_diff / control_mean:+.2%}")
-            st.write(f"p-value: {p_value:.2f}")
+            st.write(f"Alpha: {alpha:.4f}")
+            st.write(f"p-value: {prefix}{p_value:.4f}")
+            st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
             code = template.render(test=test, confidence_level=confidence_level)
             with st.expander("Show the code"):
