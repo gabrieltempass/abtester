@@ -42,7 +42,7 @@ st.set_page_config(
 # Hide top right menu and "Made with Streamlit" footer
 hide_menu_style = """
 	<style>
-	MainMenu {visibility: hidden; }
+	#MainMenu {visibility: hidden;}
 	footer {visibility: hidden;}
 	</style>
 """
