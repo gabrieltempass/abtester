@@ -106,6 +106,33 @@ def evaluate_proportions_significance(
     return control_effect, treatment_effect, observed_diff, alpha, p_value
 
 
+def evaluate_means_significance(
+    confidence_level,
+    df,
+):
+    alpha = get_alpha(confidence_level)
+
+    measurements = df["measurement"]
+    control_users = df[df["group"] == "control"].shape[0]
+    treatment_users = df[df["group"] == "treatment"].shape[0]
+
+    control_mean = df[df["group"] == "control"]["measurement"].mean()
+    treatment_mean = df[df["group"] == "treatment"]["measurement"].mean()
+    observed_diff = treatment_mean - control_mean
+
+    perm_diffs = []
+    i = 1000
+    my_bar = st.progress(0)
+    for percent_complete in range(i):
+        perm_diffs.append(
+            permutation(measurements, control_users, treatment_users)
+        )
+        my_bar.progress((percent_complete + 1) / i)
+
+    p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+
+    return control_mean, treatment_mean, observed_diff, alpha, p_value
+
 def show_sample_result(control_sample, treatment_sample):
     st.subheader("Result")
     st.write(f"Minimum sample for the control group: {control_sample}")
@@ -520,14 +547,16 @@ if option == "Evaluate the statistical significance":
 
     elif test == "Means":
 
-        confidence_level = st.slider(
-            label="Confidence level",
-            min_value=70,
-            max_value=99,
-            value=95,
-            format="%d%%",
-            key="post-test-means",
-            help=description["confidence_level"],
+        confidence_level = percentage(
+            st.slider(
+                label="Confidence level",
+                min_value=70,
+                max_value=99,
+                value=95,
+                format="%d%%",
+                key="post-test-means",
+                help=description["confidence_level"],
+            )
         )
 
         uploaded_file = st.file_uploader("Choose a CSV file")
@@ -558,27 +587,17 @@ if option == "Evaluate the statistical significance":
             )
 
         else:
-            confidence_level = percentage(confidence_level)
-            alpha = get_alpha(confidence_level)
 
-            measurements = df["measurement"]
-            control_users = df[df["group"] == "control"].shape[0]
-            treatment_users = df[df["group"] == "treatment"].shape[0]
-
-            control_mean = df[df["group"] == "control"]["measurement"].mean()
-            treatment_mean = df[df["group"] == "treatment"]["measurement"].mean()
-            observed_diff = treatment_mean - control_mean
-
-            perm_diffs = []
-            i = 1000
-            my_bar = st.progress(0)
-            for percent_complete in range(i):
-                perm_diffs.append(
-                    permutation(measurements, control_users, treatment_users)
-                )
-                my_bar.progress((percent_complete + 1) / i)
-
-            p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+            (
+                control_mean,
+                treatment_mean,
+                observed_diff,
+                alpha,
+                p_value,
+            ) = evaluate_means_significance(
+                confidence_level=confidence_level,
+                df=df,
+            )
 
             st.subheader("Result")
             if p_value <= alpha:
