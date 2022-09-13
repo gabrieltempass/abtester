@@ -44,6 +44,7 @@ observed_diff = treatment_mean - control_mean
 {% endif %}
 
 # Execute the permutation test
+random.seed(0)
 perm_diffs = []
 for _ in range(1000):
     perm_diffs.append(
