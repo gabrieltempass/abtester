@@ -16,9 +16,12 @@ def calculate_proportions_sample(
     alternative,
     confidence_level,
     power,
+    control_ratio,
+    treatment_ratio,
 ):
     treatment_conversion = control_conversion * (1 + sensitivity)
     alpha = get_alpha(confidence_level)
+    ratio = treatment_ratio / control_ratio
 
     # Cohen's h
     effect_size = sms.proportion_effectsize(control_conversion,
@@ -26,14 +29,14 @@ def calculate_proportions_sample(
     analysis = sms.TTestIndPower()
     if alternative == "one-sided":
         alternative = "smaller"
-    treatment_sample = math.ceil(analysis.solve_power(
+    control_sample = math.ceil(analysis.solve_power(
         effect_size,
         alternative=alternative,
         alpha=alpha,
         power=power,
-        ratio=1,
+        ratio=ratio,
     ))
-    control_sample = treatment_sample
+    treatment_sample = control_sample * ratio
 
     return control_sample, treatment_sample
 
@@ -43,13 +46,12 @@ def calculate_means_sample(
     alternative,
     confidence_level,
     power,
+    control_ratio,
+    treatment_ratio,
     df,
 ):
     alpha = get_alpha(confidence_level)
     beta = get_beta(power)
-
-    control_ratio = 0.5
-    treatment_ratio = 0.5
 
     if alternative == "one-sided":
         z_alpha = norm.ppf(1 - alpha)

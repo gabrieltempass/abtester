@@ -83,6 +83,8 @@ if option == "Calculate the minimum sample size":
             alternative,
             confidence_level,
             power,
+            control_ratio,
+            treatment_ratio,
         ) = get_proportions_sample_inputs()
 
         if not (st.button("Calculate")):
@@ -93,7 +95,9 @@ if option == "Calculate the minimum sample size":
             sensitivity=sensitivity,
             alternative=alternative,
             confidence_level=confidence_level,
-            power=power
+            power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
         )
 
         show_sample_result(control_sample, treatment_sample)
@@ -106,6 +110,8 @@ if option == "Calculate the minimum sample size":
             alternative=alternative,
             confidence_level=confidence_level,
             power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
         )
         with st.expander("Show the code"):
             st.code(code, language="python")
@@ -117,6 +123,8 @@ if option == "Calculate the minimum sample size":
             alternative,
             confidence_level,
             power,
+            control_ratio,
+            treatment_ratio,
             uploaded_file
         ) = get_means_sample_inputs()
 
@@ -153,6 +161,8 @@ if option == "Calculate the minimum sample size":
                 alternative=alternative,
                 confidence_level=confidence_level,
                 power=power,
+                control_ratio=control_ratio,
+                treatment_ratio=treatment_ratio,                
                 df=df,
             )
 
@@ -165,6 +175,8 @@ if option == "Calculate the minimum sample size":
                 alternative=alternative,
                 confidence_level=confidence_level,
                 power=power,
+                control_ratio=control_ratio,
+                treatment_ratio=treatment_ratio,
             )
             with st.expander("Show the code"):
                 st.code(code, language="python")

@@ -42,8 +42,8 @@ def get_proportions_sample_inputs():
             max_value=99,
             value=95,
             format="%d%%",
-            key="sample-proportions-confidence-level",
             help=description["confidence_level"],
+            key="sample-proportions-confidence-level",
         )
     )
 
@@ -58,12 +58,43 @@ def get_proportions_sample_inputs():
         )
     )
 
+    col_1, col_2 = st.columns(2)
+
+    control_ratio = percentage(
+        col_1.number_input(
+            label="Control ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=50.0,
+            step=1.0,
+            format="%.1f",
+            help=description["control_ratio"],
+            key="sample-proportions-control-ratio",
+        )
+    )
+
+    treatment_ratio = percentage(
+        col_2.number_input(
+            label="Treatment ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=100.0 - control_ratio * 100,
+            step=1.0,
+            format="%.1f",
+            help=description["treatment_ratio"],
+            key="sample-proportions-treatment-ratio",
+            disabled=True,
+        )
+    )
+
     return (
         control_conversion,
         sensitivity,
         alternative,
         confidence_level,
-        power
+        power,
+        control_ratio,
+        treatment_ratio,
     )
 
 
@@ -95,8 +126,8 @@ def get_means_sample_inputs():
             max_value=99,
             value=95,
             format="%d%%",
-            key="sample-means-confidence-level",
             help=description["confidence_level"],
+            key="sample-means-confidence-level",
         )
     )
 
@@ -111,6 +142,35 @@ def get_means_sample_inputs():
         )
     )
 
+    col_1, col_2 = st.columns(2)
+
+    control_ratio = percentage(
+        col_1.number_input(
+            label="Control ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=50.0,
+            step=1.0,
+            format="%.1f",
+            help=description["control_ratio"],
+            key="sample-means-control-ratio",
+        )
+    )
+
+    treatment_ratio = percentage(
+        col_2.number_input(
+            label="Treatment ratio (%)",
+            min_value=0.1,
+            max_value=99.9,
+            value=100.0 - control_ratio * 100,
+            step=1.0,
+            format="%.1f",
+            help=description["treatment_ratio"],
+            key="sample-means-treatment-ratio",
+            disabled=True,
+        )
+    )
+
     uploaded_file = st.file_uploader("Choose a CSV file")
 
     return (
@@ -118,6 +178,8 @@ def get_means_sample_inputs():
         alternative,
     	confidence_level,
     	power,
+        control_ratio,
+        treatment_ratio,
     	uploaded_file
     )
 
@@ -162,8 +224,8 @@ def get_proportions_significance_inputs():
             max_value=99,
             value=95,
             format="%d%%",
-            key="significance-proportions-confidence-level",
             help=description["confidence_level"],
+            key="significance-proportions-confidence-level",
         )
     )
 
@@ -184,8 +246,8 @@ def get_means_significance_inputs():
             max_value=99,
             value=95,
             format="%d%%",
-            key="significance-means-confidence-level",
             help=description["confidence_level"],
+            key="significance-means-confidence-level",
         )
     )
 
