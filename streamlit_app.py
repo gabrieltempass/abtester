@@ -114,6 +114,7 @@ if option == "Calculate the minimum sample size":
 
         (
             sensitivity,
+            alternative,
             confidence_level,
             power,
             uploaded_file
@@ -149,6 +150,7 @@ if option == "Calculate the minimum sample size":
 
             control_sample, treatment_sample = calculate_means_sample(
                 sensitivity=sensitivity,
+                alternative=alternative,
                 confidence_level=confidence_level,
                 power=power,
                 df=df,
@@ -160,9 +162,9 @@ if option == "Calculate the minimum sample size":
             code = template.render(
                 test=test,
                 sensitivity=sensitivity,
+                alternative=alternative,
                 confidence_level=confidence_level,
                 power=power,
-                control_ratio=control_ratio,
             )
             with st.expander("Show the code"):
                 st.code(code, language="python")

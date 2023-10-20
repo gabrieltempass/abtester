@@ -28,10 +28,10 @@ def get_proportions_sample_inputs():
 
     alternative = st.radio(
         label="Hypothesis",
-        options=("smaller", "two-sided"),
+        options=("one-sided", "two-sided"),
         index=1,
         horizontal=True,
-        format_func=lambda x: {"smaller": "One-sided", "two-sided": "Two-sided"}.get(x),
+        format_func=lambda x: {"one-sided": "One-sided", "two-sided": "Two-sided"}.get(x),
         help=description["alternative"],
     )
 
@@ -79,6 +79,14 @@ def get_means_sample_inputs():
         )
     )
 
+    alternative = st.radio(
+        label="Hypothesis",
+        options=("One-sided", "Two-sided"),
+        index=1,
+        horizontal=True,
+        help=description["alternative"],
+    )
+
     confidence_level = percentage(
         st.slider(
             label="Confidence level",
@@ -106,6 +114,7 @@ def get_means_sample_inputs():
 
     return (
     	sensitivity,
+        alternative,
     	confidence_level,
     	power,
     	uploaded_file

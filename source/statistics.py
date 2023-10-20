@@ -24,6 +24,8 @@ def calculate_proportions_sample(
     effect_size = sms.proportion_effectsize(control_conversion,
                                             treatment_conversion)
     analysis = sms.TTestIndPower()
+    if alternative == "one-sided":
+        alternative = "smaller"
     treatment_sample = math.ceil(analysis.solve_power(
         effect_size,
         alternative=alternative,
@@ -38,6 +40,7 @@ def calculate_proportions_sample(
 
 def calculate_means_sample(
     sensitivity,
+    alternative,
     confidence_level,
     power,
     df,
@@ -48,11 +51,14 @@ def calculate_means_sample(
     control_ratio = 0.5
     treatment_ratio = 0.5
 
-    z_alpha = norm.ppf(1 - alpha / 2)
+    if alternative == "one-sided":
+        z_alpha = norm.ppf(1 - alpha)
+    else:
+        z_alpha = norm.ppf(1 - alpha / 2)
+
     z_beta = norm.ppf(1 - beta)
     a = 1 / control_ratio + 1 / treatment_ratio
     b = pow(z_alpha + z_beta, 2)
-
     effect_size = df["measurement"].mean() * (1 + sensitivity)
     std_dev = df["measurement"].std()
 
