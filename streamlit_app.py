@@ -64,10 +64,9 @@ loader = FileSystemLoader("templates")
 env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
 
 if option == "Calculate the minimum sample size":
-    st.header("Sample size")
-
     template = env.get_template("calculate_sample.py")
 
+    st.header("Sample size")
     test = st.radio(
         label="Test",
         options=("Proportions", "Means"),
@@ -78,7 +77,6 @@ if option == "Calculate the minimum sample size":
     )
 
     if test == "Proportions":
-
         (
             control_conversion,
             sensitivity,
@@ -117,8 +115,6 @@ if option == "Calculate the minimum sample size":
             sensitivity,
             confidence_level,
             power,
-            control_ratio,
-            treatment_ratio,
             uploaded_file
         ) = get_means_sample_inputs()
 
@@ -172,10 +168,9 @@ if option == "Calculate the minimum sample size":
                 st.code(code, language="python")
 
 if option == "Evaluate the statistical significance":
+    template = env.get_template("evaluate_significance.py")    
+
     st.header("Statistical significance")
-
-    template = env.get_template("evaluate_significance.py")
-
     test = st.radio(
         label="Test",
         options=("Proportions", "Means"),

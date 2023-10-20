@@ -40,21 +40,23 @@ def calculate_means_sample(
     sensitivity,
     confidence_level,
     power,
-    control_ratio,
-    treatment_ratio,
     df,
 ):
     alpha = get_alpha(confidence_level)
     beta = get_beta(power)
+
+    control_ratio = 0.5
+    treatment_ratio = 0.5
 
     z_alpha = norm.ppf(1 - alpha / 2)
     z_beta = norm.ppf(1 - beta)
     a = 1 / control_ratio + 1 / treatment_ratio
     b = pow(z_alpha + z_beta, 2)
 
+    effect_size = df["measurement"].mean() * (1 + sensitivity)
     std_dev = df["measurement"].std()
 
-    total_sample = math.ceil(a * b / pow(sensitivity / std_dev, 2))
+    total_sample = math.ceil(a * b / pow(effect_size / std_dev, 2))
     control_sample = math.ceil(total_sample * control_ratio)
     treatment_sample = math.ceil(total_sample * treatment_ratio)
 
