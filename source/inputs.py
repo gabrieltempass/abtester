@@ -81,9 +81,10 @@ def get_means_sample_inputs():
 
     alternative = st.radio(
         label="Hypothesis",
-        options=("One-sided", "Two-sided"),
+        options=("one-sided", "two-sided"),
         index=1,
         horizontal=True,
+        format_func=lambda x: {"one-sided": "One-sided", "two-sided": "Two-sided"}.get(x),
         help=description["alternative"],
     )
 

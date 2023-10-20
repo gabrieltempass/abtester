@@ -53,7 +53,7 @@ def calculate_means_sample(
 
     if alternative == "one-sided":
         z_alpha = norm.ppf(1 - alpha)
-    else:
+    elif alternative == "two-sided":
         z_alpha = norm.ppf(1 - alpha / 2)
 
     z_beta = norm.ppf(1 - beta)
