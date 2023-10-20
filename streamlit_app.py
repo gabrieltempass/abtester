@@ -64,7 +64,6 @@ loader = FileSystemLoader("templates")
 env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
 
 if option == "Calculate the minimum sample size":
-    template = env.get_template("calculate_sample.py")
 
     st.header("Sample size")
     test = st.radio(
@@ -77,6 +76,7 @@ if option == "Calculate the minimum sample size":
     )
 
     if test == "Proportions":
+
         (
             control_conversion,
             sensitivity,
@@ -98,6 +98,7 @@ if option == "Calculate the minimum sample size":
 
         show_sample_result(control_sample, treatment_sample)
 
+        template = env.get_template("sample_size_proportions.py")
         code = template.render(
             test=test,
             control_conversion=control_conversion,
@@ -150,13 +151,12 @@ if option == "Calculate the minimum sample size":
                 sensitivity=sensitivity,
                 confidence_level=confidence_level,
                 power=power,
-                control_ratio=control_ratio,
-                treatment_ratio=treatment_ratio,
                 df=df,
             )
 
             show_sample_result(control_sample, treatment_sample)
 
+            template = env.get_template("sample_size_means.py")
             code = template.render(
                 test=test,
                 sensitivity=sensitivity,
@@ -168,7 +168,6 @@ if option == "Calculate the minimum sample size":
                 st.code(code, language="python")
 
 if option == "Evaluate the statistical significance":
-    template = env.get_template("evaluate_significance.py")    
 
     st.header("Statistical significance")
     test = st.radio(
@@ -229,6 +228,7 @@ if option == "Evaluate the statistical significance":
         st.write(f"p-value: {prefix}{p_value:.4f}")
         st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
+        template = env.get_template("statistical_significance_proportions.py")
         code = template.render(
             test=test,
             control_users=control_users,
@@ -305,6 +305,7 @@ if option == "Evaluate the statistical significance":
             st.write(f"p-value: {prefix}{p_value:.4f}")
             st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
+            template = env.get_template("statistical_significance_means.py")
             code = template.render(test=test, confidence_level=confidence_level)
             with st.expander("Show the code"):
                 st.code(code, language="python")
