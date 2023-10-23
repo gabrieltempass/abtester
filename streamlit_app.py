@@ -162,7 +162,7 @@ if option == "Calculate the minimum sample size":
                 confidence_level=confidence_level,
                 power=power,
                 control_ratio=control_ratio,
-                treatment_ratio=treatment_ratio,                
+                treatment_ratio=treatment_ratio,
                 df=df,
             )
 
@@ -170,6 +170,7 @@ if option == "Calculate the minimum sample size":
 
             template = env.get_template("sample_size_means.py")
             code = template.render(
+                file_name=uploaded_file.name,
                 test=test,
                 sensitivity=sensitivity,
                 alternative=alternative,
@@ -320,6 +321,10 @@ if option == "Evaluate the statistical significance":
             st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
             template = env.get_template("statistical_significance_means.py")
-            code = template.render(test=test, confidence_level=confidence_level)
+            code = template.render(
+                file_name=uploaded_file.name,
+                test=test,
+                confidence_level=confidence_level,
+            )
             with st.expander("Show the code"):
                 st.code(code, language="python")

@@ -3,6 +3,9 @@ import random
 import numpy as np
 import pandas as pd
 
+# Load the CSV file
+df = pd.read_csv("{{ file_name }}")
+
 # Declare the permutation function
 def permutation(x, nA, nB):
     n = nA + nB

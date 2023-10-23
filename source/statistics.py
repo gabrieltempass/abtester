@@ -2,8 +2,8 @@ import math
 import numpy as np
 import pandas as pd
 import statsmodels.stats.api as sms
+from statsmodels.stats.power import zt_ind_solve_power
 import streamlit as st
-from scipy.stats import norm
 
 from source.utils import get_alpha
 from source.utils import get_beta
@@ -50,26 +50,25 @@ def calculate_means_sample(
     treatment_ratio,
     df,
 ):
-    alpha = get_alpha(confidence_level)
-    beta = get_beta(power)
-
     if alternative == "one-sided":
-        z_alpha = norm.ppf(1 - alpha)
-    elif alternative == "two-sided":
-        z_alpha = norm.ppf(1 - alpha / 2)
-    z_beta = norm.ppf(1 - beta)
+        alternative = "smaller"
+    alpha = get_alpha(confidence_level)
+    ratio = treatment_ratio / control_ratio
 
-    a = 1 / control_ratio + 1 / treatment_ratio
-    b = pow(z_alpha + z_beta, 2)
-    
     control_mean = df["measurement"].mean()
     treatment_mean = control_mean * (1 + sensitivity)
-    effect_size = treatment_mean - control_mean
-    std_dev = df["measurement"].std()
+    difference = treatment_mean - control_mean
+    standard_deviation = df["measurement"].std()
+    effect_size = difference / standard_deviation
 
-    sample = math.ceil(a * b / pow(effect_size / std_dev, 2))
-    control_sample = math.ceil(sample * control_ratio)
-    treatment_sample = math.ceil(sample * treatment_ratio)
+    control_sample = math.ceil(zt_ind_solve_power(
+        effect_size=effect_size,
+        alpha=alpha,
+        power=power,
+        ratio=ratio,
+        alternative=alternative,
+    ))
+    treatment_sample = control_sample * ratio
 
     return control_sample, treatment_sample
 
