@@ -68,7 +68,7 @@ def calculate_means_sample(
         ratio=ratio,
         alternative=alternative,
     ))
-    treatment_sample = control_sample * ratio
+    treatment_sample = math.ceil(control_sample * ratio)
 
     return control_sample, treatment_sample
 

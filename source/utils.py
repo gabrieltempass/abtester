@@ -18,9 +18,10 @@ def get_beta(power):
 
 def show_sample_result(control_sample, treatment_sample):
     st.subheader("Result")
-    st.write(f"Minimum sample for the control group: {control_sample}")
-    st.write(f"Minimum sample for the treatment group: {treatment_sample}")
-    st.write(f"Total minimum sample for the experiment: {control_sample + treatment_sample}")
+    st.write("Minimum sample size")
+    st.write(f"Control: {control_sample:,d}")
+    st.write(f"Treatment: {treatment_sample:,d}")
+    st.write(f"Total: {(control_sample + treatment_sample):,d}")
 
 
 def show_file_summary(df, option):

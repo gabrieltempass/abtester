@@ -31,6 +31,7 @@ treatment_sample = math.ceil(analysis.solve_power(
 control_sample = treatment_sample
 
 # Show the result
-print(f"Minimum sample for the control group: {control_sample}")
-print(f"Minimum sample for the treatment group: {treatment_sample}")
-print(f"Total minimum sample for the experiment: {control_sample + treatment_sample}")
+print("Minimum sample size")
+print(f"Control: {control_sample:,d}")
+print(f"Treatment: {treatment_sample:,d}")
+print(f"Total: {(control_sample + treatment_sample):,d}")
