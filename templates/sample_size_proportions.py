@@ -11,7 +11,7 @@ confidence_level = {{ confidence_level }}
 alpha = 1 - confidence_level
 power = {{ power }}
 
-# Calculate the minimum sample
+# Calculate the sample size
 effect_size = sms.proportion_effectsize(
     control_conversion,
     treatment_conversion

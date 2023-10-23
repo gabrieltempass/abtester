@@ -57,16 +57,19 @@ def calculate_means_sample(
         z_alpha = norm.ppf(1 - alpha)
     elif alternative == "two-sided":
         z_alpha = norm.ppf(1 - alpha / 2)
-
     z_beta = norm.ppf(1 - beta)
+
     a = 1 / control_ratio + 1 / treatment_ratio
     b = pow(z_alpha + z_beta, 2)
-    effect_size = df["measurement"].mean() * (1 + sensitivity)
+    
+    control_mean = df["measurement"].mean()
+    treatment_mean = control_mean * (1 + sensitivity)
+    effect_size = treatment_mean - control_mean
     std_dev = df["measurement"].std()
 
-    total_sample = math.ceil(a * b / pow(effect_size / std_dev, 2))
-    control_sample = math.ceil(total_sample * control_ratio)
-    treatment_sample = math.ceil(total_sample * treatment_ratio)
+    sample = math.ceil(a * b / pow(effect_size / std_dev, 2))
+    control_sample = math.ceil(sample * control_ratio)
+    treatment_sample = math.ceil(sample * treatment_ratio)
 
     return control_sample, treatment_sample
 
