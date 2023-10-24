@@ -1,7 +1,16 @@
+import base64
 import random
 import numpy as np
 import pandas as pd
 import streamlit as st
+
+
+def render_svg(svg):
+    """Renders the given svg string."""
+    b64 = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
+    html = r'<img src="data:image/svg+xml;base64,%s" width="300" alt="abtester logo"/>' % b64
+    c = st.container()
+    c.write(html, unsafe_allow_html=True)
 
 
 def percentage(number):
@@ -19,9 +28,9 @@ def get_beta(power):
 def show_sample_result(control_sample, treatment_sample):
     st.subheader("Result")
     st.write("Minimum sample size")
-    st.write(f"Control: {control_sample:,d}")
-    st.write(f"Treatment: {treatment_sample:,d}")
-    st.write(f"Total: {(control_sample + treatment_sample):,d}")
+    st.write(f"Control: {control_sample:,}")
+    st.write(f"Treatment: {treatment_sample:,}")
+    st.write(f"Total: {(control_sample + treatment_sample):,}")
 
 
 def show_file_summary(df, option):

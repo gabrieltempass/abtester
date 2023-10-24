@@ -13,6 +13,7 @@ from source.statistics import calculate_means_sample
 from source.statistics import evaluate_proportions_significance
 from source.statistics import evaluate_means_significance
 
+from source.utils import render_svg
 from source.utils import percentage
 from source.utils import get_alpha
 from source.utils import get_beta
@@ -27,10 +28,10 @@ from source.utils import permutation
 about = """
 This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).
 
-If you would like to provide feedback, learn more about the A/B Tester, or anything else, feel free to send an email to contact@abtester.app.
+If you would like to provide feedback, learn more about abtester, or anything else, feel free to send an email to contact@abtester.app.
 """
 st.set_page_config(
-    page_title="A/B Tester",
+    page_title="abtester",
     page_icon=Image.open("images/favicon.png"),
     menu_items={
         "Get help": "https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link",
@@ -48,7 +49,16 @@ hide_menu_style = """
 """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-st.title("A/B Tester")
+render_svg(open("images/logo.svg").read())
+
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+st.write("")
+
 option = st.selectbox(
     "What do you want to do?",
     (
