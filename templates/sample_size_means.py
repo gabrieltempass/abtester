@@ -31,12 +31,12 @@ control_sample = math.ceil(zt_ind_solve_power(
     alpha=alpha,
     power=power,
     ratio=ratio,
-    alternative=alternative,
+    alternative=alternative
 ))
 treatment_sample = math.ceil(control_sample * ratio)
 
 # Show the result
 print("Minimum sample size")
-print(f"Control: {control_sample:,d}")
-print(f"Treatment: {treatment_sample:,d}")
-print(f"Total: {(control_sample + treatment_sample):,d}")
+print(f"Control: {control_sample:,}")
+print(f"Treatment: {treatment_sample:,}")
+print(f"Total: {(control_sample + treatment_sample):,}")

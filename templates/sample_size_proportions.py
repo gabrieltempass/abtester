@@ -5,13 +5,16 @@ import statsmodels.stats.api as sms
 # Define the parameters
 control_conversion = {{ control_conversion }}
 sensitivity = {{ sensitivity }}
-treatment_conversion = control_conversion * (1 + sensitivity)
 alternative = "{{ alternative }}"
 confidence_level = {{ confidence_level }}
-alpha = 1 - confidence_level
 power = {{ power }}
+control_ratio = {{ control_ratio }}
+treatment_ratio = {{ treatment_ratio }}
 
 # Calculate the sample size
+treatment_conversion = control_conversion * (1 + sensitivity)
+alpha = 1 - confidence_level
+ratio = treatment_ratio / control_ratio
 effect_size = sms.proportion_effectsize(
     control_conversion,
     treatment_conversion
@@ -21,17 +24,17 @@ analysis = sms.TTestIndPower()
 if alternative == "one-sided":
     alternative = "smaller"
 {% endif %}
-treatment_sample = math.ceil(analysis.solve_power(
-    effect_size,
-    power=power,
+control_sample = math.ceil(analysis.solve_power(
+    effect_size=effect_size,
     alpha=alpha,
-    ratio=1,
+    power=power,
+    ratio=ratio,
     alternative=alternative
 ))
-control_sample = treatment_sample
+treatment_sample = math.ceil(control_sample * ratio)
 
 # Show the result
 print("Minimum sample size")
-print(f"Control: {control_sample:,d}")
-print(f"Treatment: {treatment_sample:,d}")
-print(f"Total: {(control_sample + treatment_sample):,d}")
+print(f"Control: {control_sample:,}")
+print(f"Treatment: {treatment_sample:,}")
+print(f"Total: {(control_sample + treatment_sample):,}")
