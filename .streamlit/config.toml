@@ -1,3 +1,14 @@
 [theme]
+# The preset Streamlit theme that your custom theme inherits from.
+# One of "light" or "dark".
 base="light"
+
+# Primary accent color for interactive elements.
 primaryColor="#4285f4"
+
+# Color used for almost all text.
+textColor ="#45474d"
+
+[ui]
+# Hide the running animation and the stop and menu buttons.
+hideTopBar = true

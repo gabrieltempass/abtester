@@ -32,7 +32,7 @@ If you would like to provide feedback, learn more about abtester, or anything el
 """
 st.set_page_config(
     page_title="abtester",
-    page_icon=Image.open("images/favicon.png"),
+    page_icon=Image.open("images/icon.png"),
     menu_items={
         "Get help": "https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link",
         "Report a bug": "https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.",
