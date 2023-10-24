@@ -36,7 +36,7 @@ def calculate_proportions_sample(
         power=power,
         ratio=ratio,
     ))
-    treatment_sample = control_sample * ratio
+    treatment_sample = math.ceil(control_sample * ratio)
 
     return control_sample, treatment_sample
 
