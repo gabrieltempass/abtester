@@ -40,6 +40,9 @@ st.set_page_config(
     },
 )
 
+# Hide the default linear gradient at the top of the page
+st.markdown("<style>div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display:none;} </style>", unsafe_allow_html=True)
+
 # Hide top right menu and "Made with Streamlit" footer
 hide_menu_style = """
 	<style>
@@ -63,7 +66,7 @@ option = st.selectbox(
     "What do you want to do?",
     (
         "Select an option",
-        "Calculate the minimum sample size",
+        "Calculate the sample size",
         "Evaluate the statistical significance",
     ),
 )
@@ -73,16 +76,16 @@ description = "A proportions test is when the data can be expressed in discrete 
 loader = FileSystemLoader("templates")
 env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
 
-if option == "Calculate the minimum sample size":
+if option == "Calculate the sample size":
 
     st.header("Sample size")
     test = st.radio(
         label="Test",
         options=("Proportions", "Means"),
         index=0,
-        key="sample-size",
         horizontal=True,
         help=description,
+        key="sample-size",
     )
 
     if test == "Proportions":
