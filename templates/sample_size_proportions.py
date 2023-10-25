@@ -1,6 +1,7 @@
 # Import the libraries
 import math
-import statsmodels.stats.api as sms
+from statsmodels.stats.proportion import proportion_effectsize
+from statsmodels.stats.power import tt_ind_solve_power
 
 # Define the parameters
 control_conversion = {{ control_conversion }}
@@ -17,12 +18,11 @@ if alternative == "smaller":
 treatment_conversion = control_conversion * (1 + sensitivity)
 alpha = 1 - confidence_level
 ratio = treatment_ratio / control_ratio
-effect_size = sms.proportion_effectsize(
+effect_size = proportion_effectsize(
     treatment_conversion,
     control_conversion
 )
-analysis = sms.TTestIndPower()
-control_sample = math.ceil(analysis.solve_power(
+control_sample = math.ceil(tt_ind_solve_power(
     effect_size=effect_size,
     alpha=alpha,
     power=power,
