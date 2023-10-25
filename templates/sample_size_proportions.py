@@ -12,18 +12,16 @@ control_ratio = {{ control_ratio }}
 treatment_ratio = {{ treatment_ratio }}
 
 # Calculate the sample size
+if alternative == "smaller":
+    sensitivity *= -1
 treatment_conversion = control_conversion * (1 + sensitivity)
 alpha = 1 - confidence_level
 ratio = treatment_ratio / control_ratio
 effect_size = sms.proportion_effectsize(
-    control_conversion,
-    treatment_conversion
+    treatment_conversion,
+    control_conversion
 )
 analysis = sms.TTestIndPower()
-{% if alternative == "one-sided" %}
-if alternative == "one-sided":
-    alternative = "smaller"
-{% endif %}
 control_sample = math.ceil(analysis.solve_power(
     effect_size=effect_size,
     alpha=alpha,

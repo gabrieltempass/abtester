@@ -1,8 +1,10 @@
 import math
 import numpy as np
 import pandas as pd
-import statsmodels.stats.api as sms
+from statsmodels.stats.proportion import proportion_effectsize
+from statsmodels.stats.power import tt_ind_solve_power
 from statsmodels.stats.power import zt_ind_solve_power
+
 import streamlit as st
 
 from source.utils import get_alpha
@@ -19,18 +21,16 @@ def calculate_proportions_sample(
     control_ratio,
     treatment_ratio,
 ):
+    if alternative == "smaller":
+        sensitivity *= -1
     treatment_conversion = control_conversion * (1 + sensitivity)
     alpha = get_alpha(confidence_level)
     ratio = treatment_ratio / control_ratio
 
-    # Cohen's h
-    effect_size = sms.proportion_effectsize(control_conversion,
-                                            treatment_conversion)
-    analysis = sms.TTestIndPower()
-    if alternative == "one-sided":
-        alternative = "smaller"
-    control_sample = math.ceil(analysis.solve_power(
-        effect_size,
+    effect_size = proportion_effectsize(treatment_conversion,
+                                        control_conversion)
+    control_sample = math.ceil(tt_ind_solve_power(
+        effect_size=effect_size,
         alternative=alternative,
         alpha=alpha,
         power=power,
@@ -50,8 +50,8 @@ def calculate_means_sample(
     treatment_ratio,
     df,
 ):
-    if alternative == "one-sided":
-        alternative = "smaller"
+    if alternative == "smaller":
+        sensitivity *= -1
     alpha = get_alpha(confidence_level)
     ratio = treatment_ratio / control_ratio
 

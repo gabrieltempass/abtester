@@ -5,7 +5,7 @@ from source.utils import percentage
 def get_proportions_sample_inputs():
     control_conversion = percentage(
         st.number_input(
-            label="Baseline conversion rate (%)",
+            label="Control conversion rate (%)",
             min_value=0.1,
             max_value=100.0,
             value=15.0,
@@ -27,12 +27,18 @@ def get_proportions_sample_inputs():
     )
 
     alternative = st.radio(
-        label="Hypothesis",
-        options=("one-sided", "two-sided"),
-        index=1,
-        horizontal=True,
-        format_func=lambda x: {"one-sided": "One-sided", "two-sided": "Two-sided"}.get(x),
+        label="Alternative is",
+        options=("smaller", "larger", "two-sided"),
+        index=2,
+        format_func=lambda x: {
+            "smaller": "Smaller than the null",
+            "larger": "Larger than the null",
+            "two-sided": "Not equal to the null",
+        }.get(x),
+        captions=("One-sided", "One-sided", "Two-sided"),
         help=description["alternative"],
+        horizontal=True,
+        disabled=False,
     )
 
     confidence_level = percentage(
@@ -111,12 +117,17 @@ def get_means_sample_inputs():
     )
 
     alternative = st.radio(
-        label="Hypothesis",
-        options=("one-sided", "two-sided"),
-        index=1,
-        horizontal=True,
-        format_func=lambda x: {"one-sided": "One-sided", "two-sided": "Two-sided"}.get(x),
+        label="Alternative is",
+        options=("smaller", "larger", "two-sided"),
+        index=2,
+        format_func=lambda x: {
+            "smaller": "Smaller than the null",
+            "larger": "Larger than the null",
+            "two-sided": "Not equal to the null",
+        }.get(x),
+        captions=("One-sided", "One-sided", "Two-sided"),
         help=description["alternative"],
+        horizontal=True,
     )
 
     confidence_level = percentage(
@@ -259,7 +270,7 @@ def get_means_significance_inputs():
 description = {
     "control_conversion": "The conversion rate expected for the control. To help you set this value, you could use similar historical data. However, if that it is not available, make a guess based on your experience.",
     "sensitivity": "The minimum effect size that you want to be able to measure. A rule of thumb is to use 10% (meaning that you want to be able to detect at least a 10% difference for the treatment over the control).",
-    "alternative": "A one-sided hypothesis is to test whether one group has a distribution greater then the other. While a two-sided is to test whether one group has a distribution smaller or greater then the other. If you are not sure about which one to use, choose the two-sided (more conservative).",
+    "alternative": "Whether you believe that the alternative hypothesis (H₁) will be smaller or larger than the null hypothesis (H₀). If the hypothesis test is two-sided, H₁ is not equal to H₀ must be selected.",
     "confidence_level": "The probability of detecting a true negative. That is, detecting that there is not a statistically significant difference between the control and the treatment, when this difference indeed does not exists. A rule of thumb is to use 95%.",
     "power": "The probability of detecting a true positive. That is, detecting that there is a statistically significant difference between the control and the treatment, when this difference indeed exists. A rule of thumb is to use 80%.",
     "control_users": "The number of users in the control group.",

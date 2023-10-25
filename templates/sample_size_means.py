@@ -17,10 +17,8 @@ control_mean = df["measurement"].mean()
 standard_deviation = df["measurement"].std()
 
 # Calculate the sample size
-{% if alternative == "one-sided" %}
-if alternative == "one-sided":
-	alternative = "smaller"
-{% endif %}
+if alternative == "smaller":
+    sensitivity *= -1
 alpha = 1 - confidence_level
 ratio = treatment_ratio / control_ratio
 treatment_mean = control_mean * (1 + sensitivity)
