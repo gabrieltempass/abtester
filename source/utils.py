@@ -63,7 +63,7 @@ def show_download_button(name, path, file):
     )
 
 
-@st.cache
+@st.cache_data
 def convert_df(df):
     return df.to_csv(index=False).encode("utf-8")
 
