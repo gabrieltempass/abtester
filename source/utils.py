@@ -73,5 +73,5 @@ def permutation(x, nA, nB):
     n = nA + nB
     idx_A = set(random.sample(range(n), nB))
     idx_B = set(range(n)) - idx_A
-    return x.loc[idx_B].mean() - x.loc[idx_A].mean()
+    return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
 
