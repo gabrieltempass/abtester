@@ -27,7 +27,7 @@ def get_proportions_sample_inputs():
     )
 
     alternative = st.radio(
-        label="Alternative is",
+        label="Alternative",
         options=("smaller", "larger", "two-sided"),
         index=2,
         format_func=lambda x: {
@@ -117,7 +117,7 @@ def get_means_sample_inputs():
     )
 
     alternative = st.radio(
-        label="Alternative is",
+        label="Alternative",
         options=("smaller", "larger", "two-sided"),
         index=2,
         format_func=lambda x: {
@@ -182,7 +182,11 @@ def get_means_sample_inputs():
         )
     )
 
-    uploaded_file = st.file_uploader("Choose a CSV file")
+    uploaded_file = st.file_uploader(
+        label="Choose a CSV file",
+        type="csv",
+        help=description["uploaded_file"],
+    )
 
     return (
     	sensitivity,
@@ -193,6 +197,20 @@ def get_means_sample_inputs():
         treatment_ratio,
     	uploaded_file
     )
+
+
+def get_file_sample_inputs():
+    option = st.selectbox(
+        label="Select the column with the measurements",
+        options=(
+            "Column A",
+            "Column B",
+            "Column C",
+        ),
+        index=None,
+        placeholder="Choose an option",
+    )
+    return (option)
 
 
 def get_proportions_significance_inputs():
@@ -279,4 +297,5 @@ description = {
     "treatment_conversions": "The number of users in the treatment group that converted. For example, if the treatment group received an email, the conversions could the number of users that clicked in an ad inside it.",
     "control_ratio": "The percentage of users from the entire experiment who are part of the control group.",
     "treatment_ratio": "The percentage of users from the entire experiment who are part of the treatment group.",
+    "uploaded_file": "The file must have a header as the first row, and one of the columns must have the values of the metric of interest for every respective unique user.",
 }

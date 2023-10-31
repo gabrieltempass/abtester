@@ -34,22 +34,24 @@ def show_sample_result(control_sample, treatment_sample):
 
 
 def show_file_summary(df, option):
+    st.dataframe(df, height=230, use_container_width=True, hide_index=True)
+    row_plural = ""
+    column_plural = ""
+    if df.shape[0] > 1:
+        row_plural = "s"
+    if df.shape[1] > 1:
+        column_plural = "s"
+    st.write(f"{df.shape[0]:,} row{row_plural} and {df.shape[1]:,} column{column_plural}")
     st.write("**File summary**")
-    st.write(f"Size: {df.shape[0]} rows and {df.shape[1]} columns")
 
     if option == "Evaluate the statistical significance":
-        control_users = df[df["group"] == "control"].shape[0]
-        treatment_users = df[df["group"] == "treatment"].shape[0]
+        control_users = df[df["Group"] == "Control"].shape[0]
+        treatment_users = df[df["Group"] == "Treatment"].shape[0]
         total_users = control_users + treatment_users
 
         control_ratio = control_users / total_users
         treatment_ratio = treatment_users / total_users
-        st.write(f"Ratio: {control_users} control users ({control_ratio:.2%}) and {treatment_users} treatment users ({treatment_ratio:.2%})")
-
-    st.write("Preview of the first 5 rows:")
-    st.table(df.head(5))
-    st.write("And the last 5 rows:")
-    st.table(df.tail(5))
+        st.write(f"Ratio: {control_users:,} control users ({control_ratio:.2%}) and {treatment_users:,} treatment users ({treatment_ratio:.2%})")
 
 
 def show_download_button(name, path, file):

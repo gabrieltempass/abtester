@@ -7,6 +7,7 @@ from source.inputs import get_proportions_sample_inputs
 from source.inputs import get_means_sample_inputs
 from source.inputs import get_proportions_significance_inputs
 from source.inputs import get_means_significance_inputs
+from source.inputs import get_file_sample_inputs
 
 from source.statistics import calculate_proportions_sample
 from source.statistics import calculate_means_sample
@@ -143,15 +144,16 @@ if option == "Calculate the sample size":
 
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
+            column = get_file_sample_inputs()
             show_file_summary(df, option)
         else:
             st.write(
-                'The file must have each row with a unique user. And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
+                "The file must have a header as the first row, and one of the columns must have the values of the metric of interest for every respective unique user. Here is an example:"
             )
 
-            path = "sample_datasets/minimum_sample/"
+            path = "sample_datasets/sample_size/"
             df_format = pd.read_csv(f"{path}format.csv")
-            st.table(df_format)
+            st.dataframe(df_format, height=230, use_container_width=True, hide_index=True)
 
             st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
 
@@ -282,7 +284,7 @@ if option == "Evaluate the statistical significance":
 
             path = "sample_datasets/statistical_significance/"
             df_format = pd.read_csv(f"{path}format.csv")
-            st.table(df_format)
+            st.dataframe(df_format, height=230, use_container_width=True, hide_index=True)
 
             st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
 

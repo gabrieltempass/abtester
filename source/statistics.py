@@ -24,11 +24,10 @@ def calculate_proportions_sample(
     if alternative == "smaller":
         sensitivity *= -1
     treatment_conversion = control_conversion * (1 + sensitivity)
-    alpha = get_alpha(confidence_level)
-    ratio = treatment_ratio / control_ratio
-
     effect_size = proportion_effectsize(treatment_conversion,
                                         control_conversion)
+    alpha = get_alpha(confidence_level)
+    ratio = treatment_ratio / control_ratio
     control_sample = math.ceil(tt_ind_solve_power(
         effect_size=effect_size,
         alternative=alternative,
@@ -52,15 +51,13 @@ def calculate_means_sample(
 ):
     if alternative == "smaller":
         sensitivity *= -1
-    alpha = get_alpha(confidence_level)
-    ratio = treatment_ratio / control_ratio
-
-    control_mean = df["measurement"].mean()
+    control_mean = df["Measurement"].mean()
     treatment_mean = control_mean * (1 + sensitivity)
     difference = treatment_mean - control_mean
-    standard_deviation = df["measurement"].std()
+    standard_deviation = df["Measurement"].std()
     effect_size = difference / standard_deviation
-
+    alpha = get_alpha(confidence_level)
+    ratio = treatment_ratio / control_ratio
     control_sample = math.ceil(zt_ind_solve_power(
         effect_size=effect_size,
         alpha=alpha,
@@ -113,12 +110,12 @@ def evaluate_means_significance(
 ):
     alpha = get_alpha(confidence_level)
 
-    measurements = df["measurement"]
-    control_users = df[df["group"] == "control"].shape[0]
-    treatment_users = df[df["group"] == "treatment"].shape[0]
+    measurements = df["Measurement"]
+    control_users = df[df["Group"] == "Control"].shape[0]
+    treatment_users = df[df["Group"] == "Treatment"].shape[0]
 
-    control_mean = df[df["group"] == "control"]["measurement"].mean()
-    treatment_mean = df[df["group"] == "treatment"]["measurement"].mean()
+    control_mean = df[df["Group"] == "Control"]["Measurement"].mean()
+    treatment_mean = df[df["Group"] == "Treatment"]["Measurement"].mean()
     observed_diff = treatment_mean - control_mean
 
     perm_diffs = []
