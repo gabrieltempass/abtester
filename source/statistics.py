@@ -1,15 +1,65 @@
 import math
+import random
 import numpy as np
 import pandas as pd
 from statsmodels.stats.proportion import proportion_effectsize
 from statsmodels.stats.power import tt_ind_solve_power
 from statsmodels.stats.power import zt_ind_solve_power
-
 import streamlit as st
 
-from source.utils import get_alpha
-from source.utils import get_beta
-from source.utils import permutation
+
+def percentage(number):
+    return number / 100
+
+
+def get_alpha(confidence_level):
+    return 1 - confidence_level
+
+
+def get_beta(power):
+    return 1 - power
+
+
+def permutation(x, nA, nB):
+    random.seed(0)
+    n = nA + nB
+    idx_A = set(random.sample(range(n), nB))
+    idx_B = set(range(n)) - idx_A
+    return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
+
+
+def calculate_sample(
+    test,
+    control_conversion,
+    sensitivity,
+    alternative,
+    confidence_level,
+    power,
+    control_ratio,
+    treatment_ratio,
+    df,
+):
+    if test == "Proportions":
+        control_sample, treatment_sample = calculate_proportions_sample(
+            control_conversion=control_conversion,
+            sensitivity=sensitivity,
+            alternative=alternative,
+            confidence_level=confidence_level,
+            power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
+        )
+    elif test == "Means":
+        control_sample, treatment_sample = calculate_means_sample(
+            sensitivity=sensitivity,
+            alternative=alternative,
+            confidence_level=confidence_level,
+            power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
+            df=df,
+        )
+    return control_sample, treatment_sample
 
 
 def calculate_proportions_sample(

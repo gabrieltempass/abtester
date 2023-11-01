@@ -3,42 +3,33 @@ from jinja2 import FileSystemLoader, Environment
 import pandas as pd
 import streamlit as st
 
-from source.inputs import get_proportions_sample_inputs
-from source.inputs import get_means_sample_inputs
+from source.inputs import get_menu_input
+from source.inputs import get_test_input
+from source.inputs import get_sample_inputs
 from source.inputs import get_proportions_significance_inputs
 from source.inputs import get_means_significance_inputs
-from source.inputs import get_file_sample_inputs
+from source.inputs import show_file_summary
 
-from source.statistics import calculate_proportions_sample
-from source.statistics import calculate_means_sample
+from source.statistics import percentage
+from source.statistics import get_alpha
+from source.statistics import get_beta
+from source.statistics import permutation
+from source.statistics import calculate_sample
 from source.statistics import evaluate_proportions_significance
 from source.statistics import evaluate_means_significance
 
+from source.results import show_sample_result
+from source.results import show_significance_result
+
 from source.utils import render_svg
-from source.utils import percentage
-from source.utils import get_alpha
-from source.utils import get_beta
-from source.utils import show_sample_result
-from source.utils import show_file_summary
 from source.utils import show_download_button
 from source.utils import convert_df
-from source.utils import permutation
 
 
 # Set browser tab title, favicon and menu options
-about = """
-This app was made by Gabriel Tem Pass. You can check the source code at [https://github.com/gabrieltempass/ab-tester](https://github.com/gabrieltempass/ab-tester).
-
-If you would like to provide feedback, learn more about abtester, or anything else, feel free to send an email to contact@abtester.app.
-"""
 st.set_page_config(
     page_title="abtester",
     page_icon=Image.open("images/icon.png"),
-    menu_items={
-        "Get help": "https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link",
-        "Report a bug": "https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here.",
-        "About": about,
-    },
 )
 
 # Hide the default linear gradient at the top of the page
@@ -63,151 +54,56 @@ st.write("")
 st.write("")
 st.write("")
 
-option = st.selectbox(
-    "What do you want to do?",
-    (
-        "Select an option",
-        "Calculate the sample size",
-        "Evaluate the statistical significance",
-    ),
-)
-
-description = "A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when he or she converts it is a one).\n\nA means test is when the data is continuous. For example: the time spent in a web page."
-
-loader = FileSystemLoader("templates")
-env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-
-if option == "Calculate the sample size":
+menu = get_menu_input()
+if menu == "Calculate the sample size":
 
     st.header("Sample size")
-    test = st.radio(
-        label="Test",
-        options=("Proportions", "Means"),
-        index=0,
-        horizontal=True,
-        help=description,
-        key="sample-size",
+    (
+        test,
+        control_conversion,
+        sensitivity,
+        alternative,
+        confidence_level,
+        power,
+        control_ratio,
+        treatment_ratio,
+        df,
+        file_name,
+    ) = get_sample_inputs()
+
+    if not st.button("Calculate"):
+        st.stop()
+
+    control_sample, treatment_sample = calculate_sample(
+        test=test,
+        control_conversion=control_conversion,
+        sensitivity=sensitivity,
+        alternative=alternative,
+        confidence_level=confidence_level,
+        power=power,
+        control_ratio=control_ratio,
+        treatment_ratio=treatment_ratio,
+        df=df,
     )
 
-    if test == "Proportions":
+    show_sample_result(
+        control_sample=control_sample,
+        treatment_sample=treatment_sample,
+        test=test,
+        control_conversion=control_conversion,
+        file_name=file_name,
+        sensitivity=sensitivity,
+        alternative=alternative,
+        confidence_level=confidence_level,
+        power=power,
+        control_ratio=control_ratio,
+        treatment_ratio=treatment_ratio,
+    )
 
-        (
-            control_conversion,
-            sensitivity,
-            alternative,
-            confidence_level,
-            power,
-            control_ratio,
-            treatment_ratio,
-        ) = get_proportions_sample_inputs()
-
-        if not (st.button("Calculate")):
-            st.stop()
-
-        control_sample, treatment_sample = calculate_proportions_sample(
-            control_conversion=control_conversion,
-            sensitivity=sensitivity,
-            alternative=alternative,
-            confidence_level=confidence_level,
-            power=power,
-            control_ratio=control_ratio,
-            treatment_ratio=treatment_ratio,
-        )
-
-        show_sample_result(control_sample, treatment_sample)
-
-        template = env.get_template("sample_size_proportions.py")
-        code = template.render(
-            test=test,
-            control_conversion=control_conversion,
-            sensitivity=sensitivity,
-            alternative=alternative,
-            confidence_level=confidence_level,
-            power=power,
-            control_ratio=control_ratio,
-            treatment_ratio=treatment_ratio,
-        )
-        with st.expander("Show the code"):
-            st.code(code, language="python")
-
-    elif test == "Means":
-
-        (
-            sensitivity,
-            alternative,
-            confidence_level,
-            power,
-            control_ratio,
-            treatment_ratio,
-            uploaded_file
-        ) = get_means_sample_inputs()
-
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-            column = get_file_sample_inputs()
-            show_file_summary(df, option)
-        else:
-            st.write(
-                "The file must have a header as the first row, and one of the columns must have the values of the metric of interest for every respective unique user. Here is an example:"
-            )
-
-            path = "sample_datasets/sample_size/"
-            df_format = pd.read_csv(f"{path}format.csv")
-            st.dataframe(df_format, height=230, use_container_width=True, hide_index=True)
-
-            st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
-
-            show_download_button("dataset A", path, "dataset_a.csv")
-            show_download_button("dataset B", path, "dataset_b.csv")
-            show_download_button("dataset C", path, "dataset_c.csv")
-
-        if not (st.button("Calculate")):
-            st.stop()
-
-        if uploaded_file is None:
-            st.error(
-                "You must choose a file to be able to calculate the minimum sample."
-            )
-
-        else:
-
-            control_sample, treatment_sample = calculate_means_sample(
-                sensitivity=sensitivity,
-                alternative=alternative,
-                confidence_level=confidence_level,
-                power=power,
-                control_ratio=control_ratio,
-                treatment_ratio=treatment_ratio,
-                df=df,
-            )
-
-            show_sample_result(control_sample, treatment_sample)
-
-            template = env.get_template("sample_size_means.py")
-            code = template.render(
-                file_name=uploaded_file.name,
-                test=test,
-                sensitivity=sensitivity,
-                alternative=alternative,
-                confidence_level=confidence_level,
-                power=power,
-                control_ratio=control_ratio,
-                treatment_ratio=treatment_ratio,
-            )
-            with st.expander("Show the code"):
-                st.code(code, language="python")
-
-if option == "Evaluate the statistical significance":
+if menu == "Evaluate the statistical significance":
 
     st.header("Statistical significance")
-    test = st.radio(
-        label="Test",
-        options=("Proportions", "Means"),
-        index=0,
-        key="statistical-significance",
-        horizontal=True,
-        help=description,
-    )
+    test = get_test_input()
 
     if test == "Proportions":
 
@@ -219,7 +115,7 @@ if option == "Evaluate the statistical significance":
             confidence_level
         ) = get_proportions_significance_inputs()
 
-        if not (st.button("Calculate")):
+        if not st.button("Calculate"):
             st.stop()
 
         (
@@ -235,29 +131,17 @@ if option == "Evaluate the statistical significance":
             treatment_conversions=treatment_conversions,
             confidence_level=confidence_level,
         )
+        show_significance_result(
+            test=test,
+            control=control_effect,
+            treatment=treatment_effect,
+            observed_diff=observed_diff,
+            alpha=alpha,
+            p_value=p_value,
+        )
 
-        st.subheader("Result")
-        if p_value <= alpha:
-            st.success("The difference is statistically significant")
-            comparison = {
-                "direction": "less than or equal to",
-                "significance": "is"
-            }
-        else:
-            st.error("The difference is not statistically significant")
-            comparison = {
-                "direction": "greater than",
-                "significance": "is not"
-            }
-
-        prefix = "~" if round(p_value, 4) == 0 else ""
-        st.write(f"Control conversion: {control_effect:.2%}")
-        st.write(f"Treatment conversion: {treatment_effect:.2%}")
-        st.write(f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_effect:+.2%})")
-        st.write(f"Alpha: {alpha:.4f}")
-        st.write(f"p-value: {prefix}{p_value:.4f}")
-        st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
-
+        loader = FileSystemLoader("templates")
+        env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
         template = env.get_template("statistical_significance_proportions.py")
         code = template.render(
             test=test,
@@ -276,7 +160,7 @@ if option == "Evaluate the statistical significance":
 
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
-            show_file_summary(df, option)
+            show_file_summary(df)
         else:
             st.write(
                 'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
@@ -312,29 +196,17 @@ if option == "Evaluate the statistical significance":
                 confidence_level=confidence_level,
                 df=df,
             )
+            show_significance_result(
+                test=test,
+                control=control_mean,
+                treatment=treatment_mean,
+                observed_diff=observed_diff,
+                alpha=alpha,
+                p_value=p_value,
+            )
 
-            st.subheader("Result")
-            if p_value <= alpha:
-                st.success("The difference is statistically significant")
-                comparison = {
-                    "direction": "less than or equal to",
-                    "significance": "is"
-                }
-            else:
-                st.error("The difference is not statistically significant")
-                comparison = {
-                    "direction": "greater than",
-                    "significance": "is not"
-                }
-
-            prefix = "~" if round(p_value, 4) == 0 else ""
-            st.write(f"Control mean: {control_mean:.2f}")
-            st.write(f"Treatment mean: {treatment_mean:.2f}")
-            st.write(f"Observed difference: {observed_diff / control_mean:+.2%}")
-            st.write(f"Alpha: {alpha:.4f}")
-            st.write(f"p-value: {prefix}{p_value:.4f}")
-            st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
-
+            loader = FileSystemLoader("templates")
+            env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
             template = env.get_template("statistical_significance_means.py")
             code = template.render(
                 file_name=uploaded_file.name,

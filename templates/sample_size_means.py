@@ -19,11 +19,11 @@ standard_deviation = df["measurement"].std()
 # Calculate the sample size
 if alternative == "smaller":
     sensitivity *= -1
-alpha = 1 - confidence_level
-ratio = treatment_ratio / control_ratio
 treatment_mean = control_mean * (1 + sensitivity)
 difference = treatment_mean - control_mean
 effect_size = difference / standard_deviation
+alpha = 1 - confidence_level
+ratio = treatment_ratio / control_ratio
 control_sample = math.ceil(zt_ind_solve_power(
     effect_size=effect_size,
     alpha=alpha,
@@ -34,7 +34,7 @@ control_sample = math.ceil(zt_ind_solve_power(
 treatment_sample = math.ceil(control_sample * ratio)
 
 # Show the result
-print("Minimum sample size")
+print("Sample size")
 print(f"Control: {control_sample:,}")
 print(f"Treatment: {treatment_sample:,}")
 print(f"Total: {(control_sample + treatment_sample):,}")
