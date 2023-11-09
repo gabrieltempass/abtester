@@ -7,7 +7,7 @@ from statsmodels.stats.power import tt_ind_solve_power
 control_conversion = {{ control_conversion }}
 sensitivity = {{ sensitivity }}
 alternative = "{{ alternative }}"
-confidence_level = {{ confidence_level }}
+confidence = {{ confidence }}
 power = {{ power }}
 control_ratio = {{ control_ratio }}
 treatment_ratio = {{ treatment_ratio }}
@@ -20,7 +20,7 @@ effect_size = proportion_effectsize(
     treatment_conversion,
     control_conversion
 )
-alpha = 1 - confidence_level
+alpha = 1 - confidence
 ratio = treatment_ratio / control_ratio
 control_sample = math.ceil(tt_ind_solve_power(
     effect_size=effect_size,

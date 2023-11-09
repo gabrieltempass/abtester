@@ -1,6 +1,4 @@
 import base64
-import numpy as np
-import pandas as pd
 import streamlit as st
 
 
@@ -13,19 +11,8 @@ def render_svg(svg):
     return
 
 
-def show_download_button(name, path, file):
-    df = pd.read_csv(path+file)
-    df = convert_df(df)
-    st.download_button(
-        label=f"Download {name}",
-        data=df,
-        file_name=file,
-        mime="text/csv",
-    )
+def add_spaces(n):
+    for i in range(n):
+        st.write("")
     return
-
-
-@st.cache_data
-def convert_df(df):
-    return df.to_csv(index=False).encode("utf-8")
 

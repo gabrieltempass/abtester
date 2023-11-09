@@ -12,8 +12,8 @@ def percentage(number):
     return number / 100
 
 
-def get_alpha(confidence_level):
-    return 1 - confidence_level
+def get_alpha(confidence):
+    return 1 - confidence
 
 
 def get_beta(power):
@@ -33,18 +33,19 @@ def calculate_sample(
     control_conversion,
     sensitivity,
     alternative,
-    confidence_level,
+    confidence,
     power,
     control_ratio,
     treatment_ratio,
     df,
+    alias,
 ):
     if test == "Proportions":
         control_sample, treatment_sample = calculate_proportions_sample(
             control_conversion=control_conversion,
             sensitivity=sensitivity,
             alternative=alternative,
-            confidence_level=confidence_level,
+            confidence=confidence,
             power=power,
             control_ratio=control_ratio,
             treatment_ratio=treatment_ratio,
@@ -53,11 +54,12 @@ def calculate_sample(
         control_sample, treatment_sample = calculate_means_sample(
             sensitivity=sensitivity,
             alternative=alternative,
-            confidence_level=confidence_level,
+            confidence=confidence,
             power=power,
             control_ratio=control_ratio,
             treatment_ratio=treatment_ratio,
             df=df,
+            alias=alias,
         )
     return control_sample, treatment_sample
 
@@ -66,7 +68,7 @@ def calculate_proportions_sample(
     control_conversion,
     sensitivity,
     alternative,
-    confidence_level,
+    confidence,
     power,
     control_ratio,
     treatment_ratio,
@@ -76,7 +78,7 @@ def calculate_proportions_sample(
     treatment_conversion = control_conversion * (1 + sensitivity)
     effect_size = proportion_effectsize(treatment_conversion,
                                         control_conversion)
-    alpha = get_alpha(confidence_level)
+    alpha = get_alpha(confidence)
     ratio = treatment_ratio / control_ratio
     control_sample = math.ceil(tt_ind_solve_power(
         effect_size=effect_size,
@@ -93,20 +95,21 @@ def calculate_proportions_sample(
 def calculate_means_sample(
     sensitivity,
     alternative,
-    confidence_level,
+    confidence,
     power,
     control_ratio,
     treatment_ratio,
     df,
+    alias,
 ):
     if alternative == "smaller":
         sensitivity *= -1
-    control_mean = df["Measurement"].mean()
+    control_mean = df[alias["Measurement"]].mean()
     treatment_mean = control_mean * (1 + sensitivity)
     difference = treatment_mean - control_mean
-    standard_deviation = df["Measurement"].std()
+    standard_deviation = df[alias["Measurement"]].std()
     effect_size = difference / standard_deviation
-    alpha = get_alpha(confidence_level)
+    alpha = get_alpha(confidence)
     ratio = treatment_ratio / control_ratio
     control_sample = math.ceil(zt_ind_solve_power(
         effect_size=effect_size,
@@ -125,9 +128,9 @@ def evaluate_proportions_significance(
     treatment_users,
     control_conversions,
     treatment_conversions,
-    confidence_level,
+    confidence,
 ):
-    alpha = get_alpha(confidence_level)
+    alpha = get_alpha(confidence)
     control_effect = control_conversions / control_users
     treatment_effect = treatment_conversions / treatment_users
     observed_diff = treatment_effect - control_effect
@@ -138,7 +141,7 @@ def evaluate_proportions_significance(
 
     perm_diffs = []
     i = 1000
-    my_bar = st.progress(0)
+    bar = st.empty().progress(0)
     for percent_complete in range(i):
         perm_diffs.append(
             permutation(
@@ -147,36 +150,44 @@ def evaluate_proportions_significance(
                 treatment_users + treatment_conversions,
             )
         )
-        my_bar.progress((percent_complete + 1) / i)
+        bar.progress((percent_complete + 1) / i)
 
+    bar.empty()
     p_value = np.mean([diff > observed_diff for diff in perm_diffs])
 
     return control_effect, treatment_effect, observed_diff, alpha, p_value
 
 
 def evaluate_means_significance(
-    confidence_level,
+    confidence,
     df,
+    alias,
 ):
-    alpha = get_alpha(confidence_level)
+    alpha = get_alpha(confidence)
 
-    measurements = df["Measurement"]
-    control_users = df[df["Group"] == "Control"].shape[0]
-    treatment_users = df[df["Group"] == "Treatment"].shape[0]
+    measurement = alias["Measurement"]
+    group = alias["Group"]
+    control = alias["Control"]
+    treatment = alias["Treatment"]
 
-    control_mean = df[df["Group"] == "Control"]["Measurement"].mean()
-    treatment_mean = df[df["Group"] == "Treatment"]["Measurement"].mean()
+    measurements = df[measurement]
+    control_users = df[df[group] == control].shape[0]
+    treatment_users = df[df[group] == treatment].shape[0]
+
+    control_mean = df[df[group] == control][measurement].mean()
+    treatment_mean = df[df[group] == treatment][measurement].mean()
     observed_diff = treatment_mean - control_mean
 
     perm_diffs = []
     i = 1000
-    my_bar = st.progress(0)
+    bar = st.empty().progress(0)
     for percent_complete in range(i):
         perm_diffs.append(
             permutation(measurements, control_users, treatment_users)
         )
-        my_bar.progress((percent_complete + 1) / i)
+        bar.progress((percent_complete + 1) / i)
 
+    bar.empty()
     p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
 
     return control_mean, treatment_mean, observed_diff, alpha, p_value

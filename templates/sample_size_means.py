@@ -9,12 +9,12 @@ df = pd.read_csv("{{ file_name }}")
 # Define the parameters
 sensitivity = {{ sensitivity }}
 alternative = "{{ alternative }}"
-confidence_level = {{ confidence_level }}
+confidence = {{ confidence }}
 power = {{ power }}
 control_ratio = {{ control_ratio }}
 treatment_ratio = {{ treatment_ratio }}
-control_mean = df["measurement"].mean()
-standard_deviation = df["measurement"].std()
+control_mean = df["{{ alias['Measurement'] }}"].mean()
+standard_deviation = df["{{ alias['Measurement'] }}"].std()
 
 # Calculate the sample size
 if alternative == "smaller":
@@ -22,7 +22,7 @@ if alternative == "smaller":
 treatment_mean = control_mean * (1 + sensitivity)
 difference = treatment_mean - control_mean
 effect_size = difference / standard_deviation
-alpha = 1 - confidence_level
+alpha = 1 - confidence
 ratio = treatment_ratio / control_ratio
 control_sample = math.ceil(zt_ind_solve_power(
     effect_size=effect_size,

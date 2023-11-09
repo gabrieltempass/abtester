@@ -15,8 +15,8 @@ control_users = {{ control_users }}
 treatment_users = {{ treatment_users }}
 control_conversions = {{ control_conversions }}
 treatment_conversions = {{ treatment_conversions }}
-confidence_level = {{ confidence_level }}
-alpha = 1 - confidence_level
+confidence = {{ confidence }}
+alpha = 1 - confidence
 
 # Calculate the observed difference
 control_effect = control_conversions / control_users

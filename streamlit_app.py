@@ -1,19 +1,12 @@
 from PIL import Image
-from jinja2 import FileSystemLoader, Environment
-import pandas as pd
 import streamlit as st
 
 from source.inputs import get_menu_input
 from source.inputs import get_test_input
 from source.inputs import get_sample_inputs
-from source.inputs import get_proportions_significance_inputs
-from source.inputs import get_means_significance_inputs
-from source.inputs import show_file_summary
+from source.inputs import get_significance_proportions_inputs
+from source.inputs import get_significance_means_inputs
 
-from source.statistics import percentage
-from source.statistics import get_alpha
-from source.statistics import get_beta
-from source.statistics import permutation
 from source.statistics import calculate_sample
 from source.statistics import evaluate_proportions_significance
 from source.statistics import evaluate_means_significance
@@ -22,8 +15,7 @@ from source.results import show_sample_result
 from source.results import show_significance_result
 
 from source.utils import render_svg
-from source.utils import show_download_button
-from source.utils import convert_df
+from source.utils import add_spaces
 
 
 # Set browser tab title, favicon and menu options
@@ -32,77 +24,94 @@ st.set_page_config(
     page_icon=Image.open("images/icon.png"),
 )
 
-# Hide the default linear gradient at the top of the page
-st.markdown("<style>div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display:none;} </style>", unsafe_allow_html=True)
+html = {
+    "linear gradient": """
+        <style>
+            div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display:none;}
+        </style>
+    """,
+    "menu": """
+        <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+        </style>
+    """,
+}
 
-# Hide top right menu and "Made with Streamlit" footer
-hide_menu_style = """
-	<style>
-	#MainMenu {visibility: hidden;}
-	footer {visibility: hidden;}
-	</style>
-"""
-st.markdown(hide_menu_style, unsafe_allow_html=True)
+# Hide the default linear gradient at the top of the page
+st.markdown(html["linear gradient"], unsafe_allow_html=True)
+
+# Hide the top right menu and the "Made with Streamlit" footer
+st.markdown(html["menu"], unsafe_allow_html=True)
 
 render_svg(open("images/logo.svg").read())
-
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
+add_spaces(7)
 
 menu = get_menu_input()
 if menu == "Calculate the sample size":
 
+    add_spaces(3)
     st.header("Sample size")
+    st.divider()
+    st.subheader("Parameters")
+
     (
         test,
         control_conversion,
         sensitivity,
         alternative,
-        confidence_level,
+        confidence,
         power,
         control_ratio,
         treatment_ratio,
         df,
         file_name,
-    ) = get_sample_inputs()
+        alias,
+    ) = get_sample_inputs(menu)
 
     if not st.button("Calculate"):
         st.stop()
 
-    control_sample, treatment_sample = calculate_sample(
-        test=test,
-        control_conversion=control_conversion,
-        sensitivity=sensitivity,
-        alternative=alternative,
-        confidence_level=confidence_level,
-        power=power,
-        control_ratio=control_ratio,
-        treatment_ratio=treatment_ratio,
-        df=df,
-    )
+    if df is None and test == "Means":
+        st.error(
+            "You must choose a file to be able to calculate the sample size."
+        )
+    else:
+        control_sample, treatment_sample = calculate_sample(
+            test=test,
+            control_conversion=control_conversion,
+            sensitivity=sensitivity,
+            alternative=alternative,
+            confidence=confidence,
+            power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
+            df=df,
+            alias=alias,
+        )
 
-    show_sample_result(
-        control_sample=control_sample,
-        treatment_sample=treatment_sample,
-        test=test,
-        control_conversion=control_conversion,
-        file_name=file_name,
-        sensitivity=sensitivity,
-        alternative=alternative,
-        confidence_level=confidence_level,
-        power=power,
-        control_ratio=control_ratio,
-        treatment_ratio=treatment_ratio,
-    )
+        show_sample_result(
+            menu=menu,
+            test=test,
+            control_sample=control_sample,
+            treatment_sample=treatment_sample,
+            control_conversion=control_conversion,
+            sensitivity=sensitivity,
+            alternative=alternative,
+            confidence=confidence,
+            power=power,
+            control_ratio=control_ratio,
+            treatment_ratio=treatment_ratio,
+            file_name=file_name,
+            alias=alias,
+        )
 
 if menu == "Evaluate the statistical significance":
 
+    add_spaces(3)
     st.header("Statistical significance")
+    st.divider()
+    st.subheader("Parameters")
     test = get_test_input()
 
     if test == "Proportions":
@@ -112,11 +121,14 @@ if menu == "Evaluate the statistical significance":
             treatment_users,
             control_conversions,
             treatment_conversions,
-            confidence_level
-        ) = get_proportions_significance_inputs()
+            confidence
+        ) = get_significance_proportions_inputs()
 
         if not st.button("Calculate"):
             st.stop()
+
+        st.divider()
+        st.subheader("Result")
 
         (
             control_effect,
@@ -129,63 +141,44 @@ if menu == "Evaluate the statistical significance":
             treatment_users=treatment_users,
             control_conversions=control_conversions,
             treatment_conversions=treatment_conversions,
-            confidence_level=confidence_level,
+            confidence=confidence,
         )
         show_significance_result(
+            menu=menu,
             test=test,
             control=control_effect,
             treatment=treatment_effect,
             observed_diff=observed_diff,
             alpha=alpha,
             p_value=p_value,
-        )
-
-        loader = FileSystemLoader("templates")
-        env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-        template = env.get_template("statistical_significance_proportions.py")
-        code = template.render(
-            test=test,
             control_users=control_users,
             treatment_users=treatment_users,
             control_conversions=control_conversions,
             treatment_conversions=treatment_conversions,
-            confidence_level=confidence_level,
+            confidence=confidence,
         )
-        with st.expander("Show the code"):
-            st.code(code, language="python")
 
     elif test == "Means":
 
-        confidence_level, uploaded_file = get_means_significance_inputs()
+        (
+            confidence,
+            df,
+            file_name,
+            alias
+        ) = get_significance_means_inputs(menu)
 
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-            show_file_summary(df)
-        else:
-            st.write(
-                'The file must have each row with a unique user. One column named "group", with the user classification as "control" or "treatment". And one column named "measurement", with the value of the metric for the respective user. Below is an example of how the file should look like:'
-            )
-
-            path = "sample_datasets/statistical_significance/"
-            df_format = pd.read_csv(f"{path}format.csv")
-            st.dataframe(df_format, height=230, use_container_width=True, hide_index=True)
-
-            st.write("Don't have a CSV file available? Download one of the sample datasets below and try it out.")
-
-            show_download_button("dataset 1", path, "dataset_1.csv")
-            show_download_button("dataset 2", path, "dataset_2.csv")
-            show_download_button("dataset 3", path, "dataset_3.csv")
-
-        if not (st.button("Calculate")):
+        if not st.button("Calculate"):
             st.stop()
 
-        if uploaded_file is None:
+        if df is None:
             st.error(
                 "You must choose a file to be able to calculate the statistical significance."
             )
 
         else:
 
+            st.divider()
+            st.subheader("Result")
             (
                 control_mean,
                 treatment_mean,
@@ -193,25 +186,19 @@ if menu == "Evaluate the statistical significance":
                 alpha,
                 p_value,
             ) = evaluate_means_significance(
-                confidence_level=confidence_level,
+                confidence=confidence,
                 df=df,
+                alias=alias,
             )
             show_significance_result(
+                menu=menu,
                 test=test,
                 control=control_mean,
                 treatment=treatment_mean,
                 observed_diff=observed_diff,
                 alpha=alpha,
                 p_value=p_value,
+                confidence=confidence,
+                file_name=file_name,
+                alias=alias,
             )
-
-            loader = FileSystemLoader("templates")
-            env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-            template = env.get_template("statistical_significance_means.py")
-            code = template.render(
-                file_name=uploaded_file.name,
-                test=test,
-                confidence_level=confidence_level,
-            )
-            with st.expander("Show the code"):
-                st.code(code, language="python")

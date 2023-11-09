@@ -14,17 +14,17 @@ def permutation(x, nA, nB):
     return x.loc[idx_B].mean() - x.loc[idx_A].mean()
 
 # Define the parameters
-confidence_level = {{ confidence_level }}
-alpha = 1 - confidence_level
+confidence = {{ confidence }}
+alpha = 1 - confidence
 
 # Get the measurements and count the users
-measurements = df["measurement"]
-control_users = df[df["group"] == "control"].shape[0]
-treatment_users = df[df["group"] == "treatment"].shape[0]
+measurements = df["{{ alias['Measurement'] }}"]
+control_users = df[df["{{ alias['Group'] }}"] == "{{ alias['Control'] }}"].shape[0]
+treatment_users = df[df["{{ alias['Group'] }}"] == "{{ alias['Treatment'] }}"].shape[0]
 
 # Calculate the observed difference
-control_mean = df[df["group"] == "control"]["measurement"].mean()
-treatment_mean = df[df["group"] == "treatment"]["measurement"].mean()
+control_mean = df[df["{{ alias['Group'] }}"] == "{{ alias['Control'] }}"]["{{ alias['Measurement'] }}"].mean()
+treatment_mean = df[df["{{ alias['Group'] }}"] == "{{ alias['Treatment'] }}"]["{{ alias['Measurement'] }}"].mean()
 observed_diff = treatment_mean - control_mean
 
 # Execute the permutation test
