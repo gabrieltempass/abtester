@@ -26,6 +26,17 @@ def get_test_input():
     return test
 
 
+def get_users_input(label, min_value, value, description):
+    users = st.number_input(
+        label=label,
+        min_value=min_value,
+        value=value,
+        step=1,
+        help=description,
+    )
+    return users
+
+
 def get_control_conversion_input():
     control_conversion = percentage(
         st.number_input(
@@ -127,6 +138,33 @@ def get_ratios_input():
     return control_ratio, treatment_ratio
 
 
+def get_csv_input(description):
+    file = st.file_uploader(
+        label="Choose a CSV file",
+        type="csv",
+        help=description,
+    )
+    return file
+
+
+def get_column_input(label, columns, description, df, alias, standard):
+    if "User ID" in columns:
+        columns.remove("User ID")
+    column = st.selectbox(
+        label=label,
+        options=columns,
+        index=None,
+        help=description,
+    )
+    if column is None:
+        alias.update({standard: standard})
+        return df, alias
+    else:
+        df = df[column]
+        alias.update({standard: column})
+        return df, alias
+
+
 def get_labels_input(df, alias):
 
     labels = list(df[alias["Group"]].unique())
@@ -163,44 +201,6 @@ def get_labels_input(df, alias):
                 "Treatment": treatment,
             })
         return alias
-
-
-def get_csv_input(description):
-    file = st.file_uploader(
-        label="Choose a CSV file",
-        type="csv",
-        help=description,
-    )
-    return file
-
-
-def get_column_input(label, columns, description, df, alias, standard):
-    if "User ID" in columns:
-        columns.remove("User ID")
-    column = st.selectbox(
-        label=label,
-        options=columns,
-        index=None,
-        help=description,
-    )
-    if column is None:
-        alias.update({standard: standard})
-        return df, alias
-    else:
-        df = df[column]
-        alias.update({standard: column})
-        return df, alias
-
-
-def get_users_input(label, min_value, value, description):
-    users = st.number_input(
-        label=label,
-        min_value=min_value,
-        value=value,
-        step=1,
-        help=description,
-    )
-    return users
 
 
 def show_download_button(path, display, file, key):
@@ -261,6 +261,28 @@ def show_file_summary(df):
 
     st.write(string)
     return
+
+
+def get_test_statistic_input(menu):
+    show = st.checkbox("Show advanced settings")
+    if show:
+
+        if menu == "Calculate the sample size":
+            options = ("t-test", "z-test")
+            index = 0
+        # if menu == "Evaluate the statistical significance":
+        #     if test == "Means":
+        #         options = ("t-test", "z-test", "Permutation")
+        #         index = 2
+
+        test_statistic = st.radio(
+            label="Test statistic",
+            options=options,
+            index=index,
+            help=description["test_statistic"],
+            horizontal=True,
+        )
+        return test_statistic
 
 
 def get_non_standard_inputs(
@@ -466,7 +488,7 @@ def get_file_input(menu, requirements, description, path, file_names):
     return df, file_name, alias
 
 
-def get_sample_proportions_inputs():
+def get_sample_proportions_inputs(menu):
     control_conversion = get_control_conversion_input()
     sensitivity = get_sensitivity_input()
     alternative = get_alternative_input()
@@ -474,6 +496,7 @@ def get_sample_proportions_inputs():
     power = get_power_input()
     control_ratio, treatment_ratio = get_ratios_input()
     df, file_name, alias = None, None, None
+    test_statistic = get_test_statistic_input(menu)
 
     return (
         control_conversion,
@@ -486,6 +509,7 @@ def get_sample_proportions_inputs():
         df,
         file_name,
         alias,
+        test_statistic,
     )
 
 
@@ -507,6 +531,7 @@ def get_sample_means_inputs(menu):
             "dataset C": "dataset_c.csv",
         },
     )
+    test_statistic = get_test_statistic_input(menu)
 
     return (
         control_conversion,
@@ -519,6 +544,7 @@ def get_sample_means_inputs(menu):
         df,
         file_name,
         alias,
+        test_statistic,
     )
 
 def get_sample_inputs(menu):
@@ -535,7 +561,8 @@ def get_sample_inputs(menu):
             df,
             file_name,
             alias,
-        ) = get_sample_proportions_inputs()
+            test_statistic,
+        ) = get_sample_proportions_inputs(menu)
     elif test == "Means":
         (
             control_conversion,
@@ -548,6 +575,7 @@ def get_sample_inputs(menu):
             df,
             file_name,
             alias,
+            test_statistic,
         ) = get_sample_means_inputs(menu)
     return (
         test,
@@ -561,6 +589,7 @@ def get_sample_inputs(menu):
         df,
         file_name,
         alias,
+        test_statistic,
     )
 
 
@@ -634,6 +663,7 @@ description = {
     "group": "Select the column that contains the labels that marks users who participated in the control or treatment groups.",
     "control": "Select the label that marks users who participated in the control group.",
     "treatment": "Select the label that marks users who participated in the treatment group.",
+    "test_statistic": "Choose which test statistic will be used to perform the calculations.",
 }
 
 text = {

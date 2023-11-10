@@ -39,6 +39,7 @@ def calculate_sample(
     treatment_ratio,
     df,
     alias,
+    test_statistic,
 ):
     if test == "Proportions":
         control_sample, treatment_sample = calculate_proportions_sample(
@@ -49,6 +50,7 @@ def calculate_sample(
             power=power,
             control_ratio=control_ratio,
             treatment_ratio=treatment_ratio,
+            test_statistic=test_statistic,
         )
     elif test == "Means":
         control_sample, treatment_sample = calculate_means_sample(
@@ -60,6 +62,7 @@ def calculate_sample(
             treatment_ratio=treatment_ratio,
             df=df,
             alias=alias,
+            test_statistic=test_statistic,
         )
     return control_sample, treatment_sample
 
@@ -72,6 +75,7 @@ def calculate_proportions_sample(
     power,
     control_ratio,
     treatment_ratio,
+    test_statistic,
 ):
     if alternative == "smaller":
         sensitivity *= -1
@@ -80,13 +84,24 @@ def calculate_proportions_sample(
                                         control_conversion)
     alpha = get_alpha(confidence)
     ratio = treatment_ratio / control_ratio
-    control_sample = math.ceil(tt_ind_solve_power(
-        effect_size=effect_size,
-        alternative=alternative,
-        alpha=alpha,
-        power=power,
-        ratio=ratio,
-    ))
+
+    if test_statistic == "t-test":
+        control_sample = math.ceil(tt_ind_solve_power(
+            effect_size=effect_size,
+            alternative=alternative,
+            alpha=alpha,
+            power=power,
+            ratio=ratio,
+        ))
+    elif test_statistic == "z-test":
+        control_sample = math.ceil(zt_ind_solve_power(
+            effect_size=effect_size,
+            alternative=alternative,
+            alpha=alpha,
+            power=power,
+            ratio=ratio,
+        ))
+
     treatment_sample = math.ceil(control_sample * ratio)
 
     return control_sample, treatment_sample
@@ -101,6 +116,7 @@ def calculate_means_sample(
     treatment_ratio,
     df,
     alias,
+    test_statistic,
 ):
     if alternative == "smaller":
         sensitivity *= -1
@@ -111,13 +127,24 @@ def calculate_means_sample(
     effect_size = difference / standard_deviation
     alpha = get_alpha(confidence)
     ratio = treatment_ratio / control_ratio
-    control_sample = math.ceil(zt_ind_solve_power(
-        effect_size=effect_size,
-        alpha=alpha,
-        power=power,
-        ratio=ratio,
-        alternative=alternative,
-    ))
+
+    if test_statistic == "t-test":
+        control_sample = math.ceil(tt_ind_solve_power(
+            effect_size=effect_size,
+            alpha=alpha,
+            power=power,
+            ratio=ratio,
+            alternative=alternative,
+        ))
+    elif test_statistic == "z-test":
+        control_sample = math.ceil(zt_ind_solve_power(
+            effect_size=effect_size,
+            alpha=alpha,
+            power=power,
+            ratio=ratio,
+            alternative=alternative,
+        ))
+    
     treatment_sample = math.ceil(control_sample * ratio)
 
     return control_sample, treatment_sample

@@ -2,10 +2,11 @@ from jinja2 import FileSystemLoader, Environment
 import streamlit as st
 
 
-def show_sample_report(control_sample, treatment_sample):
+def show_sample_report(test_statistic, control_sample, treatment_sample):
     st.divider()
     st.subheader("Result")
     st.write("Sample size")
+    st.write(f"Test statistic: {test_statistic}")
     st.write(f"Control: {control_sample:,}")
     st.write(f"Treatment: {treatment_sample:,}")
     st.write(f"Total: {(control_sample + treatment_sample):,}")
@@ -54,6 +55,7 @@ def show_code(
     menu,
     test,
     confidence,
+    test_statistic=None,
     sensitivity=None,
     alternative=None,
     power=None,
@@ -98,6 +100,7 @@ def show_code(
         treatment_conversions=treatment_conversions,
         file_name=file_name,
         alias=alias,
+        test_statistic=test_statistic,
     )
     with st.expander("Show the code"):
         st.code(code, language="python")
@@ -113,13 +116,14 @@ def show_sample_result(
     power,
     control_sample,
     treatment_sample,
+    test_statistic,
     control_ratio=None,
     treatment_ratio=None,
     control_conversion=None,
     file_name=None,
     alias=None,
 ):
-    show_sample_report(control_sample, treatment_sample)
+    show_sample_report(test_statistic, control_sample, treatment_sample)
     show_code(
         menu=menu,
         test=test,
@@ -132,6 +136,7 @@ def show_sample_result(
         treatment_ratio=treatment_ratio,
         file_name=file_name,
         alias=alias,
+        test_statistic=test_statistic,
     )
     return
 

@@ -67,6 +67,7 @@ if menu == "Calculate the sample size":
         df,
         file_name,
         alias,
+        test_statistic,
     ) = get_sample_inputs(menu)
 
     if not st.button("Calculate"):
@@ -88,6 +89,7 @@ if menu == "Calculate the sample size":
             treatment_ratio=treatment_ratio,
             df=df,
             alias=alias,
+            test_statistic=test_statistic,
         )
 
         show_sample_result(
@@ -104,6 +106,7 @@ if menu == "Calculate the sample size":
             treatment_ratio=treatment_ratio,
             file_name=file_name,
             alias=alias,
+            test_statistic=test_statistic,
         )
 
 if menu == "Evaluate the statistical significance":

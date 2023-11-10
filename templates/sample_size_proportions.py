@@ -22,7 +22,11 @@ effect_size = proportion_effectsize(
 )
 alpha = 1 - confidence
 ratio = treatment_ratio / control_ratio
+{% if test_statistic == "t-test" %}
 control_sample = math.ceil(tt_ind_solve_power(
+{% elif test_statistic == "z-test" %}
+control_sample = math.ceil(zt_ind_solve_power(
+{% endif %}
     effect_size=effect_size,
     alpha=alpha,
     power=power,
