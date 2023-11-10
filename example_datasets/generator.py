@@ -118,7 +118,7 @@ generate_stat_sign_dataset(
 )
 generate_stat_sign_dataset(
     mean_c=600,
-    mean_t=660,
+    mean_t=630,
     std_dev_c=240,
     std_dev_t=240,
     size_c=490,
