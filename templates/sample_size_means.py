@@ -1,7 +1,11 @@
 # Import the libraries
 import math
 import pandas as pd
+{% if test_statistic == "t-test" %}
+from statsmodels.stats.power import tt_ind_solve_power
+{% elif test_statistic == "z-test" %}
 from statsmodels.stats.power import zt_ind_solve_power
+{% endif %}
 
 # Load the CSV file
 df = pd.read_csv("{{ file_name }}")

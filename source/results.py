@@ -84,7 +84,10 @@ def show_code(
         if test == "Proportions":
             template = env.get_template("statistical_significance_proportions.py")
         elif test == "Means":
-            template = env.get_template("statistical_significance_means.py")
+            if test_statistic == "Permutation":
+                template = env.get_template("statistical_significance_means_comp.py")
+            elif test_statistic == "t-test" or test_statistic == "z-test":
+                template = env.get_template("statistical_significance_means_freq.py")
 
     code = template.render(
         sensitivity=sensitivity,
@@ -149,6 +152,7 @@ def show_significance_result(
     observed_diff,
     alpha,
     p_value,
+    test_statistic=None,
     control_users=None,
     treatment_users=None,
     control_conversions=None,
@@ -175,5 +179,6 @@ def show_significance_result(
         confidence=confidence,
         file_name=file_name,
         alias=alias,
+        test_statistic=test_statistic,
     )
 

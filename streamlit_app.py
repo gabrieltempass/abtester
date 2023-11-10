@@ -167,8 +167,9 @@ if menu == "Evaluate the statistical significance":
             confidence,
             df,
             file_name,
-            alias
-        ) = get_significance_means_inputs(menu)
+            alias,
+            test_statistic,
+        ) = get_significance_means_inputs(menu, test)
 
         if not st.button("Calculate"):
             st.stop()
@@ -192,6 +193,7 @@ if menu == "Evaluate the statistical significance":
                 confidence=confidence,
                 df=df,
                 alias=alias,
+                test_statistic=test_statistic,
             )
             show_significance_result(
                 menu=menu,
@@ -204,4 +206,5 @@ if menu == "Evaluate the statistical significance":
                 confidence=confidence,
                 file_name=file_name,
                 alias=alias,
+                test_statistic=test_statistic,
             )

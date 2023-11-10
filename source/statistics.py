@@ -3,8 +3,8 @@ import random
 import numpy as np
 import pandas as pd
 from statsmodels.stats.proportion import proportion_effectsize
-from statsmodels.stats.power import tt_ind_solve_power
-from statsmodels.stats.power import zt_ind_solve_power
+from statsmodels.stats.power import tt_ind_solve_power, zt_ind_solve_power
+from statsmodels.stats.weightstats import ttest_ind, ztest
 import streamlit as st
 
 
@@ -144,7 +144,7 @@ def calculate_means_sample(
             ratio=ratio,
             alternative=alternative,
         ))
-    
+
     treatment_sample = math.ceil(control_sample * ratio)
 
     return control_sample, treatment_sample
@@ -185,7 +185,7 @@ def evaluate_proportions_significance(
     return control_effect, treatment_effect, observed_diff, alpha, p_value
 
 
-def evaluate_means_significance(
+def evaluate_means_significance_comp(
     confidence,
     df,
     alias,
@@ -216,6 +216,67 @@ def evaluate_means_significance(
 
     bar.empty()
     p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+
+    return control_mean, treatment_mean, observed_diff, alpha, p_value
+
+def evaluate_means_significance_freq(
+    confidence,
+    df,
+    alias,
+    test_statistic,
+):
+    alpha = get_alpha(confidence)
+
+    measurement = alias["Measurement"]
+    group = alias["Group"]
+    control = alias["Control"]
+    treatment = alias["Treatment"]
+
+    control_mean = df[df[group] == control][measurement].mean()
+    treatment_mean = df[df[group] == treatment][measurement].mean()
+    observed_diff = treatment_mean - control_mean
+
+    control_measurements = df[df[group] == control][measurement]
+    treatment_measurements = df[df[group] == treatment][measurement]
+
+    if test_statistic == "t-test":
+        tstat, p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
+    elif test_statistic == "z-test":
+        tstat, p_value = ztest(control_measurements, treatment_measurements)
+
+    return control_mean, treatment_mean, observed_diff, alpha, p_value
+
+def evaluate_means_significance(
+    confidence,
+    df,
+    alias,
+    test_statistic,
+):
+    if test_statistic == "Permutation":
+        (
+            control_mean,
+            treatment_mean,
+            observed_diff,
+            alpha,
+            p_value,
+        ) = evaluate_means_significance_comp(
+            confidence=confidence,
+            df=df,
+            alias=alias,
+        )
+    elif test_statistic == "t-test" or test_statistic == "z-test":
+        (
+            control_mean,
+            treatment_mean,
+            observed_diff,
+            alpha,
+            p_value,
+        ) = evaluate_means_significance_freq(
+            confidence=confidence,
+            df=df,
+            alias=alias,
+            test_statistic=test_statistic,
+        )
 
     return control_mean, treatment_mean, observed_diff, alpha, p_value
 

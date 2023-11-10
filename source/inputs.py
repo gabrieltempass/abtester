@@ -263,17 +263,17 @@ def show_file_summary(df):
     return
 
 
-def get_test_statistic_input(menu):
+def get_test_statistic_input(menu, test):
     show = st.checkbox("Show advanced settings")
     if show:
 
         if menu == "Calculate the sample size":
             options = ("t-test", "z-test")
             index = 0
-        # if menu == "Evaluate the statistical significance":
-        #     if test == "Means":
-        #         options = ("t-test", "z-test", "Permutation")
-        #         index = 2
+        if menu == "Evaluate the statistical significance":
+            if test == "Means":
+                options = ("t-test", "z-test", "Permutation")
+                index = 0
 
         test_statistic = st.radio(
             label="Test statistic",
@@ -488,7 +488,7 @@ def get_file_input(menu, requirements, description, path, file_names):
     return df, file_name, alias
 
 
-def get_sample_proportions_inputs(menu):
+def get_sample_proportions_inputs(menu, test):
     control_conversion = get_control_conversion_input()
     sensitivity = get_sensitivity_input()
     alternative = get_alternative_input()
@@ -496,7 +496,7 @@ def get_sample_proportions_inputs(menu):
     power = get_power_input()
     control_ratio, treatment_ratio = get_ratios_input()
     df, file_name, alias = None, None, None
-    test_statistic = get_test_statistic_input(menu)
+    test_statistic = get_test_statistic_input(menu, test)
 
     return (
         control_conversion,
@@ -513,7 +513,7 @@ def get_sample_proportions_inputs(menu):
     )
 
 
-def get_sample_means_inputs(menu):
+def get_sample_means_inputs(menu, test):
     control_conversion = None
     sensitivity = get_sensitivity_input()
     alternative = get_alternative_input()
@@ -531,7 +531,7 @@ def get_sample_means_inputs(menu):
             "dataset C": "dataset_c.csv",
         },
     )
-    test_statistic = get_test_statistic_input(menu)
+    test_statistic = get_test_statistic_input(menu, test)
 
     return (
         control_conversion,
@@ -562,7 +562,7 @@ def get_sample_inputs(menu):
             file_name,
             alias,
             test_statistic,
-        ) = get_sample_proportions_inputs(menu)
+        ) = get_sample_proportions_inputs(menu, test)
     elif test == "Means":
         (
             control_conversion,
@@ -576,7 +576,7 @@ def get_sample_inputs(menu):
             file_name,
             alias,
             test_statistic,
-        ) = get_sample_means_inputs(menu)
+        ) = get_sample_means_inputs(menu, test)
     return (
         test,
         control_conversion,
@@ -628,7 +628,7 @@ def get_significance_proportions_inputs():
     )
 
 
-def get_significance_means_inputs(menu):
+def get_significance_means_inputs(menu, test):
     confidence = get_confidence_input()
     df, file_name, alias = get_file_input(
         menu=menu,
@@ -641,7 +641,8 @@ def get_significance_means_inputs(menu):
             "dataset 3": "dataset_3.csv",
         },
     )
-    return confidence, df, file_name, alias
+    test_statistic = get_test_statistic_input(menu, test)
+    return confidence, df, file_name, alias, test_statistic
 
 
 description = {

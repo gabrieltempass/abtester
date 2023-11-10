@@ -1,7 +1,11 @@
 # Import the libraries
 import math
 from statsmodels.stats.proportion import proportion_effectsize
+{% if test_statistic == "t-test" %}
 from statsmodels.stats.power import tt_ind_solve_power
+{% elif test_statistic == "z-test" %}
+from statsmodels.stats.power import zt_ind_solve_power
+{% endif %}
 
 # Define the parameters
 control_conversion = {{ control_conversion }}
