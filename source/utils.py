@@ -14,5 +14,24 @@ def render_svg(svg):
 def add_spaces(n):
     for i in range(n):
         st.write("")
-    return
+
+
+def add_header(menu):
+    add_spaces(3)
+    st.header(menu.capitalize())
+
+
+def add_section(subheader):
+    st.divider()
+    st.subheader(subheader)
+
+
+def add_calculate_button():
+    if not st.button("Calculate"):
+        st.stop()
+
+
+def wait_file(inputs):
+    if inputs.df is None and inputs.test == "Means":
+        st.error(f"You must choose a file to be able to calculate the {inputs.menu}.")
 

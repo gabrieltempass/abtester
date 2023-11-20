@@ -2,10 +2,10 @@ import math
 import random
 import numpy as np
 import pandas as pd
+import streamlit as st
 from statsmodels.stats.proportion import proportion_effectsize
 from statsmodels.stats.power import tt_ind_solve_power, zt_ind_solve_power
 from statsmodels.stats.weightstats import ttest_ind, ztest
-import streamlit as st
 
 
 def percentage(number):
@@ -28,255 +28,157 @@ def permutation(x, nA, nB):
     return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
 
 
-def calculate_sample(
-    test,
-    control_conversion,
-    sensitivity,
-    alternative,
-    confidence,
-    power,
-    control_ratio,
-    treatment_ratio,
-    df,
-    alias,
-    test_statistic,
-):
-    if test == "Proportions":
-        control_sample, treatment_sample = calculate_proportions_sample(
-            control_conversion=control_conversion,
-            sensitivity=sensitivity,
-            alternative=alternative,
-            confidence=confidence,
-            power=power,
-            control_ratio=control_ratio,
-            treatment_ratio=treatment_ratio,
-            test_statistic=test_statistic,
+def calculate_size(inputs):
+    size = SampleSizeCalc()
+    if inputs.test == "Proportions":
+        size.calculate_prop_size(inputs)
+    elif inputs.test == "Means":
+        size.calculate_mean_size(inputs)
+    return size
+
+
+def evaluate_signif(inputs):
+    signif = StatSignifCalc()
+    if inputs.test == "Proportions":
+        signif.evaluate_prop_signif(inputs)
+    elif inputs.test == "Means":
+        if inputs.test_statistic == "Permutation":
+            signif.evaluate_mean_signif_comp(inputs)
+        elif inputs.test_statistic == "t-test" or inputs.test_statistic == "z-test":
+            signif.evaluate_mean_signif_freq(inputs)
+    return signif
+
+
+class SampleSizeCalc:
+    def calculate_prop_size(self, inputs):
+        if inputs.alternative == "smaller":
+            inputs.sensitivity *= -1
+        self.treatment_proportion = inputs.control_proportion * (1 + inputs.sensitivity)
+        self.effect_size = proportion_effectsize(
+            self.treatment_proportion,
+            inputs.control_proportion
         )
-    elif test == "Means":
-        control_sample, treatment_sample = calculate_means_sample(
-            sensitivity=sensitivity,
-            alternative=alternative,
-            confidence=confidence,
-            power=power,
-            control_ratio=control_ratio,
-            treatment_ratio=treatment_ratio,
-            df=df,
-            alias=alias,
-            test_statistic=test_statistic,
-        )
-    return control_sample, treatment_sample
+        self.alpha = get_alpha(inputs.confidence)
+        self.ratio = inputs.treatment_ratio / inputs.control_ratio
 
+        if inputs.test_statistic == "t-test":
+            self.t_test(inputs)
+        elif inputs.test_statistic == "z-test":
+            self.z_test(inputs)
 
-def calculate_proportions_sample(
-    control_conversion,
-    sensitivity,
-    alternative,
-    confidence,
-    power,
-    control_ratio,
-    treatment_ratio,
-    test_statistic,
-):
-    if alternative == "smaller":
-        sensitivity *= -1
-    treatment_conversion = control_conversion * (1 + sensitivity)
-    effect_size = proportion_effectsize(treatment_conversion,
-                                        control_conversion)
-    alpha = get_alpha(confidence)
-    ratio = treatment_ratio / control_ratio
+        self.treatment_sample = math.ceil(self.control_sample * self.ratio)
 
-    if test_statistic == "t-test":
-        control_sample = math.ceil(tt_ind_solve_power(
-            effect_size=effect_size,
-            alternative=alternative,
-            alpha=alpha,
-            power=power,
-            ratio=ratio,
-        ))
-    elif test_statistic == "z-test":
-        control_sample = math.ceil(zt_ind_solve_power(
-            effect_size=effect_size,
-            alternative=alternative,
-            alpha=alpha,
-            power=power,
-            ratio=ratio,
+    def calculate_mean_size(self, inputs):
+        if inputs.alternative == "smaller":
+            inputs.sensitivity *= -1
+        self.control_mean = inputs.df[inputs.alias["Measurement"]].mean()
+        self.treatment_mean = self.control_mean * (1 + inputs.sensitivity)
+        self.difference = self.treatment_mean - self.control_mean
+        self.standard_deviation = inputs.df[inputs.alias["Measurement"]].std()
+        self.effect_size = self.difference / self.standard_deviation
+        self.alpha = get_alpha(inputs.confidence)
+        self.ratio = inputs.treatment_ratio / inputs.control_ratio
+
+        if inputs.test_statistic == "t-test":
+            self.t_test(inputs)
+        elif inputs.test_statistic == "z-test":
+            self.z_test(inputs)
+
+        self.treatment_sample = math.ceil(self.control_sample * self.ratio)
+
+    def t_test(self, inputs):
+        self.control_sample = math.ceil(tt_ind_solve_power(
+            effect_size=self.effect_size,
+            alpha=self.alpha,
+            power=inputs.power,
+            ratio=self.ratio,
+            alternative=inputs.alternative,
         ))
 
-    treatment_sample = math.ceil(control_sample * ratio)
-
-    return control_sample, treatment_sample
-
-
-def calculate_means_sample(
-    sensitivity,
-    alternative,
-    confidence,
-    power,
-    control_ratio,
-    treatment_ratio,
-    df,
-    alias,
-    test_statistic,
-):
-    if alternative == "smaller":
-        sensitivity *= -1
-    control_mean = df[alias["Measurement"]].mean()
-    treatment_mean = control_mean * (1 + sensitivity)
-    difference = treatment_mean - control_mean
-    standard_deviation = df[alias["Measurement"]].std()
-    effect_size = difference / standard_deviation
-    alpha = get_alpha(confidence)
-    ratio = treatment_ratio / control_ratio
-
-    if test_statistic == "t-test":
-        control_sample = math.ceil(tt_ind_solve_power(
-            effect_size=effect_size,
-            alpha=alpha,
-            power=power,
-            ratio=ratio,
-            alternative=alternative,
-        ))
-    elif test_statistic == "z-test":
-        control_sample = math.ceil(zt_ind_solve_power(
-            effect_size=effect_size,
-            alpha=alpha,
-            power=power,
-            ratio=ratio,
-            alternative=alternative,
+    def z_test(self, inputs):
+        self.control_sample = math.ceil(zt_ind_solve_power(
+            effect_size=self.effect_size,
+            alpha=self.alpha,
+            power=inputs.power,
+            ratio=self.ratio,
+            alternative=inputs.alternative,
         ))
 
-    treatment_sample = math.ceil(control_sample * ratio)
 
-    return control_sample, treatment_sample
+class StatSignifCalc:
+    def evaluate_prop_signif(self, inputs):
+        self.alpha = get_alpha(inputs.confidence)
+        self.control_prop = inputs.control_conversions / inputs.control_users
+        self.treatment_prop = inputs.treatment_conversions / inputs.treatment_users
+        self.observed_diff = self.treatment_prop - self.control_prop
 
+        conversion = [0] * (inputs.control_users + inputs.treatment_users)
+        conversion.extend([1] * (inputs.control_conversions + inputs.treatment_conversions))
+        conversion = pd.Series(conversion)
 
-def evaluate_proportions_significance(
-    control_users,
-    treatment_users,
-    control_conversions,
-    treatment_conversions,
-    confidence,
-):
-    alpha = get_alpha(confidence)
-    control_effect = control_conversions / control_users
-    treatment_effect = treatment_conversions / treatment_users
-    observed_diff = treatment_effect - control_effect
-
-    conversion = [0] * (control_users + treatment_users)
-    conversion.extend([1] * (control_conversions + treatment_conversions))
-    conversion = pd.Series(conversion)
-
-    perm_diffs = []
-    i = 1000
-    bar = st.empty().progress(0)
-    for percent_complete in range(i):
-        perm_diffs.append(
-            permutation(
-                conversion,
-                control_users + control_conversions,
-                treatment_users + treatment_conversions,
+        perm_diffs = []
+        i = 1000
+        # Show a progress bar that disappears when completed
+        bar = st.empty().progress(0)
+        for percent_complete in range(i):
+            perm_diffs.append(
+                permutation(
+                    conversion,
+                    inputs.control_users + inputs.control_conversions,
+                    inputs.treatment_users + inputs.treatment_conversions,
+                )
             )
-        )
-        bar.progress((percent_complete + 1) / i)
+            bar.progress((percent_complete + 1) / i)
 
-    bar.empty()
-    p_value = np.mean([diff > observed_diff for diff in perm_diffs])
+        bar.empty()
+        self.p_value = np.mean([diff > self.observed_diff for diff in perm_diffs])
 
-    return control_effect, treatment_effect, observed_diff, alpha, p_value
+    def evaluate_mean_signif_comp(self, inputs):
+        self.alpha = get_alpha(inputs.confidence)
 
+        measurement = inputs.alias["Measurement"]
+        group = inputs.alias["Group"]
+        control = inputs.alias["Control"]
+        treatment = inputs.alias["Treatment"]
 
-def evaluate_means_significance_comp(
-    confidence,
-    df,
-    alias,
-):
-    alpha = get_alpha(confidence)
+        measurements = inputs.df[measurement]
+        self.control_users = inputs.df[inputs.df[group] == control].shape[0]
+        self.treatment_users = inputs.df[inputs.df[group] == treatment].shape[0]
 
-    measurement = alias["Measurement"]
-    group = alias["Group"]
-    control = alias["Control"]
-    treatment = alias["Treatment"]
+        self.control_mean = inputs.df[inputs.df[group] == control][measurement].mean()
+        self.treatment_mean = inputs.df[inputs.df[group] == treatment][measurement].mean()
+        self.observed_diff = self.treatment_mean - self.control_mean
 
-    measurements = df[measurement]
-    control_users = df[df[group] == control].shape[0]
-    treatment_users = df[df[group] == treatment].shape[0]
+        perm_diffs = []
+        i = 1000
+        # Show a progress bar that disappears when completed
+        bar = st.empty().progress(0)
+        for percent_complete in range(i):
+            perm_diffs.append(
+                permutation(measurements, self.control_users, self.treatment_users)
+            )
+            bar.progress((percent_complete + 1) / i)
 
-    control_mean = df[df[group] == control][measurement].mean()
-    treatment_mean = df[df[group] == treatment][measurement].mean()
-    observed_diff = treatment_mean - control_mean
+        bar.empty()
+        self.p_value = np.mean([diff > abs(self.observed_diff) for diff in perm_diffs])
 
-    perm_diffs = []
-    i = 1000
-    bar = st.empty().progress(0)
-    for percent_complete in range(i):
-        perm_diffs.append(
-            permutation(measurements, control_users, treatment_users)
-        )
-        bar.progress((percent_complete + 1) / i)
+    def evaluate_mean_signif_freq(self, inputs):
+        self.alpha = get_alpha(inputs.confidence)
 
-    bar.empty()
-    p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+        measurement = inputs.alias["Measurement"]
+        group = inputs.alias["Group"]
+        control = inputs.alias["Control"]
+        treatment = inputs.alias["Treatment"]
 
-    return control_mean, treatment_mean, observed_diff, alpha, p_value
+        self.control_mean = inputs.df[inputs.df[group] == control][measurement].mean()
+        self.treatment_mean = inputs.df[inputs.df[group] == treatment][measurement].mean()
+        self.observed_diff = self.treatment_mean - self.control_mean
 
-def evaluate_means_significance_freq(
-    confidence,
-    df,
-    alias,
-    test_statistic,
-):
-    alpha = get_alpha(confidence)
+        control_measurements = inputs.df[inputs.df[group] == control][measurement]
+        treatment_measurements = inputs.df[inputs.df[group] == treatment][measurement]
 
-    measurement = alias["Measurement"]
-    group = alias["Group"]
-    control = alias["Control"]
-    treatment = alias["Treatment"]
-
-    control_mean = df[df[group] == control][measurement].mean()
-    treatment_mean = df[df[group] == treatment][measurement].mean()
-    observed_diff = treatment_mean - control_mean
-
-    control_measurements = df[df[group] == control][measurement]
-    treatment_measurements = df[df[group] == treatment][measurement]
-
-    if test_statistic == "t-test":
-        tstat, p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
-    elif test_statistic == "z-test":
-        tstat, p_value = ztest(control_measurements, treatment_measurements)
-
-    return control_mean, treatment_mean, observed_diff, alpha, p_value
-
-def evaluate_means_significance(
-    confidence,
-    df,
-    alias,
-    test_statistic,
-):
-    if test_statistic == "Permutation":
-        (
-            control_mean,
-            treatment_mean,
-            observed_diff,
-            alpha,
-            p_value,
-        ) = evaluate_means_significance_comp(
-            confidence=confidence,
-            df=df,
-            alias=alias,
-        )
-    elif test_statistic == "t-test" or test_statistic == "z-test":
-        (
-            control_mean,
-            treatment_mean,
-            observed_diff,
-            alpha,
-            p_value,
-        ) = evaluate_means_significance_freq(
-            confidence=confidence,
-            df=df,
-            alias=alias,
-            test_statistic=test_statistic,
-        )
-
-    return control_mean, treatment_mean, observed_diff, alpha, p_value
+        if inputs.test_statistic == "t-test":
+            tstat, self.p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
+        elif inputs.test_statistic == "z-test":
+            tstat, self.p_value = ztest(control_measurements, treatment_measurements)
 
