@@ -6,16 +6,16 @@ import pandas as pd
 # Declare the permutation function
 def permutation(x, nA, nB):
     n = nA + nB
-    idx_A = set(random.sample(range(n), nB))
-    idx_B = set(range(n)) - idx_A
-    return x.loc[idx_B].mean() - x.loc[idx_A].mean()
+    idx_B = set(random.sample(range(n), nB))
+    idx_A = set(range(n)) - idx_B
+    return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
 
 # Define the parameters
-control_users = {{ control_users }}
-treatment_users = {{ treatment_users }}
-control_conversions = {{ control_conversions }}
-treatment_conversions = {{ treatment_conversions }}
-confidence = {{ confidence }}
+control_users = {{ i.control_users }}
+treatment_users = {{ i.treatment_users }}
+control_conversions = {{ i.control_conversions }}
+treatment_conversions = {{ i.treatment_conversions }}
+confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
 # Calculate the observed difference
@@ -24,7 +24,9 @@ treatment_effect = treatment_conversions / treatment_users
 observed_diff = treatment_effect - control_effect
 
 # Create the pool to draw the samples
-conversion = [0] * (control_users + treatment_users)
+control_no_conversions = control_users - control_conversions
+treatment_no_conversions = treatment_users - treatment_conversions
+conversion = [0] * (control_no_conversions + treatment_no_conversions)
 conversion.extend([1] * (control_conversions + treatment_conversions))
 conversion = pd.Series(conversion)
 
@@ -35,8 +37,8 @@ for _ in range(1000):
     perm_diffs.append(
         permutation(
             conversion,
-            control_users + control_conversions,
-            treatment_users + treatment_conversions
+            control_users,
+            treatment_users
         )
     )
 

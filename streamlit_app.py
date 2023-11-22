@@ -55,8 +55,8 @@ if menu == "sample size":
 
     if inputs.test == "Proportions" or inputs.file is not None:
         add_section("Results")
-        size = calculate_size(inputs)
-        show_size_result(inputs=inputs, size=size)
+        statistics = calculate_size(inputs)
+        show_size_result(i=inputs, s=statistics)
 
 elif menu == "statistical significance":
 
@@ -68,5 +68,5 @@ elif menu == "statistical significance":
 
     if inputs.test == "Proportions" or inputs.file is not None:
         add_section("Results")
-        signif = evaluate_signif(inputs)
-        show_signif_result(inputs=inputs, signif=signif)
+        statistics = evaluate_signif(inputs)
+        show_signif_result(i=inputs, s=statistics)

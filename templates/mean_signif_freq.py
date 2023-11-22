@@ -2,32 +2,32 @@
 import random
 import numpy as np
 import pandas as pd
-{% if inputs.test_statistic == "t-test" %}
+{% if i.test_statistic == "t-test" %}
 from statsmodels.stats.weightstats import ttest_ind
-{% elif inputs.test_statistic == "z-test" %}
+{% elif i.test_statistic == "z-test" %}
 from statsmodels.stats.weightstats import ztest
 {% endif %}
 
 # Load the CSV file
-df = pd.read_csv("{{ inputs.file.name }}")
+df = pd.read_csv("{{ i.file.name }}")
 
 # Define the parameters
-confidence = {{ inputs.confidence }}
+confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
 # Calculate the observed difference
-control_mean = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Control'] }}"]["{{ inputs.alias['Measurement'] }}"].mean()
-treatment_mean = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Treatment'] }}"]["{{ inputs.alias['Measurement'] }}"].mean()
+control_mean = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"]["{{ i.alias['Measurement'] }}"].mean()
+treatment_mean = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"]["{{ i.alias['Measurement'] }}"].mean()
 observed_diff = treatment_mean - control_mean
 
 # Get the control and treatment measurements
-control_measurements = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Control'] }}"]["{{ inputs.alias['Measurement'] }}"]
-treatment_measurements = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Treatment'] }}"]["{{ inputs.alias['Measurement'] }}"]
+control_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"]["{{ i.alias['Measurement'] }}"]
+treatment_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"]["{{ i.alias['Measurement'] }}"]
 
 # Calculate the p-value
-{% if inputs.test_statistic == "t-test" %}
+{% if i.test_statistic == "t-test" %}
 tstat, p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
-{% elif inputs.test_statistic == "z-test" %}
+{% elif i.test_statistic == "z-test" %}
 tstat, p_value = ztest(control_measurements, treatment_measurements)
 {% endif %}
 

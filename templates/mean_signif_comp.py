@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Load the CSV file
-df = pd.read_csv("{{ inputs.file.name }}")
+df = pd.read_csv("{{ i.file.name }}")
 
 # Declare the permutation function
 def permutation(x, nA, nB):
@@ -14,17 +14,17 @@ def permutation(x, nA, nB):
     return x.loc[idx_B].mean() - x.loc[idx_A].mean()
 
 # Define the parameters
-confidence = {{ inputs.confidence }}
+confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
 # Get the measurements and count the users
-measurements = df["{{ inputs.alias['Measurement'] }}"]
-control_users = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Control'] }}"].shape[0]
-treatment_users = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Treatment'] }}"].shape[0]
+measurements = df["{{ i.alias['Measurement'] }}"]
+control_users = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"].shape[0]
+treatment_users = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"].shape[0]
 
 # Calculate the observed difference
-control_mean = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Control'] }}"]["{{ inputs.alias['Measurement'] }}"].mean()
-treatment_mean = df[df["{{ inputs.alias['Group'] }}"] == "{{ inputs.alias['Treatment'] }}"]["{{ inputs.alias['Measurement'] }}"].mean()
+control_mean = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"]["{{ i.alias['Measurement'] }}"].mean()
+treatment_mean = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"]["{{ i.alias['Measurement'] }}"].mean()
 observed_diff = treatment_mean - control_mean
 
 # Execute the permutation test
