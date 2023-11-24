@@ -81,6 +81,7 @@ def get_signif_inputs():
 def get_prop_signif_inputs():
     inputs = PropSignifInputs()
     inputs.get_users()
+    inputs.get_alternative()
     inputs.get_confidence()
     return inputs
 

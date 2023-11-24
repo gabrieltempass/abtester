@@ -134,7 +134,7 @@ class StatSignifCalc:
             bar.progress((percent_complete + 1) / iterations)
         bar.empty()
 
-        self.p_value = np.mean([diff > self.observed_diff for diff in perm_diffs])
+        self.get_comp_p_value(perm_diffs, i.alternative)
 
     def evaluate_mean_signif_comp(self, i):
         self.alpha = get_alpha(i.confidence)
@@ -166,12 +166,7 @@ class StatSignifCalc:
             bar.progress((percent_complete + 1) / iterations)
         bar.empty()
 
-        if i.alternative == "smaller":
-            self.p_value = np.mean([diff <= self.observed_diff for diff in perm_diffs])
-        elif i.alternative == "larger":
-            self.p_value = np.mean([diff >= self.observed_diff for diff in perm_diffs])
-        elif i.alternative == "two-sided":
-            self.p_value = np.mean([abs(diff) >= abs(self.observed_diff) for diff in perm_diffs])
+        self.get_comp_p_value(perm_diffs, i.alternative)
 
     def evaluate_mean_signif_freq(self, i):
         self.alpha = get_alpha(i.confidence)
@@ -202,4 +197,12 @@ class StatSignifCalc:
                 control_measurements,
                 alternative=i.alternative,
             )
+
+    def get_comp_p_value(self, diffs, alternative):
+        if alternative == "smaller":
+            self.p_value = np.mean([diff <= self.observed_diff for diff in diffs])
+        elif alternative == "larger":
+            self.p_value = np.mean([diff >= self.observed_diff for diff in diffs])
+        elif alternative == "two-sided":
+            self.p_value = np.mean([abs(diff) >= abs(self.observed_diff) for diff in diffs])
 
