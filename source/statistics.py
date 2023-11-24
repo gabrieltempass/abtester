@@ -132,8 +132,8 @@ class StatSignifCalc:
                 )
             )
             bar.progress((percent_complete + 1) / iterations)
-
         bar.empty()
+
         self.p_value = np.mean([diff > self.observed_diff for diff in perm_diffs])
 
     def evaluate_mean_signif_comp(self, i):
@@ -148,13 +148,15 @@ class StatSignifCalc:
         self.control_users = i.df[i.df[group] == control].shape[0]
         self.treatment_users = i.df[i.df[group] == treatment].shape[0]
 
+        self.control_std = i.df[i.df[group] == control][measurement].std()
+        self.treatment_std = i.df[i.df[group] == treatment][measurement].std()
         self.control_mean = i.df[i.df[group] == control][measurement].mean()
         self.treatment_mean = i.df[i.df[group] == treatment][measurement].mean()
         self.observed_diff = self.treatment_mean - self.control_mean
 
         random.seed(0)
         perm_diffs = []
-        iterations = 1000
+        iterations = 10000
         # Show a progress bar that disappears when completed
         bar = st.empty().progress(0)
         for percent_complete in range(iterations):
@@ -162,9 +164,14 @@ class StatSignifCalc:
                 permutation(measurements, self.control_users, self.treatment_users)
             )
             bar.progress((percent_complete + 1) / iterations)
-
         bar.empty()
-        self.p_value = np.mean([diff > abs(self.observed_diff) for diff in perm_diffs])
+
+        if i.alternative == "smaller":
+            self.p_value = np.mean([diff <= self.observed_diff for diff in perm_diffs])
+        elif i.alternative == "larger":
+            self.p_value = np.mean([diff >= self.observed_diff for diff in perm_diffs])
+        elif i.alternative == "two-sided":
+            self.p_value = np.mean([abs(diff) >= abs(self.observed_diff) for diff in perm_diffs])
 
     def evaluate_mean_signif_freq(self, i):
         self.alpha = get_alpha(i.confidence)
@@ -174,6 +181,8 @@ class StatSignifCalc:
         control = i.alias["Control"]
         treatment = i.alias["Treatment"]
 
+        self.control_std = i.df[i.df[group] == control][measurement].std()
+        self.treatment_std = i.df[i.df[group] == treatment][measurement].std()
         self.control_mean = i.df[i.df[group] == control][measurement].mean()
         self.treatment_mean = i.df[i.df[group] == treatment][measurement].mean()
         self.observed_diff = self.treatment_mean - self.control_mean
@@ -182,7 +191,15 @@ class StatSignifCalc:
         treatment_measurements = i.df[i.df[group] == treatment][measurement]
 
         if i.test_statistic == "t-test":
-            tstat, self.p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
+            self.tstat, self.p_value, dfree = ttest_ind(
+                treatment_measurements,
+                control_measurements,
+                alternative=i.alternative,
+            )
         elif i.test_statistic == "z-test":
-            tstat, self.p_value = ztest(control_measurements, treatment_measurements)
+            self.tstat, self.p_value = ztest(
+                treatment_measurements,
+                control_measurements,
+                alternative=i.alternative,
+            )
 

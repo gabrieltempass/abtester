@@ -87,6 +87,7 @@ def get_prop_signif_inputs():
 
 def get_mean_signif_inputs():
     inputs = MeanSignifInputs()
+    inputs.get_alternative()
     inputs.get_confidence()
     inputs.get_file(
         requirements=text["significance_requirements"],
@@ -106,6 +107,21 @@ class ExperimentInputs:
     def __init__(self):
         # Review this part
         self.df, self.file_name, self.alias = None, None, None
+
+    def get_alternative(self):
+        self.alternative = st.radio(
+            label="Alternative",
+            options=("smaller", "larger", "two-sided"),
+            format_func=lambda x: {
+                "smaller": "Smaller than the null",
+                "larger": "Larger than the null",
+                "two-sided": "Not equal to the null",
+            }.get(x),
+            captions=("One-sided", "One-sided", "Two-sided"),
+            index=2,
+            help=description["alternative"],
+            horizontal=True,
+        )
 
     def get_confidence(self):
         self.confidence = percentage(
@@ -424,21 +440,6 @@ class SampleSizeInputs(ExperimentInputs):
                 format="%.1f",
                 help=description["sensitivity"],
             )
-        )
-
-    def get_alternative(self):
-        self.alternative = st.radio(
-            label="Alternative",
-            options=("smaller", "larger", "two-sided"),
-            format_func=lambda x: {
-                "smaller": "Smaller than the null",
-                "larger": "Larger than the null",
-                "two-sided": "Not equal to the null",
-            }.get(x),
-            captions=("One-sided", "One-sided", "Two-sided"),
-            index=2,
-            help=description["alternative"],
-            horizontal=True,
         )
 
     def get_power(self):

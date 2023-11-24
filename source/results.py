@@ -35,13 +35,16 @@ def show_signif_report(i, s):
             "significance": "is not"
         }
 
-    prefix = "~" if round(s.p_value, 4) == 0 else ""
+    prefix = "<" if round(s.p_value, 4) < 0.0001 else ""
 
     if i.test == "Proportions":
         st.write(f"Control proportion: {s.control_prop:.2%}")
         st.write(f"Treatment proportion: {s.treatment_prop:.2%}")
         st.write(f"Observed difference: {s.observed_diff * 100:+.2f} p.p. ({s.observed_diff / s.control_prop:+.2%})")
     elif i.test == "Means":
+        # st.write(f"Test statistic: {s.tstat:.4f}")
+        st.write(f"Control standard deviation: {s.control_std:.2f}")
+        st.write(f"Treatment standard deviation: {s.treatment_std:.2f}")
         st.write(f"Control mean: {s.control_mean:.2f}")
         st.write(f"Treatment mean: {s.treatment_mean:.2f}")
         st.write(f"Observed difference: {s.observed_diff / s.control_mean:+.2%}")
