@@ -4,24 +4,25 @@ import numpy as np
 import pandas as pd
 
 # Declare the permutation function
-def permutation(x, nA, nB):
-    n = nA + nB
-    idx_B = set(random.sample(range(n), nB))
-    idx_A = set(range(n)) - idx_B
-    return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
+def permutation(x, nC, nT):
+    n = nC + nT
+    idx_T = set(random.sample(range(n), nT))
+    idx_C = set(range(n)) - idx_T
+    return x.loc[list(idx_T)].mean() - x.loc[list(idx_C)].mean()
 
 # Define the parameters
 control_users = {{ i.control_users }}
 treatment_users = {{ i.treatment_users }}
 control_conversions = {{ i.control_conversions }}
 treatment_conversions = {{ i.treatment_conversions }}
+alternative = "{{ i.alternative }}"
 confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
 # Calculate the observed difference
-control_effect = control_conversions / control_users
-treatment_effect = treatment_conversions / treatment_users
-observed_diff = treatment_effect - control_effect
+control_proportion = control_conversions / control_users
+treatment_proportion = treatment_conversions / treatment_users
+observed_diff = treatment_proportion - control_proportion
 
 # Create the pool to draw the samples
 control_no_conversions = control_users - control_conversions
@@ -43,7 +44,12 @@ for _ in range(1000):
     )
 
 # Calculate the p-value
-p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+if alternative == "smaller":
+    p_value = np.mean([diff <= observed_diff for diff in perm_diffs])
+elif alternative == "larger":
+    p_value = np.mean([diff >= observed_diff for diff in perm_diffs])
+elif alternative == "two-sided":
+    p_value = np.mean([abs(diff) >= abs(observed_diff) for diff in perm_diffs])
 
 # Show the result
 if p_value <= alpha:
@@ -58,10 +64,10 @@ else:
         "direction": "greater than",
         "significance": "is not"
     }
-prefix = "~" if round(p_value, 4) == 0 else ""
-print(f"Control conversion: {control_effect:.2%}")
-print(f"Treatment conversion: {treatment_effect:.2%}")
-print(f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_effect:+.2%})")
+prefix = "<" if round(p_value, 4) < 0.0001 else ""
+print(f"Control conversion: {control_proportion:.2%}")
+print(f"Treatment conversion: {treatment_proportion:.2%}")
+print(f"Observed difference: {observed_diff * 100:+.2f} p.p. ({observed_diff / control_proportion:+.2%})")
 print(f"Alpha: {alpha:.4f}")
 print(f"p-value: {prefix}{p_value:.4f}")
 print(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")

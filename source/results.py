@@ -42,7 +42,6 @@ def show_signif_report(i, s):
         st.write(f"Treatment proportion: {s.treatment_prop:.2%}")
         st.write(f"Observed difference: {s.observed_diff * 100:+.2f} p.p. ({s.observed_diff / s.control_prop:+.2%})")
     elif i.test == "Means":
-        # st.write(f"Test statistic: {s.tstat:.4f}")
         st.write(f"Control standard deviation: {s.control_std:.2f}")
         st.write(f"Treatment standard deviation: {s.treatment_std:.2f}")
         st.write(f"Control mean: {s.control_mean:.2f}")
@@ -68,7 +67,11 @@ def show_code(i):
     elif i.menu == "statistical significance":
 
         if i.test == "Proportions":
-            template = env.get_template("prop_signif.py")
+            if i.test_statistic == "Permutation":
+                template = env.get_template("prop_signif_comp.py")
+            elif i.test_statistic == "z-test":
+                template = env.get_template("prop_signif_freq.py")
+
         elif i.test == "Means":
             if i.test_statistic == "Permutation":
                 template = env.get_template("mean_signif_comp.py")

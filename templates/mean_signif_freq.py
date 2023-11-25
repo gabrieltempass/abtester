@@ -12,6 +12,7 @@ from statsmodels.stats.weightstats import ztest
 df = pd.read_csv("{{ i.file.name }}")
 
 # Define the parameters
+alternative = "{{ i.alternative }}"
 confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
@@ -26,9 +27,17 @@ treatment_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatme
 
 # Calculate the p-value
 {% if i.test_statistic == "t-test" %}
-tstat, p_value, dfree = ttest_ind(control_measurements, treatment_measurements)
+tstat, p_value, dfree = ttest_ind(
+    treatment_measurements,
+    control_measurements,
+    alternative=alternative
+)
 {% elif i.test_statistic == "z-test" %}
-tstat, p_value = ztest(control_measurements, treatment_measurements)
+tstat, p_value = ztest(
+    treatment_measurements,
+    control_measurements,
+    alternative=alternative
+)
 {% endif %}
 
 # Show the result
@@ -44,7 +53,7 @@ else:
         "direction": "greater than",
         "significance": "is not"
     }
-prefix = "~" if round(p_value, 4) == 0 else ""
+prefix = "<" if round(p_value, 4) < 0.0001 else ""
 print(f"Control mean: {control_mean:.2f}")
 print(f"Treatment mean: {treatment_mean:.2f}")
 print(f"Observed difference: {observed_diff / control_mean:+.2%}")

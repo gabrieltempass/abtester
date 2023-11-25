@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+
 from source.statistics import percentage
 
 
@@ -83,6 +84,7 @@ def get_prop_signif_inputs():
     inputs.get_users()
     inputs.get_alternative()
     inputs.get_confidence()
+    inputs.get_test_statistic()
     return inputs
 
 
@@ -144,7 +146,10 @@ class ExperimentInputs:
                 options = ("t-test", "z-test")
                 index = 0
             if self.menu == "statistical significance":
-                if self.test == "Means":
+                if self.test == "Proportions":
+                    options = ("z-test", "Permutation")
+                    index = 1
+                elif self.test == "Means":
                     options = ("t-test", "z-test", "Permutation")
                     index = 2
 

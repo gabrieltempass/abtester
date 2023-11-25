@@ -1,9 +1,10 @@
 import math
 import random
+
 import numpy as np
 import pandas as pd
 import streamlit as st
-from statsmodels.stats.proportion import proportion_effectsize
+from statsmodels.stats.proportion import proportion_effectsize, proportions_ztest
 from statsmodels.stats.power import tt_ind_solve_power, zt_ind_solve_power
 from statsmodels.stats.weightstats import ttest_ind, ztest
 
@@ -20,11 +21,11 @@ def get_beta(power):
     return 1 - power
 
 
-def permutation(x, nA, nB):
-    n = nA + nB
-    idx_B = set(random.sample(range(n), nB))
-    idx_A = set(range(n)) - idx_B
-    return x.loc[list(idx_B)].mean() - x.loc[list(idx_A)].mean()
+def permutation(x, nC, nT):
+    n = nC + nT
+    idx_T = set(random.sample(range(n), nT))
+    idx_C = set(range(n)) - idx_T
+    return x.loc[list(idx_T)].mean() - x.loc[list(idx_C)].mean()
 
 
 def calculate_size(i):
@@ -38,8 +39,13 @@ def calculate_size(i):
 
 def evaluate_signif(i):
     signif = StatSignifCalc()
+
     if i.test == "Proportions":
-        signif.evaluate_prop_signif(i)
+        if i.test_statistic == "Permutation":
+            signif.evaluate_prop_signif_comp(i)
+        elif i.test_statistic == "z-test":
+            signif.evaluate_prop_signif_freq(i)
+
     elif i.test == "Means":
         if i.test_statistic == "Permutation":
             signif.evaluate_mean_signif_comp(i)
@@ -105,7 +111,7 @@ class SampleSizeCalc:
 
 
 class StatSignifCalc:
-    def evaluate_prop_signif(self, i):
+    def evaluate_prop_signif_comp(self, i):
         self.alpha = get_alpha(i.confidence)
         self.control_prop = i.control_conversions / i.control_users
         self.treatment_prop = i.treatment_conversions / i.treatment_users
@@ -135,6 +141,20 @@ class StatSignifCalc:
         bar.empty()
 
         self.get_comp_p_value(perm_diffs, i.alternative)
+
+    def evaluate_prop_signif_freq(self, i):
+        self.alpha = get_alpha(i.confidence)
+        self.control_prop = i.control_conversions / i.control_users
+        self.treatment_prop = i.treatment_conversions / i.treatment_users
+        self.observed_diff = self.treatment_prop - self.control_prop
+
+        count = np.array([i.treatment_conversions, i.control_conversions])
+        nobs = np.array([i.treatment_users, i.control_users])
+        self.tstat, self.p_value = proportions_ztest(
+            count=count,
+            nobs=nobs,
+            alternative=i.alternative
+        )
 
     def evaluate_mean_signif_comp(self, i):
         self.alpha = get_alpha(i.confidence)

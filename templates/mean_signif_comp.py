@@ -7,13 +7,14 @@ import pandas as pd
 df = pd.read_csv("{{ i.file.name }}")
 
 # Declare the permutation function
-def permutation(x, nA, nB):
-    n = nA + nB
-    idx_A = set(random.sample(range(n), nB))
-    idx_B = set(range(n)) - idx_A
-    return x.loc[idx_B].mean() - x.loc[idx_A].mean()
+def permutation(x, nC, nT):
+    n = nC + nT
+    idx_C = set(random.sample(range(n), nT))
+    idx_T = set(range(n)) - idx_C
+    return x.loc[idx_T].mean() - x.loc[idx_C].mean()
 
 # Define the parameters
+alternative = "{{ i.alternative }}"
 confidence = {{ i.confidence }}
 alpha = 1 - confidence
 
@@ -40,7 +41,12 @@ for _ in range(1000):
     )
 
 # Calculate the p-value
-p_value = np.mean([diff > abs(observed_diff) for diff in perm_diffs])
+if alternative == "smaller":
+    p_value = np.mean([diff <= observed_diff for diff in perm_diffs])
+elif alternative == "larger":
+    p_value = np.mean([diff >= observed_diff for diff in perm_diffs])
+elif alternative == "two-sided":
+    p_value = np.mean([abs(diff) >= abs(observed_diff) for diff in perm_diffs])
 
 # Show the result
 if p_value <= alpha:
@@ -55,7 +61,7 @@ else:
         "direction": "greater than",
         "significance": "is not"
     }
-prefix = "~" if round(p_value, 4) == 0 else ""
+prefix = "<" if round(p_value, 4) < 0.0001 else ""
 print(f"Control mean: {control_mean:.2f}")
 print(f"Treatment mean: {treatment_mean:.2f}")
 print(f"Observed difference: {observed_diff / control_mean:+.2%}")
