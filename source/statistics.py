@@ -41,15 +41,15 @@ def evaluate_signif(i):
     signif = StatSignifCalc()
 
     if i.test == "Proportions":
-        if i.test_statistic == "Permutation":
+        if i.method == "Permutation":
             signif.evaluate_prop_signif_comp(i)
-        elif i.test_statistic == "z-test":
+        elif i.method == "z-test":
             signif.evaluate_prop_signif_freq(i)
 
     elif i.test == "Means":
-        if i.test_statistic == "Permutation":
+        if i.method == "Permutation":
             signif.evaluate_mean_signif_comp(i)
-        elif i.test_statistic == "t-test" or i.test_statistic == "z-test":
+        elif i.method == "t-test" or i.method == "z-test":
             signif.evaluate_mean_signif_freq(i)
     return signif
 
@@ -66,9 +66,9 @@ class SampleSizeCalc:
         self.alpha = get_alpha(i.confidence)
         self.ratio = i.treatment_ratio / i.control_ratio
 
-        if i.test_statistic == "t-test":
+        if i.method == "t-test":
             self.t_test(i)
-        elif i.test_statistic == "z-test":
+        elif i.method == "z-test":
             self.z_test(i)
 
         self.treatment_sample = math.ceil(self.control_sample * self.ratio)
@@ -84,9 +84,9 @@ class SampleSizeCalc:
         self.alpha = get_alpha(i.confidence)
         self.ratio = i.treatment_ratio / i.control_ratio
 
-        if i.test_statistic == "t-test":
+        if i.method == "t-test":
             self.t_test(i)
-        elif i.test_statistic == "z-test":
+        elif i.method == "z-test":
             self.z_test(i)
 
         self.treatment_sample = math.ceil(self.control_sample * self.ratio)
@@ -203,13 +203,13 @@ class StatSignifCalc:
         control_measurements = i.df[i.df[group] == control][measurement]
         treatment_measurements = i.df[i.df[group] == treatment][measurement]
 
-        if i.test_statistic == "t-test":
+        if i.method == "t-test":
             self.tstat, self.p_value, dfree = ttest_ind(
                 treatment_measurements,
                 control_measurements,
                 alternative=i.alternative,
             )
-        elif i.test_statistic == "z-test":
+        elif i.method == "z-test":
             self.tstat, self.p_value = ztest(
                 treatment_measurements,
                 control_measurements,

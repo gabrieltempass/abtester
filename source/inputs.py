@@ -45,7 +45,7 @@ def get_prop_size_inputs():
     inputs.get_confidence()
     inputs.get_power()
     inputs.get_ratios()
-    inputs.get_test_statistic()
+    inputs.get_method()
     return inputs
 
 
@@ -66,7 +66,7 @@ def get_mean_size_inputs():
             "dataset C": "dataset_c.csv",
         },
     )
-    inputs.get_test_statistic()
+    inputs.get_method()
     return inputs
 
 
@@ -84,7 +84,7 @@ def get_prop_signif_inputs():
     inputs.get_users()
     inputs.get_alternative()
     inputs.get_confidence()
-    inputs.get_test_statistic()
+    inputs.get_method()
     return inputs
 
 
@@ -102,7 +102,7 @@ def get_mean_signif_inputs():
             "dataset 3": "dataset_3.csv",
         },
     )
-    inputs.get_test_statistic()
+    inputs.get_method()
     return inputs
 
 
@@ -138,7 +138,7 @@ class ExperimentInputs:
             )
         )
 
-    def get_test_statistic(self):
+    def get_method(self):
         self.show = st.checkbox("Show advanced settings")
         if self.show:
 
@@ -153,15 +153,15 @@ class ExperimentInputs:
                     options = ("t-test", "z-test", "Permutation")
                     index = 2
 
-            self.test_statistic = st.radio(
+            self.method = st.radio(
                 label="Test statistic",
                 options=options,
                 index=index,
-                help=description["test_statistic"],
+                help=description["method"],
                 horizontal=True,
             )
 
-            if self.test_statistic == "Permutation":
+            if self.method == "Permutation":
                 self.iterations = st.select_slider(
                     label="Iterations",
                     options=[1000, 2000, 5000, 10000, 20000, 50000, 100000],
@@ -442,7 +442,7 @@ class SampleSizeInputs(ExperimentInputs):
     def __init__(self):
         super().__init__()
         self.menu = "sample size"
-        self.test_statistic = "t-test"
+        self.method = "t-test"
 
     def get_sensitivity(self):
         self.sensitivity = percentage(
@@ -525,7 +525,7 @@ class StatSignifInputs(ExperimentInputs):
     def __init__(self):
         super().__init__()
         self.menu = "statistical significance"
-        self.test_statistic = "Permutation"
+        self.method = "Permutation"
         self.iterations = 10000
 
     @staticmethod
@@ -628,7 +628,7 @@ description = {
     "group": "Select the column that contains the labels that marks users who participated in the control or treatment groups.",
     "control": "Select the label that marks users who participated in the control group.",
     "treatment": "Select the label that marks users who participated in the treatment group.",
-    "test_statistic": "Choose which test statistic will be used to perform the calculations.",
+    "method": "Choose which test statistic will be used to perform the calculations.",
     "iterations": "How many resampling combinations of the control and treatment groups the permutation test will perform. The higher the number, the more accurate the p-value will be. However, it will also take more time to be calculated.",
 }
 

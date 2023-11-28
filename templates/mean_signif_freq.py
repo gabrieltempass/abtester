@@ -2,9 +2,9 @@
 import random
 import numpy as np
 import pandas as pd
-{% if i.test_statistic == "t-test" %}
+{% if i.method == "t-test" %}
 from statsmodels.stats.weightstats import ttest_ind
-{% elif i.test_statistic == "z-test" %}
+{% elif i.method == "z-test" %}
 from statsmodels.stats.weightstats import ztest
 {% endif %}
 
@@ -26,13 +26,13 @@ control_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control']
 treatment_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"]["{{ i.alias['Measurement'] }}"]
 
 # Calculate the p-value
-{% if i.test_statistic == "t-test" %}
+{% if i.method == "t-test" %}
 tstat, p_value, dfree = ttest_ind(
     treatment_measurements,
     control_measurements,
     alternative=alternative
 )
-{% elif i.test_statistic == "z-test" %}
+{% elif i.method == "z-test" %}
 tstat, p_value = ztest(
     treatment_measurements,
     control_measurements,

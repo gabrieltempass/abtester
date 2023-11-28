@@ -14,7 +14,7 @@ def show_signif_result(i, s):
 
 def show_size_report(i, s):
     st.write("Sample size")
-    st.write(f"Test statistic: {i.test_statistic}")
+    st.write(f"Method: {i.method}")
     st.write(f"Control: {s.control_sample:,}")
     st.write(f"Treatment: {s.treatment_sample:,}")
     st.write(f"Total: {(s.control_sample + s.treatment_sample):,}")
@@ -67,15 +67,15 @@ def show_code(i):
     elif i.menu == "statistical significance":
 
         if i.test == "Proportions":
-            if i.test_statistic == "Permutation":
+            if i.method == "Permutation":
                 template = env.get_template("prop_signif_comp.py")
-            elif i.test_statistic == "z-test":
+            elif i.method == "z-test":
                 template = env.get_template("prop_signif_freq.py")
 
         elif i.test == "Means":
-            if i.test_statistic == "Permutation":
+            if i.method == "Permutation":
                 template = env.get_template("mean_signif_comp.py")
-            elif i.test_statistic == "t-test" or i.test_statistic == "z-test":
+            elif i.method == "t-test" or i.method == "z-test":
                 template = env.get_template("mean_signif_freq.py")
 
     code = template.render(i=i)

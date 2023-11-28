@@ -1,9 +1,9 @@
 # Import the libraries
 import math
 import pandas as pd
-{% if i.test_statistic == "t-test" %}
+{% if i.method == "t-test" %}
 from statsmodels.stats.power import tt_ind_solve_power
-{% elif i.test_statistic == "z-test" %}
+{% elif i.method == "z-test" %}
 from statsmodels.stats.power import zt_ind_solve_power
 {% endif %}
 
@@ -28,9 +28,9 @@ difference = treatment_mean - control_mean
 effect_size = difference / standard_deviation
 alpha = 1 - confidence
 ratio = treatment_ratio / control_ratio
-{% if i.test_statistic == "t-test" %}
+{% if i.method == "t-test" %}
 control_sample = math.ceil(tt_ind_solve_power(
-{% elif i.test_statistic == "z-test" %}
+{% elif i.method == "z-test" %}
 control_sample = math.ceil(zt_ind_solve_power(
 {% endif %}
     effect_size=effect_size,

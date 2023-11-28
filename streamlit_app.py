@@ -26,7 +26,7 @@ st.set_page_config(
 html = {
     "linear gradient": """
         <style>
-            div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display:none;}
+            div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display: none;}
         </style>
     """,
     "menu": """
