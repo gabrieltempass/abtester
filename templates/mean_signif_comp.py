@@ -17,6 +17,9 @@ def permutation(x, nC, nT):
 alternative = "{{ i.alternative }}"
 confidence = {{ i.confidence }}
 alpha = 1 - confidence
+{% if i.show == True %}
+iterations = {{ i.iterations }}
+{% endif %}
 
 # Get the measurements and count the users
 measurements = df["{{ i.alias['Measurement'] }}"]
@@ -31,7 +34,11 @@ observed_diff = treatment_mean - control_mean
 # Execute the permutation test
 random.seed(0)
 perm_diffs = []
-for _ in range(1000):
+{% if i.show == True %}
+for _ in range(iterations):
+{% else %}
+for _ in range({{ i.iterations }}):
+{% endif %}
     perm_diffs.append(
         permutation(
             measurements,

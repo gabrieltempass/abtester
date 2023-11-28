@@ -126,10 +126,9 @@ class StatSignifCalc:
 
         random.seed(0)
         perm_diffs = []
-        iterations = 1000
         # Show a progress bar that disappears when completed
         bar = st.empty().progress(0)
-        for percent_complete in range(iterations):
+        for percent_complete in range(i.iterations):
             perm_diffs.append(
                 permutation(
                     conversion,
@@ -137,7 +136,7 @@ class StatSignifCalc:
                     i.treatment_users,
                 )
             )
-            bar.progress((percent_complete + 1) / iterations)
+            bar.progress((percent_complete + 1) / i.iterations)
         bar.empty()
 
         self.get_comp_p_value(perm_diffs, i.alternative)
@@ -176,14 +175,13 @@ class StatSignifCalc:
 
         random.seed(0)
         perm_diffs = []
-        iterations = 10000
         # Show a progress bar that disappears when completed
         bar = st.empty().progress(0)
-        for percent_complete in range(iterations):
+        for percent_complete in range(i.iterations):
             perm_diffs.append(
                 permutation(measurements, self.control_users, self.treatment_users)
             )
-            bar.progress((percent_complete + 1) / iterations)
+            bar.progress((percent_complete + 1) / i.iterations)
         bar.empty()
 
         self.get_comp_p_value(perm_diffs, i.alternative)

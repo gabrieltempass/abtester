@@ -28,7 +28,7 @@ def add_section(subheader):
 
 
 def add_calculate_button():
-    if not st.button("Calculate"):
+    if not st.button("Calculate", type="primary"):
         st.stop()
 
 

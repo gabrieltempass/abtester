@@ -20,6 +20,7 @@ from source.results import show_signif_result
 st.set_page_config(
     page_title="abtester",
     page_icon=Image.open("images/icon.png"),
+    initial_sidebar_state="collapsed",
 )
 
 html = {

@@ -139,8 +139,8 @@ class ExperimentInputs:
         )
 
     def get_test_statistic(self):
-        show = st.checkbox("Show advanced settings")
-        if show:
+        self.show = st.checkbox("Show advanced settings")
+        if self.show:
 
             if self.menu == "sample size":
                 options = ("t-test", "z-test")
@@ -160,6 +160,14 @@ class ExperimentInputs:
                 help=description["test_statistic"],
                 horizontal=True,
             )
+
+            if self.test_statistic == "Permutation":
+                self.iterations = st.select_slider(
+                    label="Iterations",
+                    options=[1000, 2000, 5000, 10000, 20000, 50000, 100000],
+                    value=10000,
+                    help=description["iterations"],
+                )
 
     def get_file(self, description, requirements, path, file_names):
         self.file = st.file_uploader(
@@ -518,6 +526,7 @@ class StatSignifInputs(ExperimentInputs):
         super().__init__()
         self.menu = "statistical significance"
         self.test_statistic = "Permutation"
+        self.iterations = 10000
 
     @staticmethod
     def get_labels(df, alias):
@@ -620,6 +629,7 @@ description = {
     "control": "Select the label that marks users who participated in the control group.",
     "treatment": "Select the label that marks users who participated in the treatment group.",
     "test_statistic": "Choose which test statistic will be used to perform the calculations.",
+    "iterations": "How many resampling combinations of the control and treatment groups the permutation test will perform. The higher the number, the more accurate the p-value will be. However, it will also take more time to be calculated.",
 }
 
 text = {

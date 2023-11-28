@@ -18,6 +18,9 @@ treatment_conversions = {{ i.treatment_conversions }}
 alternative = "{{ i.alternative }}"
 confidence = {{ i.confidence }}
 alpha = 1 - confidence
+{% if i.show == True %}
+iterations = {{ i.iterations }}
+{% endif %}
 
 # Calculate the observed difference
 control_proportion = control_conversions / control_users
@@ -34,7 +37,11 @@ conversion = pd.Series(conversion)
 # Execute the permutation test
 random.seed(0)
 perm_diffs = []
-for _ in range(1000):
+{% if i.show == True %}
+for _ in range(iterations):
+{% else %}
+for _ in range({{ i.iterations }}):
+{% endif %}
     perm_diffs.append(
         permutation(
             conversion,
