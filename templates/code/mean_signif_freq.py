@@ -27,7 +27,7 @@ treatment_measurements = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatme
 
 # Calculate the p-value
 {% if i.method == "t-test" %}
-tstat, p_value, dfree = ttest_ind(
+tstat, p_value, dof = ttest_ind(
     treatment_measurements,
     control_measurements,
     alternative=alternative
@@ -42,21 +42,8 @@ tstat, p_value = ztest(
 
 # Show the result
 if p_value <= alpha:
-    print("The difference is statistically significant")
-    comparison = {
-        "direction": "less than or equal to",
-        "significance": "is"
-    }
+    result = "is statistically significant"
 else:
-    print("The difference is not statistically significant")
-    comparison = {
-        "direction": "greater than",
-        "significance": "is not"
-    }
+    result = "is not statistically significant"
 prefix = "<" if round(p_value, 4) < 0.0001 else ""
-print(f"Control mean: {control_mean:.2f}")
-print(f"Treatment mean: {treatment_mean:.2f}")
-print(f"Observed difference: {observed_diff / control_mean:+.2%}")
-print(f"Alpha: {alpha:.4f}")
-print(f"p-value: {prefix}{p_value:.4f}")
-print(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
+print("The difference {result}, with a p-value of: {prefix}{p_value:.4f}")
