@@ -4,7 +4,7 @@ import streamlit as st
 from source.utils import render_svg
 from source.utils import add_spaces
 from source.utils import add_header
-from source.utils import add_section
+from source.utils import add_subheader
 from source.utils import add_calculate_button
 from source.utils import wait_file
 from source.inputs import get_menu
@@ -24,24 +24,41 @@ st.set_page_config(
 )
 
 html = {
-    "linear gradient": """
+    "hide_decoration": """
         <style>
-            div[class='st-emotion-cache-1dp5vir ezrtsby1'] {display: none;}
+            #stDecoration {
+                visibility: hidden;
+            }
         </style>
     """,
-    "menu": """
+    "hide_menu": """
         <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
+            #MainMenu {
+                visibility: hidden;
+            }
+        </style>
+    """,
+    "hide_footer": """
+        <style>
+            footer {
+                visibility: hidden;
+            }
+        </style>
+    """,
+    "change_slider_font": """
+        <style>
+            div[data-testid="stThumbValue"], div[data-testid="stTickBarMin"], div[data-testid="stTickBarMax"] {
+                font-family: "Source Sans Pro", sans-serif;
+                font-size: 16px;
+            }
         </style>
     """,
 }
 
-# Hide the default linear gradient at the top of the page
-st.markdown(html["linear gradient"], unsafe_allow_html=True)
-
-# Hide the top right menu and the "Made with Streamlit" footer
-st.markdown(html["menu"], unsafe_allow_html=True)
+st.markdown(html["hide_decoration"], unsafe_allow_html=True)
+st.markdown(html["hide_menu"], unsafe_allow_html=True)
+st.markdown(html["hide_footer"], unsafe_allow_html=True)
+st.markdown(html["change_slider_font"], unsafe_allow_html=True)
 
 render_svg(open("images/logo.svg").read())
 add_spaces(7)
@@ -50,25 +67,25 @@ menu = get_menu()
 if menu == "sample size":
 
     add_header(menu)
-    add_section("Parameters")
+    add_subheader("Parameters")
     inputs = get_size_inputs()
     add_calculate_button()
     wait_file(inputs)
 
     if inputs.test == "Proportions" or inputs.file is not None:
-        add_section("Results")
+        add_subheader("Results")
         statistics = calculate_size(inputs)
         show_size_result(i=inputs, s=statistics)
 
 elif menu == "statistical significance":
 
     add_header(menu)
-    add_section("Parameters")
+    add_subheader("Parameters")
     inputs = get_signif_inputs()
     add_calculate_button()
     wait_file(inputs)
 
     if inputs.test == "Proportions" or inputs.file is not None:
-        add_section("Results")
+        add_subheader("Results")
         statistics = evaluate_signif(inputs)
         show_signif_result(i=inputs, s=statistics)

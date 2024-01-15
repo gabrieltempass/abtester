@@ -22,8 +22,8 @@ def add_header(menu):
     st.header(menu.capitalize())
 
 
-def add_section(subheader):
-    st.divider()
+def add_subheader(subheader):
+    add_spaces(3)
     st.subheader(subheader)
 
 
