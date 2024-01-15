@@ -9,7 +9,11 @@ def show_size_result(i, s):
 
 def show_signif_result(i, s):
     show_signif_report(i=i, s=s)
-    show_code(i)
+    if i.menu == "statistical significance":
+        if i.test == "Means":
+            if i.method == "t-test":
+                show_calculation(i=i, s=s)
+    show_code(i=i)
 
 
 def show_size_report(i, s):
@@ -54,7 +58,7 @@ def show_signif_report(i, s):
 
 
 def show_code(i):
-    loader = FileSystemLoader("templates")
+    loader = FileSystemLoader("templates/code")
     env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
 
     if i.menu == "sample size":
@@ -79,6 +83,20 @@ def show_code(i):
                 template = env.get_template("mean_signif_freq.py")
 
     code = template.render(i=i)
-    with st.expander("Show the code"):
+    with st.expander("Show code"):
         st.code(code, language="python")
+
+def show_calculation(i, s):
+    loader = FileSystemLoader("templates/calculation")
+    env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+
+    if i.menu == "statistical significance":
+
+        if i.test == "Means":
+            if i.method == "t-test":
+                template = env.get_template("mean_signif.md")
+
+    calculation = template.render(i=i, s=s)
+    with st.expander("Show calculation"):
+        st.write(calculation)
 

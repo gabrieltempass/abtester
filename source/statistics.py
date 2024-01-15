@@ -194,6 +194,8 @@ class StatSignifCalc:
         control = i.alias["Control"]
         treatment = i.alias["Treatment"]
 
+        self.control_n = i.df[i.df[group] == control].shape[0]
+        self.treatment_n = i.df[i.df[group] == treatment].shape[0]
         self.control_std = i.df[i.df[group] == control][measurement].std()
         self.treatment_std = i.df[i.df[group] == treatment][measurement].std()
         self.control_mean = i.df[i.df[group] == control][measurement].mean()
@@ -204,7 +206,7 @@ class StatSignifCalc:
         treatment_measurements = i.df[i.df[group] == treatment][measurement]
 
         if i.method == "t-test":
-            self.tstat, self.p_value, dfree = ttest_ind(
+            self.tstat, self.p_value, self.dof = ttest_ind(
                 treatment_measurements,
                 control_measurements,
                 alternative=i.alternative,
