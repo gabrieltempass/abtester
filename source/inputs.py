@@ -139,35 +139,32 @@ class ExperimentInputs:
         )
 
     def get_method(self):
-        self.show = st.checkbox("Show advanced settings")
-        if self.show:
-
-            if self.menu == "sample size":
-                options = ("t-test", "z-test")
+        if self.menu == "sample size":
+            options = ("t-test", "z-test")
+            index = 0
+        if self.menu == "statistical significance":
+            if self.test == "Proportions":
+                options = ("z-test", "Permutation")
                 index = 0
-            if self.menu == "statistical significance":
-                if self.test == "Proportions":
-                    options = ("z-test", "Permutation")
-                    index = 1
-                elif self.test == "Means":
-                    options = ("t-test", "z-test", "Permutation")
-                    index = 2
+            elif self.test == "Means":
+                options = ("t-test", "z-test", "Permutation")
+                index = 0
 
-            self.method = st.radio(
-                label="Test statistic",
-                options=options,
-                index=index,
-                help=description["method"],
-                horizontal=True,
+        self.method = st.radio(
+            label="Method",
+            options=options,
+            index=index,
+            help=description["method"],
+            horizontal=True,
+        )
+
+        if self.method == "Permutation":
+            self.iterations = st.select_slider(
+                label="Iterations",
+                options=[1000, 2000, 5000, 10000, 20000, 50000, 100000],
+                value=10000,
+                help=description["iterations"],
             )
-
-            if self.method == "Permutation":
-                self.iterations = st.select_slider(
-                    label="Iterations",
-                    options=[1000, 2000, 5000, 10000, 20000, 50000, 100000],
-                    value=10000,
-                    help=description["iterations"],
-                )
 
     def get_file(self, description, requirements, path, file_names):
         self.file = st.file_uploader(
@@ -503,7 +500,7 @@ class PropSizeInputs(SampleSizeInputs):
     def get_control_proportion(self):
         self.control_proportion = percentage(
             st.number_input(
-                label="Control conversion rate (%)",
+                label="Control proportion (%)",
                 min_value=0.1,
                 max_value=100.0,
                 value=15.0,
@@ -573,28 +570,29 @@ class PropSignifInputs(StatSignifInputs):
         self.test = "Proportions"
 
     def get_users(self):
-        self.control_users = st.number_input(
+        col_1, col_2 = st.columns(2)
+        self.control_users = col_1.number_input(
             label="Users in the control",
             min_value=1,
             value=30000,
             step=1,
             help=description["control_users"]
         )
-        self.treatment_users = st.number_input(
+        self.treatment_users = col_2.number_input(
             label="Users in the treatment",
             min_value=1,
             value=30000,
             step=1,
             help=description["treatment_users"]
         )
-        self.control_conversions = st.number_input(
+        self.control_conversions = col_1.number_input(
             label="Conversions from the control",
             min_value=0,
             value=1215,
             step=1,
             help=description["control_conversions"]
         )
-        self.treatment_conversions = st.number_input(
+        self.treatment_conversions = col_2.number_input(
             label="Conversions from the treatment",
             min_value=0,
             value=1294,
@@ -628,7 +626,7 @@ description = {
     "group": "Select the column that contains the labels that marks users who participated in the control or treatment groups.",
     "control": "Select the label that marks users who participated in the control group.",
     "treatment": "Select the label that marks users who participated in the treatment group.",
-    "method": "Choose which test statistic will be used to perform the calculations.",
+    "method": "Choose which method will be used to perform the calculations.",
     "iterations": "How many resampling combinations of the control and treatment groups the permutation test will perform. The higher the number, the more accurate the p-value will be. However, it will also take more time to be calculated.",
 }
 
