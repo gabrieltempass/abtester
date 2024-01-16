@@ -39,7 +39,7 @@ def show_signif_report(i, s):
             "significance": "is not"
         }
 
-    if round(p_value, 4) < 0.0001:
+    if round(s.p_value, 4) < 0.0001:
         value = "< 0.0001"
     else:
         value = f"{s.p_value:.4f}"
