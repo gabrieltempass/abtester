@@ -39,7 +39,10 @@ def show_signif_report(i, s):
             "significance": "is not"
         }
 
-    prefix = "<" if round(s.p_value, 4) < 0.0001 else ""
+    if round(p_value, 4) < 0.0001:
+        value = "< 0.0001"
+    else:
+        value = f"{s.p_value:.4f}"
 
     if i.test == "Proportions":
         st.write(f"Control proportion: {s.control_prop:.2%}")
@@ -53,7 +56,7 @@ def show_signif_report(i, s):
         st.write(f"Observed difference: {s.observed_diff / s.control_mean:+.2%}")
 
     st.write(f"Alpha: {s.alpha:.4f}")
-    st.write(f"p-value: {prefix}{s.p_value:.4f}")
+    st.write(f"p-value: {value}")
     st.write(f"Since the p-value is {comparison['direction']} alpha (which comes from 1 minus the confidence level), the difference {comparison['significance']} statistically significant.")
 
 

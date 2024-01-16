@@ -51,8 +51,11 @@ elif alternative == "two-sided":
 
 # Show the result
 if p_value <= alpha:
-    result = "is statistically significant"
+    outcome = "is"
 else:
-    result = "is not statistically significant"
-prefix = "<" if round(p_value, 4) < 0.0001 else ""
-print("The difference {result}, with a p-value of: {prefix}{p_value:.4f}")
+    outcome = "is not"
+if round(p_value, 4) < 0.0001:
+    value = "< 0.0001"
+else:
+    value = f"= {p_value:.4f}"
+print(f"The difference {outcome} statistically significant, with a p-value {value}.")

@@ -115,5 +115,10 @@ p \; value =
 $$
 
 $$
-p \; value = {{ s.p_value|round(4) }}
+p \; value
+{% if s.p_value|round(4) < 0.0001 %}
+< 0.0001
+{% else %}
+= {{ s.p_value|round(4) }}
+{% endif %}
 $$
