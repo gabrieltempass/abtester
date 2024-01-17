@@ -73,6 +73,9 @@ class SampleSizeCalc:
 
         self.treatment_sample = math.ceil(self.control_sample * self.ratio)
 
+        self.control_conversions = math.floor(self.control_sample * i.control_proportion)
+        self.treatment_conversions = math.floor(self.treatment_sample * self.treatment_proportion)
+
     def calculate_mean_size(self, i):
         if i.alternative == "smaller":
             i.sensitivity *= -1
@@ -164,8 +167,8 @@ class StatSignifCalc:
         treatment = i.alias["Treatment"]
 
         measurements = i.df[measurement]
-        self.control_users = i.df[i.df[group] == control].shape[0]
-        self.treatment_users = i.df[i.df[group] == treatment].shape[0]
+        self.control_n = i.df[i.df[group] == control].shape[0]
+        self.treatment_n = i.df[i.df[group] == treatment].shape[0]
 
         self.control_std = i.df[i.df[group] == control][measurement].std()
         self.treatment_std = i.df[i.df[group] == treatment][measurement].std()
@@ -179,7 +182,7 @@ class StatSignifCalc:
         bar = st.empty().progress(0)
         for percent_complete in range(i.iterations):
             perm_diffs.append(
-                permutation(measurements, self.control_users, self.treatment_users)
+                permutation(measurements, self.control_n, self.treatment_n)
             )
             bar.progress((percent_complete + 1) / i.iterations)
         bar.empty()

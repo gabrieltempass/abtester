@@ -12,8 +12,7 @@ from source.inputs import get_size_inputs
 from source.inputs import get_signif_inputs
 from source.statistics import calculate_size
 from source.statistics import evaluate_signif
-from source.results import show_size_result
-from source.results import show_signif_result
+from source.results import show_result
 
 
 # Set browser tab title, favicon and menu options
@@ -75,7 +74,7 @@ if menu == "sample size":
     if inputs.test == "Proportions" or inputs.file is not None:
         add_subheader("Results")
         statistics = calculate_size(inputs)
-        show_size_result(i=inputs, s=statistics)
+        show_result(i=inputs, s=statistics)
 
 elif menu == "statistical significance":
 
@@ -88,4 +87,4 @@ elif menu == "statistical significance":
     if inputs.test == "Proportions" or inputs.file is not None:
         add_subheader("Results")
         statistics = evaluate_signif(inputs)
-        show_signif_result(i=inputs, s=statistics)
+        show_result(i=inputs, s=statistics)
