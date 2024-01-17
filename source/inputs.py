@@ -588,14 +588,14 @@ class PropSignifInputs(StatSignifInputs):
         self.control_conversions = col_1.number_input(
             label="Conversions from the control",
             min_value=0,
-            value=1215,
+            value=1202,
             step=1,
             help=description["control_conversions"]
         )
         self.treatment_conversions = col_2.number_input(
             label="Conversions from the treatment",
             min_value=0,
-            value=1294,
+            value=1298,
             step=1,
             help=description["treatment_conversions"]
         )
