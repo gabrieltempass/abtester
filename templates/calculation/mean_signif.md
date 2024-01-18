@@ -40,7 +40,7 @@ $$
 Once the test statistic is known, it can be used to find the p value. Through the probability density function (PDF) of the Student's t distribution, given by:
 
 $$
-f(t) = \frac{\Gamma(\frac{\nu + 1}{2})}{\sqrt{\pi \nu} \; \Gamma(\frac{\nu}{2})}\bigg(1 + \frac{x^2}{\nu}\bigg)^{- \frac{(\nu + 1)}{2}}
+f(x,\nu) = \frac{\Gamma(\frac{\nu + 1}{2})}{\sqrt{\pi \nu} \; \Gamma(\frac{\nu}{2})}\bigg(1 + \frac{x^2}{\nu}\bigg)^{- \frac{(\nu + 1)}{2}}
 $$
 
 Since this is to test whether the alternative hypothesis is
