@@ -30,11 +30,11 @@ $S_p$ = Pooled standard deviation.
 As for the solution:
 
 $$
-t = \frac{ {{ s.treatment_mean|round(4) }} - {{ s.control_mean|round(4) }} }{\sqrt{\Big(\frac{( {{ s.treatment_n }} - 1) {{ s.treatment_std|round(4) }} ^2 + ( {{ s.control_n }} - 1) {{ s.control_std|round(4) }} ^2}{ {{ s.treatment_n }} + {{ s.control_n }} - 2}\Big)\Big(\frac{1}{ {{ s.treatment_n }} } + \frac{1}{ {{ s.control_n }} }}\Big)}
+t = \frac{ {{ s.treatment_mean|prettify_number(4, thousand_separator="") }} - {{ s.control_mean|prettify_number(4, thousand_separator="") }} }{\sqrt{\Big(\frac{( {{ s.treatment_n }} - 1) {{ s.treatment_std|prettify_number(4, thousand_separator="") }} ^2 + ( {{ s.control_n }} - 1) {{ s.control_std|prettify_number(4, thousand_separator="") }} ^2}{ {{ s.treatment_n }} + {{ s.control_n }} - 2}\Big)\Big(\frac{1}{ {{ s.treatment_n }} } + \frac{1}{ {{ s.control_n }} }}\Big)}
 $$
 
 $$
-t = {{ s.tstat|round(4) }}
+t = {{ s.tstat|prettify_number(4, thousand_separator="") }}
 $$
 
 Once the test statistic is known, it can be used to find the p value. Through the probability density function (PDF) of the Student's t distribution, given by:
@@ -104,9 +104,9 @@ p \; value =
 {% endif %}
 \frac{\Gamma(\frac{ {{ s.dof|int }} + 1}{2})}{\sqrt{\pi {{ s.dof|int }} } \; \Gamma(\frac{ {{ s.dof|int }} }{2})}\int_{-\infty}^{
 {% if i.alternative == "smaller" or i.alternative == "larger" %}
-{{ s.tstat|round(4) }}
+{{ s.tstat|prettify_number(4, thousand_separator="") }}
 {% elif i.alternative == "two-sided" %}
-|{{ s.tstat|round(4) }}|
+|{{ s.tstat|prettify_number(4, thousand_separator="") }}|
 {% endif %}
 } \bigg(1 + \frac{x^2}{ {{ s.dof|int }} }\bigg)^{- \frac{( {{ s.dof|int }} + 1)}{2}} \,\mathrm{d}x
 {% if i.alternative == "two-sided" %}

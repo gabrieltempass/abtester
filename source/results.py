@@ -10,7 +10,7 @@ def show_result(i, s):
     show_report(i=i, s=s)
     if i.menu == "statistical significance":
         if i.test == "Means":
-            if i.method == "t-test":
+            if i.method in {"t-test", "z-test"}:
                 show_calculation(i=i, s=s)
     show_code(i=i)
 
@@ -60,12 +60,15 @@ def show_report(i, s):
 def show_calculation(i, s):
     loader = FileSystemLoader("templates/calculation")
     env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+    env.filters["prettify_number"] = prettify_number
 
     if i.menu == "statistical significance":
 
         if i.test == "Means":
             if i.method == "t-test":
-                template = env.get_template("mean_signif.md")
+                template = env.get_template("mean_signif_t.md")
+            elif i.method == "z-test":
+                template = env.get_template("mean_signif_z.md")
 
     calculation = template.render(i=i, s=s)
     with st.expander("Show calculation"):
@@ -87,7 +90,7 @@ def show_code(i):
 
         if i.test == "Proportions":
             if i.method == "Permutation":
-                template = env.get_template("prop_signif_comp.py")
+                template = env.get_template("prop_signif_comp.zpy")
             elif i.method == "z-test":
                 template = env.get_template("prop_signif_freq.py")
 

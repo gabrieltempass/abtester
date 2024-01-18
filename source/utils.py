@@ -1,6 +1,7 @@
 import base64
 from typing import Union
 
+from jinja2 import FileSystemLoader, Environment
 import streamlit as st
 
 
@@ -38,7 +39,7 @@ def wait_file(inputs):
         st.error(f"You must choose a file to be able to calculate the {inputs.menu}.")
 
 
-def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = "") -> str:
+def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = "", thousand_separator: str = ",") -> str:
 
 # TODO: Update to python 3.10+ to be able to use multiple types this way:
 # def prettify_number(number: float|int, decimals: int = 2, sign: str = "") -> str:
@@ -82,7 +83,7 @@ def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = ""
     elif decimals >= 0:
         # String prettified from this number. In order:
         # * Coerce this number into a string rounded to this precision.
-        result = f"{number:{sign},.{decimals}f}"
+        result = f"{number:{sign}{thousand_separator}.{decimals}f}"
     if decimals > 0:
         # * Truncate all trailing zeroes from this string.
         # * Truncate any trailing decimal place if any from this string.
@@ -92,4 +93,11 @@ def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = ""
     # or positive, with the "+" sign, yielded the anomalous result of "-0"
     # or "+0", return "0" instead; else, return this result as is.
     return "0" if result in {"-0", "+0"} else result
+
+
+def load_env(parent_directory):
+    loader = FileSystemLoader(f"templates/{parent_directory}")
+    env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+    env.filters["prettify_number"] = prettify_number
+    return env
 
