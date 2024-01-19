@@ -82,6 +82,7 @@ def get_signif_inputs():
 def get_prop_signif_inputs():
     inputs = PropSignifInputs()
     inputs.get_users()
+    inputs.get_conversions()
     inputs.get_alternative()
     inputs.get_confidence()
     inputs.get_method()
@@ -585,6 +586,9 @@ class PropSignifInputs(StatSignifInputs):
             step=1,
             help=description["treatment_users"]
         )
+
+    def get_conversions(self):
+        col_1, col_2 = st.columns(2)
         self.control_conversions = col_1.number_input(
             label="Conversions from the control",
             min_value=0,
