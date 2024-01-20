@@ -22,6 +22,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+render_svg(open("images/logo.svg").read())
+
 html = {
     "hide_decoration": """
         <style>
@@ -58,9 +60,6 @@ st.markdown(html["hide_decoration"], unsafe_allow_html=True)
 st.markdown(html["hide_menu"], unsafe_allow_html=True)
 st.markdown(html["hide_footer"], unsafe_allow_html=True)
 st.markdown(html["change_slider_font"], unsafe_allow_html=True)
-
-render_svg(open("images/logo.svg").read())
-add_spaces(7)
 
 menu = get_menu()
 if menu == "sample size":

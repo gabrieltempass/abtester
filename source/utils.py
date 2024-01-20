@@ -20,12 +20,12 @@ def add_spaces(n):
 
 
 def add_header(menu):
-    add_spaces(3)
+    add_spaces(2)
     st.header(menu.capitalize())
 
 
 def add_subheader(subheader):
-    add_spaces(3)
+    add_spaces(2)
     st.subheader(subheader)
 
 
