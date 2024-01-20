@@ -1,0 +1,14 @@
+<style>
+  .e1f1d6gn2:has(> iframe) {
+    height: {{ height_large }}px;
+  }
+
+  @media (max-width: 640px) {
+    .e1f1d6gn2:has(> iframe) {
+      height: {{ height_small }}px;
+    }
+    .e1f1d6gn2 iframe {
+      height: {{ height_small }}px;
+    }
+  }
+</style>

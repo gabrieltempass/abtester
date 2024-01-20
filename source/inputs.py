@@ -141,14 +141,14 @@ class ExperimentInputs:
 
     def get_method(self):
         if self.menu == "sample size":
-            options = ("t-test", "z-test")
+            options = ("t-test", "Z-test")
             index = 0
         if self.menu == "statistical significance":
             if self.test == "Proportions":
-                options = ("z-test", "Permutation")
+                options = ("Z-test", "Permutation")
                 index = 0
             elif self.test == "Means":
-                options = ("t-test", "z-test", "Permutation")
+                options = ("t-test", "Z-test", "Permutation")
                 index = 0
 
         self.method = st.radio(

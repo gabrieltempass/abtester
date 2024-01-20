@@ -3,7 +3,7 @@ import math
 import pandas as pd
 {% if i.method == "t-test" %}
 from statsmodels.stats.power import tt_ind_solve_power
-{% elif i.method == "z-test" %}
+{% elif i.method == "Z-test" %}
 from statsmodels.stats.power import zt_ind_solve_power
 {% endif %}
 
@@ -30,7 +30,7 @@ alpha = 1 - confidence
 ratio = treatment_ratio / control_ratio
 {% if i.method == "t-test" %}
 control_sample = math.ceil(tt_ind_solve_power(
-{% elif i.method == "z-test" %}
+{% elif i.method == "Z-test" %}
 control_sample = math.ceil(zt_ind_solve_power(
 {% endif %}
     effect_size=effect_size,

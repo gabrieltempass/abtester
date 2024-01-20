@@ -43,13 +43,13 @@ def evaluate_signif(i):
     if i.test == "Proportions":
         if i.method == "Permutation":
             signif.evaluate_prop_signif_comp(i)
-        elif i.method == "z-test":
+        elif i.method == "Z-test":
             signif.evaluate_prop_signif_freq(i)
 
     elif i.test == "Means":
         if i.method == "Permutation":
             signif.evaluate_mean_signif_comp(i)
-        elif i.method == "t-test" or i.method == "z-test":
+        elif i.method in {"t-test", "Z-test"}:
             signif.evaluate_mean_signif_freq(i)
     return signif
 
@@ -68,7 +68,7 @@ class SampleSizeCalc:
 
         if i.method == "t-test":
             self.t_test(i)
-        elif i.method == "z-test":
+        elif i.method == "Z-test":
             self.z_test(i)
 
         self.treatment_sample = math.ceil(self.control_sample * self.ratio)
@@ -89,7 +89,7 @@ class SampleSizeCalc:
 
         if i.method == "t-test":
             self.t_test(i)
-        elif i.method == "z-test":
+        elif i.method == "Z-test":
             self.z_test(i)
 
         self.treatment_sample = math.ceil(self.control_sample * self.ratio)
@@ -214,7 +214,7 @@ class StatSignifCalc:
                 control_measurements,
                 alternative=i.alternative,
             )
-        elif i.method == "z-test":
+        elif i.method == "Z-test":
             self.tstat, self.p_value = ztest(
                 treatment_measurements,
                 control_measurements,

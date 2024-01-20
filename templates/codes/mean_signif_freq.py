@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 {% if i.method == "t-test" %}
 from statsmodels.stats.weightstats import ttest_ind
-{% elif i.method == "z-test" %}
+{% elif i.method == "Z-test" %}
 from statsmodels.stats.weightstats import ztest
 {% endif %}
 
@@ -32,7 +32,7 @@ tstat, p_value, dof = ttest_ind(
     control_measurements,
     alternative=alternative
 )
-{% elif i.method == "z-test" %}
+{% elif i.method == "Z-test" %}
 tstat, p_value = ztest(
     treatment_measurements,
     control_measurements,

@@ -1,41 +1,41 @@
-from jinja2 import FileSystemLoader, Environment
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-from source.utils import prettify_number
+from source.utils import load_env
 
 
 def show_result(i, s):
-    show_report(i=i, s=s)
+    screen = show_report(i=i, s=s)
     if i.menu == "statistical significance":
         if i.test == "Means":
-            if i.method in {"t-test", "z-test"}:
+            if i.method in {"t-test", "Z-test"}:
                 show_calculation(i=i, s=s)
-    show_code(i=i)
+    show_code(i=i, screen=screen)
 
 
 def show_report(i, s):
-    loader = FileSystemLoader("templates/result")
-    env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-    env.filters["prettify_number"] = prettify_number
+    env = load_env("reports")
 
     if i.menu == "sample size":
-        template = env.get_template("size.md")
+        template = env.get_template("summary_size.md")
         summary = template.render(i=i, s=s)
         st.info(summary)
 
+        # height calculation:
+        # h = number_of_lines_with_text * 25px
+        # + number_of_row_gaps * 16px
+        
         if i.test == "Proportions":
-            template_1 = env.get_template("prop_size_1.md")
-            template_2 = env.get_template("prop_size_2.md")
+            template_1 = env.get_template("prop_size.html")
+            screen = {"large": 100, "small": 216}
 
         elif i.test == "Means":
-            template_1 = env.get_template("mean_size_1.md")
-            template_2 = env.get_template("mean_size_2.md")
+            template_1 = env.get_template("mean_size.html")
+            screen = {"large": 100, "small": 191}
 
     elif i.menu == "statistical significance":
-
-        template = env.get_template("signif.md")
+        template = env.get_template("summary_signif.md")
         summary = template.render(s=s)
         if s.p_value <= s.alpha:
             st.success(summary)
@@ -43,41 +43,44 @@ def show_report(i, s):
             st.error(summary)
 
         if i.test == "Proportions":
-            template_1 = env.get_template("prop_signif_1.md")
-            template_2 = env.get_template("prop_signif_2.md")
+            template_1 = env.get_template("prop_signif.html")
+            if i.method == "Z-test":
+                screen = {"large": 182, "small": 380}
+            elif i.method == "Permutation":
+                screen = {"large": 182, "small": 314}
 
         elif i.test == "Means":
-            template_1 = env.get_template("mean_signif_1.md")
-            template_2 = env.get_template("mean_signif_2.md")
-
-    report_1 = template_1.render(i=i, s=s)
-    report_2 = template_2.render(i=i, s=s)
-    col_1, col_2 = st.columns(2)
-    col_1.write(report_1)
-    col_2.write(report_2)
+            template_1 = env.get_template("mean_signif.html")
+            if i.method == "t-test":
+                screen = {"large": 298, "small": 546}
+            elif i.method == "Z-test":
+                screen = {"large": 232, "small": 480}
+            elif i.method == "Permutation":
+                screen = {"large": 232, "small": 414}
+    
+    report = template_1.render(i=i, s=s)
+    components.html(report, height=screen["large"])
+    return screen
 
 
 def show_calculation(i, s):
-    loader = FileSystemLoader("templates/calculation")
-    env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
-    env.filters["prettify_number"] = prettify_number
+    env = load_env("calculations")
 
     if i.menu == "statistical significance":
 
         if i.test == "Means":
             if i.method == "t-test":
                 template = env.get_template("mean_signif_t.md")
-            elif i.method == "z-test":
+            elif i.method == "Z-test":
                 template = env.get_template("mean_signif_z.md")
 
-    calculation = template.render(i=i, s=s)
-    with st.expander("Show calculation"):
-        st.write(calculation)
+            calculation = template.render(i=i, s=s)
+            with st.expander("Show calculation"):
+                st.write(calculation)
 
 
-def show_code(i):
-    loader = FileSystemLoader("templates/code")
-    env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+def show_code(i, screen):
+    env = load_env("codes")
 
     if i.menu == "sample size":
 
@@ -90,17 +93,25 @@ def show_code(i):
 
         if i.test == "Proportions":
             if i.method == "Permutation":
-                template = env.get_template("prop_signif_comp.zpy")
-            elif i.method == "z-test":
+                template = env.get_template("prop_signif_comp.py")
+            elif i.method == "Z-test":
                 template = env.get_template("prop_signif_freq.py")
 
         elif i.test == "Means":
             if i.method == "Permutation":
                 template = env.get_template("mean_signif_comp.py")
-            elif i.method == "t-test" or i.method == "z-test":
+            elif i.method == "t-test" or i.method == "Z-test":
                 template = env.get_template("mean_signif_freq.py")
 
     code = template.render(i=i)
     with st.expander("Show code"):
         st.code(code, language="python")
+
+    env = load_env("reports")
+    template = env.get_template("heights.html")
+    html = template.render(
+        height_large=screen["large"],
+        height_small=screen["small"]
+    )
+    st.markdown(html, unsafe_allow_html=True)
 
