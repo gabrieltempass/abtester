@@ -37,7 +37,7 @@ $$
 Z = {{ s.tstat|prettify_number(4, thousand_separator="") }}
 $$
 
-Once the test statistic is known, it can be used to find the p value. Through the probability density function (PDF) of the standard Normal distribution, given by:
+Once the test statistic is known, it can be used to find the p-value. Through the probability density function (PDF) of the standard Normal distribution, given by:
 
 $$
 f(x) = \frac{e^{-x^2}}{\sqrt{2 \pi}}
@@ -51,7 +51,7 @@ Since this is to test whether the alternative hypothesis is
 {% elif i.alternative == "two-sided" %}
  not equal to
 {% endif %}
- the null, the p value comes from
+ the null, the p-value comes from
 {% if i.alternative == "two-sided" %}
  two times
 {% endif %}
@@ -65,7 +65,7 @@ Since this is to test whether the alternative hypothesis is
  test statistic, with respect to x:
 
 $$
-p \; value =
+p\!-\!value =
 {% if i.alternative == "two-sided" %}
 2 \Big(1 -
 {% elif i.alternative == "larger" %}
@@ -89,7 +89,7 @@ $Z$ = Test statistic.$\\$
 The fraction one divided by square root of two times pi can be left out of the integral, because it is a constant that multiplies the integrand. Finally, the solution is (an online calculator, like [WolframAlpha](https://www.wolframalpha.com), could be used in this step):
 
 $$
-p \; value =
+p\!-\!value =
 {% if i.alternative == "two-sided" %}
 2 \Big(1 -
 {% elif i.alternative == "larger" %}
@@ -108,7 +108,7 @@ p \; value =
 $$
 
 $$
-p \; value
+p\!-\!value
 {% if s.p_value|round(4) < 0.0001 %}
 < 0.0001
 {% else %}

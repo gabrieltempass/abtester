@@ -37,7 +37,7 @@ $$
 t = {{ s.tstat|prettify_number(4, thousand_separator="") }}
 $$
 
-Once the test statistic is known, it can be used to find the p value. Through the probability density function (PDF) of the Student's t distribution, given by:
+Once the test statistic is known, it can be used to find the p-value. Through the probability density function (PDF) of the Student's t distribution, given by:
 
 $$
 f(x,\nu) = \frac{\Gamma(\frac{\nu + 1}{2})}{\sqrt{\pi \nu} \; \Gamma(\frac{\nu}{2})}\bigg(1 + \frac{x^2}{\nu}\bigg)^{- \frac{(\nu + 1)}{2}}
@@ -51,7 +51,7 @@ Since this is to test whether the alternative hypothesis is
 {% elif i.alternative == "two-sided" %}
  not equal to
 {% endif %}
- the null, the p value comes from
+ the null, the p-value comes from
 {% if i.alternative == "two-sided" %}
  two times
 {% endif %}
@@ -65,7 +65,7 @@ Since this is to test whether the alternative hypothesis is
  test statistic, with respect to x:
 
 $$
-p \; value =
+p\!-\!value =
 {% if i.alternative == "two-sided" %}
 2 \Bigg(1 -
 {% elif i.alternative == "larger" %}
@@ -96,7 +96,7 @@ $$
 Finally, the solution is (an online calculator, like [WolframAlpha](https://www.wolframalpha.com), could be used in this step):
 
 $$
-p \; value =
+p\!-\!value =
 {% if i.alternative == "two-sided" %}
 2 \Bigg(1 -
 {% elif i.alternative == "larger" %}
@@ -115,7 +115,7 @@ p \; value =
 $$
 
 $$
-p \; value
+p\!-\!value
 {% if s.p_value|round(4) < 0.0001 %}
 < 0.0001
 {% else %}

@@ -88,7 +88,7 @@
     {% elif i.method == "Z-test" or i.method == "Permutation" %}
     <div class="box">
       <p>
-        <strong>p value</strong></br>
+        <strong>p-value</strong></br>
         <span>{% if s.p_value|round(4) < 0.0001 %}< 0.0001{% else %}{{ s.p_value|round(4) }}{% endif %}</span>
       </p>
     </div>
@@ -106,7 +106,7 @@
   <div class="row">
     <div class="box">
       <p>
-        <strong>p value</strong></br>
+        <strong>p-value</strong></br>
         <span>{% if s.p_value|round(4) < 0.0001 %}< 0.0001{% else %}{{ s.p_value|round(4) }}{% endif %}</span>
       </p>
     </div>
