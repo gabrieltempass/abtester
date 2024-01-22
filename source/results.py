@@ -25,7 +25,7 @@ def show_report(i, s):
         # height calculation:
         # h = number_of_lines_with_text * 25px
         # + number_of_row_gaps * 16px
-        
+
         if i.test == "Proportions":
             template_1 = env.get_template("prop_size.html")
             screen = {"large": 100, "small": 216}
@@ -36,7 +36,7 @@ def show_report(i, s):
 
     elif i.menu == "statistical significance":
         template = env.get_template("summary_signif.md")
-        summary = template.render(s=s)
+        summary = template.render(i=i, s=s)
         if s.p_value <= s.alpha:
             st.success(summary)
         else:
