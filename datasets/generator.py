@@ -97,8 +97,8 @@ generate_stat_sign_dataset(
     file_name="format",
 )
 generate_stat_sign_dataset(
-    mean_c=150,
-    mean_t=170,
+    mean_c=170,
+    mean_t=159,
     std_dev_c=32,
     std_dev_t=32,
     size_c=100,
@@ -108,9 +108,9 @@ generate_stat_sign_dataset(
 )
 generate_stat_sign_dataset(
     mean_c=14370,
-    mean_t=14340,
-    std_dev_c=111,
-    std_dev_t=111,
+    mean_t=14333,
+    std_dev_c=600,
+    std_dev_t=600,
     size_c=4000,
     size_t=7000,
     decimals=0,
@@ -118,7 +118,7 @@ generate_stat_sign_dataset(
 )
 generate_stat_sign_dataset(
     mean_c=600,
-    mean_t=630,
+    mean_t=627,
     std_dev_c=240,
     std_dev_t=240,
     size_c=490,
