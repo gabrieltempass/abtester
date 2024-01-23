@@ -40,7 +40,7 @@ $$
 Once the test statistic is known, it can be used to find the p-value. Through the probability density function (PDF) of the standard Normal distribution, given by:
 
 $$
-f(x) = \frac{e^{-x^2}}{\sqrt{2 \pi}}
+f(x) = \frac{e^{-\frac{x^2}{2}}}{\sqrt{2 \pi}}
 $$
 
 Since this is to test whether the alternative hypothesis is
@@ -77,7 +77,7 @@ Z
 {% elif i.alternative == "two-sided" %}
 |Z|
 {% endif %}
-} e^{-x^2} \,\mathrm{d}x
+} e^{-\frac{x^2}{2}} \,\mathrm{d}x
 {% if i.alternative == "two-sided" %}
 \Big)
 {% endif %}
@@ -101,7 +101,7 @@ p\!-\!value =
 {% elif i.alternative == "two-sided" %}
 |{{ s.tstat|prettify_number(4, thousand_separator="") }}|
 {% endif %}
-} e^{-x^2} \,\mathrm{d}x
+} e^{-\frac{x^2}{2}} \,\mathrm{d}x
 {% if i.alternative == "two-sided" %}
 \Big)
 {% endif %}
