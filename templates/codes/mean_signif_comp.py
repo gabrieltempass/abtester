@@ -27,7 +27,7 @@ def permutation(x, nC, nT):
     n = nC + nT
     idx_C = set(random.sample(range(n), nT))
     idx_T = set(range(n)) - idx_C
-    return x.loc[idx_T].mean() - x.loc[idx_C].mean()
+    return x.loc[list(idx_T)].mean() - x.loc[list(idx_C)].mean()
 
 # Execute the permutation test
 random.seed(0)
