@@ -67,7 +67,7 @@ def generate_stat_sign_dataset(
         label="Treatment",
     )
     df = pd.concat([df_control, df_treatment])
-    path = "example_datasets/statistical_significance/"
+    path = "datasets/statistical_significance/"
     df.to_csv(f"{path}{file_name}.csv", index=False)
     return
 
@@ -76,7 +76,7 @@ def generate_samp_size_dataset(mean, std_dev, size, decimals, file_name, non_neg
     df = build_base_df(
         mean=mean, std_dev=std_dev, size=size, decimals=decimals, non_neg=non_neg
     )
-    path = "example_datasets/sample_size/"
+    path = "datasets/sample_size/"
     df.to_csv(f"{path}{file_name}.csv", index=False)
     return
 

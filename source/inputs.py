@@ -59,7 +59,7 @@ def get_mean_size_inputs():
     inputs.get_file(
         requirements=text["size_requirements"],
         description=description["size_file"],
-        path="example_datasets/sample_size/",
+        path="datasets/sample_size/",
         file_names={
             "dataset A": "dataset_a.csv",
             "dataset B": "dataset_b.csv",
@@ -96,7 +96,7 @@ def get_mean_signif_inputs():
     inputs.get_file(
         requirements=text["significance_requirements"],
         description=description["significance_file"],
-        path="example_datasets/statistical_significance/",
+        path="datasets/statistical_significance/",
         file_names={
             "dataset 1": "dataset_1.csv",
             "dataset 2": "dataset_2.csv",
