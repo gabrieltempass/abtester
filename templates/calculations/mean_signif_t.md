@@ -4,7 +4,7 @@ $$
 t = \frac{(\bar{x_t} - \bar{x_c}) - (\mu_t - \mu_c)}{S_p \sqrt{\frac{1}{n_t} + \frac{1}{n_c}}}
 $$
 
-Note that $\mu_t - \mu_c$ is the difference between the means under the null hypothesis, which in this case is assumed to be zero. And the pooled standard deviation comes from:
+Note that $\mu_t - \mu_c$ is the difference between the means under the null hypothesis, which in this case is assumed to be zero. While the pooled standard deviation comes from:
 
 $$
 S_p = \sqrt{\frac{(n_t - 1)S_t^2 + (n_c - 1)S_c^2}{n_t + n_c - 2}}
