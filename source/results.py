@@ -8,9 +8,8 @@ from source.utils import load_env
 def show_result(i, s):
     screen = show_report(i=i, s=s)
     if i.menu == "statistical significance":
-        if i.test == "Means":
-            if i.method in {"t-test", "Z-test"}:
-                show_calculation(i=i, s=s)
+        if i.method in {"t-test", "Z-test"}:
+            show_calculation(i=i, s=s)
     show_code(i=i, screen=screen)
 
 
@@ -22,9 +21,13 @@ def show_report(i, s):
         summary = template.render(i=i, s=s)
         st.info(summary)
 
-        # height calculation:
-        # h = number_of_lines_with_text * 25px
-        # + number_of_row_gaps * 16px
+        # large height calculation:
+        # h = number_of_lines_with_text_on_left_column * 25px
+        # + number_of_row_gaps_on_left_column * 16px
+
+        # small height calculation:
+        # h = number_of_lines_with_text_on_both_columns * 25px
+        # + number_of_row_gaps_on_both_column * 16px
 
         if i.test == "Proportions":
             template_1 = env.get_template("prop_size.html")
@@ -68,15 +71,19 @@ def show_calculation(i, s):
 
     if i.menu == "statistical significance":
 
-        if i.test == "Means":
+        if i.test == "Proportions":
+            if i.method == "Z-test":
+                template = env.get_template("prop_signif_z.md")
+
+        elif i.test == "Means":
             if i.method == "t-test":
                 template = env.get_template("mean_signif_t.md")
             elif i.method == "Z-test":
                 template = env.get_template("mean_signif_z.md")
 
-            calculation = template.render(i=i, s=s)
-            with st.expander("Show calculation"):
-                st.write(calculation)
+        calculation = template.render(i=i, s=s)
+        with st.expander("Show calculation"):
+            st.write(calculation)
 
 
 def show_code(i, screen):
