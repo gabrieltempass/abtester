@@ -44,10 +44,13 @@ html = (
             font-family: "Source Sans Pro", sans-serif;
             font-size: 16px;
         }
-        #MainMenu {
+        div[data-testid="stToolbar"] {
             visibility: hidden;
         }
         footer {
+            visibility: hidden;
+        }
+        a[class^="viewerBadge_container"] {
             visibility: hidden;
         }
     </style>
