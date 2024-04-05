@@ -6,7 +6,7 @@ import streamlit as st
 
 
 def render_svg(svg):
-    """Renders the given svg string."""
+    """Renders the given SVG string."""
     b64 = base64.b64encode(svg.encode("utf-8")).decode("utf-8")
     html = r'<img src="data:image/svg+xml;base64,%s" width="300" alt="abtester logo"/>' % b64
     c = st.container()
@@ -19,16 +19,6 @@ def add_spaces(n):
         st.write("")
 
 
-def add_header(menu):
-    add_spaces(2)
-    st.header(menu.capitalize())
-
-
-def add_subheader(subheader):
-    add_spaces(2)
-    st.subheader(subheader)
-
-
 def add_calculate_button():
     if not st.button("Calculate", type="primary"):
         st.stop()
@@ -36,7 +26,11 @@ def add_calculate_button():
 
 def wait_file(inputs):
     if inputs.df is None and inputs.test == "Means":
-        st.error(f"You must choose a file to be able to calculate the {inputs.menu}.")
+        if inputs.page == "Size":
+            msg = "sample size"
+        elif inputs.page == "Significance":
+            msg = "statistical significance"
+        st.error(f"You must choose a file to be able to calculate the {msg}.")
 
 
 def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = "", thousand_separator: str = ",") -> str:
@@ -101,3 +95,55 @@ def load_env(parent_directory):
     env.filters["prettify_number"] = prettify_number
     return env
 
+
+def stylized_container(key):
+    """
+    Add a stylized container to the app.
+
+    Insert a container into the app, that receives an ``st.markdown``, using
+    either the "with" notation or by calling methods directly on the returned
+    object.
+
+    This container has a unique CSS selector, and it is styled to remove 2rem
+    of space. Streamlit adds 1rem of space each time ``st.markdown`` is used.
+    Here, it is used once outside the function and another time inside it.
+
+    It also removes the space added by positioning the HTML element
+    ``section.main`` below the navbar, in the CSS adjustments.
+
+    Parameters
+    ----------
+    key : str, int or None
+        A key associated with this container. This needs to be unique since all
+        styles will be applied to the container with this key.
+    height : str
+        The height of the navbar. It is the same value that the HTML element
+        ``section.main`` is moved down the page, to counteract its effect.
+
+    Returns
+    -------
+    container : DeltaGenerator
+        A container object. ``st.markdown`` can be added to this container
+        using either the ``"with"`` notation or by calling methods directly on
+        the returned object.
+    """
+    html = (
+        f"""
+        <style>
+            div[data-testid="stVerticalBlockBorderWrapper"]:has(
+                div[data-testid="stVerticalBlock"]
+                > div.element-container
+                > div.stMarkdown
+                > div[data-testid='stMarkdownContainer']
+                > p
+                > span.{key}
+            ) {{
+                margin-bottom: -2rem;
+            }}
+        </style>
+        <span class='{key}'></span>
+        """
+    )
+    container = st.container()
+    container.markdown(html, unsafe_allow_html=True)
+    return container

@@ -1,18 +1,11 @@
+import os
+
 from PIL import Image
 import streamlit as st
+from streamlit_navigation_bar import st_navbar
 
-from source.utils import render_svg
-from source.utils import add_spaces
-from source.utils import add_header
-from source.utils import add_subheader
-from source.utils import add_calculate_button
-from source.utils import wait_file
-from source.inputs import get_menu
-from source.inputs import get_size_inputs
-from source.inputs import get_signif_inputs
-from source.statistics import calculate_size
-from source.statistics import evaluate_signif
-from source.results import show_result
+import pages as pg
+from source.utils import stylized_container
 
 
 # Set browser tab title, favicon and menu options
@@ -22,68 +15,53 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-render_svg(open("images/logo.svg").read())
-
-html = {
-    "hide_decoration": """
-        <style>
-            #stDecoration {
-                visibility: hidden;
-            }
-        </style>
-    """,
-    "hide_menu": """
-        <style>
-            #MainMenu {
-                visibility: hidden;
-            }
-        </style>
-    """,
-    "hide_footer": """
-        <style>
-            footer {
-                visibility: hidden;
-            }
-        </style>
-    """,
-    "change_slider_font": """
-        <style>
-            div[data-testid="stThumbValue"], div[data-testid="stTickBarMin"], div[data-testid="stTickBarMax"] {
-                font-family: "Source Sans Pro", sans-serif;
-                font-size: 16px;
-            }
-        </style>
-    """,
+pages = ["Size", "Significance", "GitHub"]
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(parent_dir, "images/icon.svg")
+urls = {
+    "GitHub": "https://github.com/gabrieltempass/ab-tester"
+}
+styles = {
+    "nav": {"background-color": "#4285f4"},
+    "div": {"max-width": "500px"},
+    "span": {"color": "white"},
 }
 
-st.markdown(html["hide_decoration"], unsafe_allow_html=True)
-st.markdown(html["hide_menu"], unsafe_allow_html=True)
-st.markdown(html["hide_footer"], unsafe_allow_html=True)
-st.markdown(html["change_slider_font"], unsafe_allow_html=True)
+page = st_navbar(
+    pages,
+    selected="Size",
+    logo_path=logo_path,
+    logo_page="Size",
+    urls=urls,
+    styles=styles,
+    options=False,
+)
 
-menu = get_menu()
-if menu == "sample size":
+html = (
+    """
+    <style>
+        div[data-testid="stThumbValue"], div[data-testid="stTickBarMin"], div[data-testid="stTickBarMax"] {
+            font-family: "Source Sans Pro", sans-serif;
+            font-size: 16px;
+        }
+        #MainMenu {
+            visibility: hidden;
+        }
+        footer {
+            visibility: hidden;
+        }
+    </style>
+    """
+)
 
-    add_header(menu)
-    add_subheader("Parameters")
-    inputs = get_size_inputs()
-    add_calculate_button()
-    wait_file(inputs)
+with stylized_container("adjust"):
+    st.markdown(html, unsafe_allow_html=True)
 
-    if inputs.test == "Proportions" or inputs.file is not None:
-        add_subheader("Results")
-        statistics = calculate_size(inputs)
-        show_result(i=inputs, s=statistics)
-
-elif menu == "statistical significance":
-
-    add_header(menu)
-    add_subheader("Parameters")
-    inputs = get_signif_inputs()
-    add_calculate_button()
-    wait_file(inputs)
-
-    if inputs.test == "Proportions" or inputs.file is not None:
-        add_subheader("Results")
-        statistics = evaluate_signif(inputs)
-        show_result(i=inputs, s=statistics)
+functions = {
+    "Home": pg.show_home,
+    "Size": pg.show_size,
+    "Significance": pg.show_significance,
+}
+go_to = functions.get(page)
+if go_to:
+    go_to()

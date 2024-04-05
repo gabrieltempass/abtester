@@ -7,7 +7,7 @@ from source.utils import load_env
 
 def show_result(i, s):
     screen = show_report(i=i, s=s)
-    if i.menu == "statistical significance":
+    if i.page == "Significance":
         if i.method in {"t-test", "Z-test"}:
             show_calculation(i=i, s=s)
     show_code(i=i, screen=screen)
@@ -16,7 +16,7 @@ def show_result(i, s):
 def show_report(i, s):
     env = load_env("reports")
 
-    if i.menu == "sample size":
+    if i.page == "Size":
         template = env.get_template("summary_size.md")
         summary = template.render(i=i, s=s)
         st.info(summary)
@@ -37,7 +37,7 @@ def show_report(i, s):
             template_1 = env.get_template("mean_size.html")
             screen = {"large": 100, "small": 191}
 
-    elif i.menu == "statistical significance":
+    elif i.page == "Significance":
         template = env.get_template("summary_signif.md")
         summary = template.render(i=i, s=s)
         if s.p_value <= s.alpha:
@@ -69,7 +69,7 @@ def show_report(i, s):
 def show_calculation(i, s):
     env = load_env("calculations")
 
-    if i.menu == "statistical significance":
+    if i.page == "Significance":
 
         if i.test == "Proportions":
             if i.method == "Z-test":
@@ -89,14 +89,14 @@ def show_calculation(i, s):
 def show_code(i, screen):
     env = load_env("codes")
 
-    if i.menu == "sample size":
+    if i.page == "Size":
 
         if i.test == "Proportions":
             template = env.get_template("prop_size.py")
         elif i.test == "Means":
             template = env.get_template("mean_size.py")
 
-    elif i.menu == "statistical significance":
+    elif i.page == "Significance":
 
         if i.test == "Proportions":
             if i.method == "Permutation":

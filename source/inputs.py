@@ -4,19 +4,6 @@ import streamlit as st
 from source.statistics import percentage
 
 
-def get_menu():
-    menu = st.selectbox(
-        label="What do you want to do?",
-        options=("sample size", "statistical significance"),
-        format_func=lambda x: {
-            "sample size": "Calculate the sample size",
-            "statistical significance": "Evaluate the statistical significance",
-        }.get(x),
-        index=None,
-    )
-    return menu
-
-
 def get_test():
     test = st.radio(
         label="Test",
@@ -140,10 +127,10 @@ class ExperimentInputs:
         )
 
     def get_method(self):
-        if self.menu == "sample size":
+        if self.page == "Size":
             options = ("t-test", "Z-test")
             index = 0
-        if self.menu == "statistical significance":
+        if self.page == "Significance":
             if self.test == "Proportions":
                 options = ("Z-test", "Permutation")
                 index = 0
@@ -194,11 +181,11 @@ class ExperimentInputs:
         treatment=True,
     ):
         
-        if self.menu == "sample size":
+        if self.page == "Size":
             if "Measurement" not in self.df.columns:
                 measurement = False
 
-        elif self.menu == "statistical significance":
+        elif self.page == "Significance":
             if "Measurement" not in self.df.columns:
                 measurement = False
             if "Group" not in self.df.columns:
@@ -233,7 +220,7 @@ class ExperimentInputs:
         if "Group" in columns:
             group_df = df["Group"]
 
-        if self.menu == "sample size":
+        if self.page == "Size":
 
             if measurement:
                 df = df["Measurement"]
@@ -257,7 +244,7 @@ class ExperimentInputs:
             self.df = df
             self.alias = alias
 
-        elif self.menu == "statistical significance":
+        elif self.page == "Significance":
 
             if measurement and group:
                 df = df[["Measurement", "Group"]]
@@ -439,7 +426,7 @@ class ExperimentInputs:
 class SampleSizeInputs(ExperimentInputs):
     def __init__(self):
         super().__init__()
-        self.menu = "sample size"
+        self.page = "Size"
         self.method = "t-test"
 
     def get_sensitivity(self):
@@ -522,7 +509,7 @@ class MeanSizeInputs(SampleSizeInputs):
 class StatSignifInputs(ExperimentInputs):
     def __init__(self):
         super().__init__()
-        self.menu = "statistical significance"
+        self.page = "Significance"
         self.method = "Permutation"
         self.iterations = 10000
 
