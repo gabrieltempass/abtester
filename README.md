@@ -1,5 +1,3 @@
-[![Join the chat at https://gitter.im/ab-tester-app/community](https://badges.gitter.im/ab-tester-app/community.svg)](https://gitter.im/ab-tester-app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 # A/B Tester
 
 A web application to help design and evaluate the results of A/B tests.
@@ -7,7 +5,6 @@ A web application to help design and evaluate the results of A/B tests.
 ## Useful links
 
 - A/B Tester: https://abtester.app
-- Participate in the community forum discussions: [https://gitter.im/ab-tester-app/community](https://gitter.im/ab-tester-app/community?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 - Report a bug or request a feature: [https://github.com/gabrieltempass/ab-tester/issues/new](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here)
 
 ## How to run locally
