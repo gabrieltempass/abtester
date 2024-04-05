@@ -1,4 +1,6 @@
-<img src="images/logo.svg" width="400">
+<img src="images/icon.svg" width="80">
+
+# abtester
 
 A web application to help design and evaluate the results of A/B tests.
 

@@ -17,7 +17,7 @@ st.set_page_config(
 
 pages = ["Size", "Significance", "GitHub"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(parent_dir, "images/icon.svg")
+logo_path = os.path.join(parent_dir, "images/icon_white.svg")
 urls = {
     "GitHub": "https://github.com/gabrieltempass/ab-tester"
 }
