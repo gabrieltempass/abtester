@@ -1,4 +1,4 @@
-# A/B Tester
+<img src="images/logo.svg" width="400">
 
 A web application to help design and evaluate the results of A/B tests.
 
