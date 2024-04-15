@@ -22,9 +22,13 @@ urls = {
     "GitHub": "https://github.com/gabrieltempass/ab-tester"
 }
 styles = {
-    "nav": {"background-color": "#4285f4"},
-    "div": {"max-width": "500px"},
+    "nav": {"background-color": "rgb(66, 135, 245)"},
+    "div": {"max-width": "31.25rem"},
     "span": {"color": "white"},
+}
+options = {
+    "show_menu": False,
+    "show_sidebar": False,
 }
 
 page = st_navbar(
@@ -34,7 +38,7 @@ page = st_navbar(
     logo_page="Size",
     urls=urls,
     styles=styles,
-    options=False,
+    options=options,
 )
 
 html = (
