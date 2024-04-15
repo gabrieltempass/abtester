@@ -41,6 +41,9 @@ page = st_navbar(
     options=options,
 )
 
+# Prevent layout shift caused by scrollbars
+# https://github.com/streamlit/streamlit/issues/8504
+
 html = (
     """
     <style>
@@ -50,6 +53,9 @@ html = (
         }
         div[data-testid="stToolbar"] {
             visibility: hidden;
+        }
+        section.main {
+            overflow-y: scroll;
         }
         footer {
             visibility: hidden;
