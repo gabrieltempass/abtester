@@ -11,7 +11,15 @@ from source.results import show_result
 def show_significance():
 
     st.header("Statistical significance")
-    add_spaces(2)
+    st.write(
+        """
+        In a properly designed hypothesis test, an observed difference between
+        two groups must be either due to a real effect or to random chance. To
+        evaluate if the difference in your experiment is statistically
+        significant, enter the parameters below.
+        """
+    )
+    add_spaces(1)
     st.subheader("Parameters")
 
     inputs = get_signif_inputs()
@@ -19,8 +27,7 @@ def show_significance():
     wait_file(inputs)
 
     if inputs.test == "Proportions" or inputs.file is not None:
-        add_spaces(2)
+        add_spaces(1)
         st.subheader("Results")
         statistics = evaluate_signif(inputs)
         show_result(i=inputs, s=statistics)
-
