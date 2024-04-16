@@ -16,4 +16,4 @@ hideTopBar = true
 [client]
 # Controls whether the default sidebar page navigation in a multipage app is
 # displayed.
-ShowSidebarNavigation = false
+showSidebarNavigation = false
