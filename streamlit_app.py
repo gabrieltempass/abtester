@@ -43,7 +43,6 @@ page = st_navbar(
 
 # Prevent layout shift caused by scrollbars
 # https://github.com/streamlit/streamlit/issues/8504
-
 html = (
     """
     <style>
@@ -71,7 +70,6 @@ with stylized_container("adjust"):
     st.markdown(html, unsafe_allow_html=True)
 
 functions = {
-    "Home": pg.show_home,
     "Size": pg.show_size,
     "Significance": pg.show_significance,
 }

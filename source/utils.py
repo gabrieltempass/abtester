@@ -33,10 +33,16 @@ def wait_file(inputs):
         st.error(f"You must choose a file to be able to calculate the {msg}.")
 
 
-def prettify_number(number: Union[float, int], decimals: int = 2, sign: str = "", thousand_separator: str = ",") -> str:
+def prettify_number(
+    number: Union[float, int],
+    decimals: int = 2,
+    sign: str = "",
+    thousand_separator: str = ","
+) -> str:
 
 # TODO: Update to python 3.10+ to be able to use multiple types this way:
-# def prettify_number(number: float|int, decimals: int = 2, sign: str = "") -> str:
+# def prettify_number(number: float|int, decimals: int = 2, sign: str = ""
+# ) -> str:
 
     """
     Prettify the passed float or int number into a human-readable string,
@@ -108,17 +114,11 @@ def stylized_container(key):
     of space. Streamlit adds 1rem of space each time ``st.markdown`` is used.
     Here, it is used once outside the function and another time inside it.
 
-    It also removes the space added by positioning the HTML element
-    ``section.main`` below the navbar, in the CSS adjustments.
-
     Parameters
     ----------
     key : str, int or None
         A key associated with this container. This needs to be unique since all
         styles will be applied to the container with this key.
-    height : str
-        The height of the navbar. It is the same value that the HTML element
-        ``section.main`` is moved down the page, to counteract its effect.
 
     Returns
     -------

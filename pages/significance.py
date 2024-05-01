@@ -1,8 +1,6 @@
 import streamlit as st
 
-from source.utils import add_spaces
-from source.utils import add_calculate_button
-from source.utils import wait_file
+from source.utils import add_spaces, add_calculate_button, wait_file
 from source.inputs import get_signif_inputs
 from source.statistics import evaluate_signif
 from source.results import show_result
