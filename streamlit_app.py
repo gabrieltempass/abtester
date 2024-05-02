@@ -1,11 +1,10 @@
 import os
 
-from PIL import Image
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
+from PIL import Image
 
 import pages as pg
-from source.utils import stylized_container
 
 
 # Set browser tab title, favicon and menu options
@@ -41,33 +40,29 @@ page = st_navbar(
     options=options,
 )
 
-# Prevent layout shift caused by scrollbars
-# https://github.com/streamlit/streamlit/issues/8504
-html = (
+st.html(
     """
     <style>
-        div[data-testid="stThumbValue"], div[data-testid="stTickBarMin"], div[data-testid="stTickBarMax"] {
+        div[data-testid="stThumbValue"],
+        div[data-testid="stTickBarMin"],
+        div[data-testid="stTickBarMax"] {
             font-family: "Source Sans Pro", sans-serif;
             font-size: 16px;
         }
         div[data-testid="stToolbar"] {
             visibility: hidden;
         }
+        /* Prevent layout shift caused by scrollbars
+        https://github.com/streamlit/streamlit/issues/8504 */
         section.main {
             overflow-y: scroll;
         }
         footer {
             visibility: hidden;
         }
-        a[class^="viewerBadge_container"] {
-            visibility: hidden;
-        }
     </style>
     """
 )
-
-with stylized_container("adjust"):
-    st.markdown(html, unsafe_allow_html=True)
 
 functions = {
     "Size": pg.show_size,

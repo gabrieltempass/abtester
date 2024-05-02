@@ -120,5 +120,4 @@ def show_code(i, screen):
         height_large=screen["large"],
         height_small=screen["small"]
     )
-    st.markdown(html, unsafe_allow_html=True)
-
+    st.html(html)
