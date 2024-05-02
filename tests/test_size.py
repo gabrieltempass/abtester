@@ -3,9 +3,8 @@ import sys
 import pytest
 import pandas as pd
 
-sys.path.insert(1, "/Users/gabrieltempass/Repositories/abtester/source")
-from inputs import SampleSizeInputs
-from statistics import calculate_size
+from ..source.inputs import SampleSizeInputs
+from ..source.statistics import calculate_size
 
 
 @pytest.fixture

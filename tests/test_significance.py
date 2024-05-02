@@ -3,9 +3,8 @@ import sys
 import pytest
 import pandas as pd
 
-sys.path.insert(1, "/Users/gabrieltempass/Repositories/abtester/source")
-from inputs import StatSignifInputs
-from statistics import evaluate_signif
+from ..source.inputs import StatSignifInputs
+from ..source.statistics import evaluate_signif
 
 
 @pytest.fixture
