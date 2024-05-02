@@ -1,7 +1,9 @@
 import pandas as pd
 import streamlit as st
 
-from source.statistics import percentage
+
+def percentage(number):
+    return number / 100
 
 
 def get_test():
@@ -13,85 +15,6 @@ def get_test():
         help=description["test"],
     )
     return test
-
-
-def get_size_inputs():
-    test = get_test()
-    if test == "Proportions":
-        inputs = get_prop_size_inputs()
-    elif test == "Means":
-        inputs = get_mean_size_inputs()
-    return inputs
-
-
-def get_prop_size_inputs():
-    inputs = PropSizeInputs()
-    inputs.get_control_proportion()
-    inputs.get_sensitivity()
-    inputs.get_alternative()
-    inputs.get_confidence()
-    inputs.get_power()
-    inputs.get_ratios()
-    inputs.get_method()
-    return inputs
-
-
-def get_mean_size_inputs():
-    inputs = MeanSizeInputs()
-    inputs.get_sensitivity()
-    inputs.get_alternative()
-    inputs.get_confidence()
-    inputs.get_power()
-    inputs.get_ratios()
-    inputs.get_file(
-        requirements=text["size_requirements"],
-        description=description["size_file"],
-        path="datasets/sample_size/",
-        file_names={
-            "dataset A": "dataset_a.csv",
-            "dataset B": "dataset_b.csv",
-            "dataset C": "dataset_c.csv",
-        },
-    )
-    inputs.get_method()
-    return inputs
-
-
-def get_signif_inputs():
-    test = get_test()
-    if test == "Proportions":
-        inputs = get_prop_signif_inputs()
-    elif test == "Means":
-        inputs = get_mean_signif_inputs()
-    return inputs
-
-
-def get_prop_signif_inputs():
-    inputs = PropSignifInputs()
-    inputs.get_users()
-    inputs.get_conversions()
-    inputs.get_alternative()
-    inputs.get_confidence()
-    inputs.get_method()
-    return inputs
-
-
-def get_mean_signif_inputs():
-    inputs = MeanSignifInputs()
-    inputs.get_alternative()
-    inputs.get_confidence()
-    inputs.get_file(
-        requirements=text["significance_requirements"],
-        description=description["significance_file"],
-        path="datasets/statistical_significance/",
-        file_names={
-            "dataset 1": "dataset_1.csv",
-            "dataset 2": "dataset_2.csv",
-            "dataset 3": "dataset_3.csv",
-        },
-    )
-    inputs.get_method()
-    return inputs
 
 
 class ExperimentInputs:
@@ -226,7 +149,7 @@ class ExperimentInputs:
                 df = df["Measurement"]
 
             elif not measurement:
-                df, alias = get_column_input(
+                df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
                     description=description["measurement"],
@@ -251,7 +174,7 @@ class ExperimentInputs:
 
             elif measurement and not group:
                 columns.remove("Measurement")
-                df, alias = get_column_input(
+                df, alias = self.get_column(
                     label="Group column",
                     columns=columns,
                     description=description["group"],
@@ -264,7 +187,7 @@ class ExperimentInputs:
 
             elif not measurement and group:
                 columns.remove("Group"),
-                df, alias = get_column_input(
+                df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
                     description=description["measurement"],
@@ -277,7 +200,7 @@ class ExperimentInputs:
 
             elif not measurement and not group:
 
-                measurement_df, alias = get_column_input(
+                measurement_df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
                     description=description["measurement"],
@@ -285,7 +208,7 @@ class ExperimentInputs:
                     alias=alias,
                     standard="Measurement",
                 )
-                group_df, alias = get_column_input(
+                group_df, alias = self.get_column(
                     label="Group column",
                     columns=columns,
                     description=description["group"],
@@ -312,7 +235,7 @@ class ExperimentInputs:
             if group:
                 # Has "Group" and doesn't have "Control" or "Treatment"
                 if not control or not treatment:
-                    alias = get_labels(
+                    alias = self.get_labels(
                         df=df,
                         alias=alias,
                     )
@@ -331,7 +254,7 @@ class ExperimentInputs:
 
                     # Doesn't have "Group" and doesn't have "Control" or "Treatment"
                     if not control or not treatment:
-                        alias = get_labels(
+                        alias = self.get_labels(
                             df=df,
                             alias=alias,
                         )
@@ -560,14 +483,14 @@ class PropSignifInputs(StatSignifInputs):
     def get_users(self):
         col_1, col_2 = st.columns(2)
         self.control_users = col_1.number_input(
-            label="Users in the control",
+            label="Control subjects",
             min_value=1,
             value=30000,
             step=1,
             help=description["control_users"]
         )
         self.treatment_users = col_2.number_input(
-            label="Users in the treatment",
+            label="Treatment subjects",
             min_value=1,
             value=30000,
             step=1,
@@ -577,14 +500,14 @@ class PropSignifInputs(StatSignifInputs):
     def get_conversions(self):
         col_1, col_2 = st.columns(2)
         self.control_conversions = col_1.number_input(
-            label="Conversions from the control",
+            label="Control conversions",
             min_value=0,
             value=1202,
             step=1,
             help=description["control_conversions"]
         )
         self.treatment_conversions = col_2.number_input(
-            label="Conversions from the treatment",
+            label="Treatment conversions",
             min_value=0,
             value=1298,
             step=1,
@@ -598,11 +521,90 @@ class MeanSignifInputs(StatSignifInputs):
         self.test = "Means"
 
 
+def get_size_inputs():
+    test = get_test()
+    if test == "Proportions":
+        inputs = get_prop_size_inputs()
+    elif test == "Means":
+        inputs = get_mean_size_inputs()
+    return inputs
+
+
+def get_prop_size_inputs():
+    inputs = PropSizeInputs()
+    inputs.get_control_proportion()
+    inputs.get_sensitivity()
+    inputs.get_alternative()
+    inputs.get_confidence()
+    inputs.get_power()
+    inputs.get_ratios()
+    inputs.get_method()
+    return inputs
+
+
+def get_mean_size_inputs():
+    inputs = MeanSizeInputs()
+    inputs.get_sensitivity()
+    inputs.get_alternative()
+    inputs.get_confidence()
+    inputs.get_power()
+    inputs.get_ratios()
+    inputs.get_file(
+        requirements=text["size_requirements"],
+        description=description["size_file"],
+        path="datasets/sample_size/",
+        file_names={
+            "dataset A": "dataset_a.csv",
+            "dataset B": "dataset_b.csv",
+            "dataset C": "dataset_c.csv",
+        },
+    )
+    inputs.get_method()
+    return inputs
+
+
+def get_signif_inputs():
+    test = get_test()
+    if test == "Proportions":
+        inputs = get_prop_signif_inputs()
+    elif test == "Means":
+        inputs = get_mean_signif_inputs()
+    return inputs
+
+
+def get_prop_signif_inputs():
+    inputs = PropSignifInputs()
+    inputs.get_users()
+    inputs.get_conversions()
+    inputs.get_alternative()
+    inputs.get_confidence()
+    inputs.get_method()
+    return inputs
+
+
+def get_mean_signif_inputs():
+    inputs = MeanSignifInputs()
+    inputs.get_alternative()
+    inputs.get_confidence()
+    inputs.get_file(
+        requirements=text["significance_requirements"],
+        description=description["significance_file"],
+        path="datasets/statistical_significance/",
+        file_names={
+            "dataset 1": "dataset_1.csv",
+            "dataset 2": "dataset_2.csv",
+            "dataset 3": "dataset_3.csv",
+        },
+    )
+    inputs.get_method()
+    return inputs
+
+
 description = {
     "test": "A proportions test is when the data can be expressed in discrete binary values. For example: the conversions of a web page (when the user does not convert it is a zero and when he or she converts it is a one).\n\nA means test is when the data is continuous. For example: the time spent in a web page.",
     "control_proportion": "The conversion rate expected for the control. To help you set this value, you could use similar historical data. However, if that it is not available, make a guess based on your experience.",
     "sensitivity": "The minimum effect size that you want to be able to measure. A rule of thumb is to use 10% (meaning that you want to be able to detect at least a 10% difference for the treatment over the control).",
-    "alternative": "Whether you believe that the alternative hypothesis (H₁) will be smaller or larger than the null hypothesis (H₀). If the hypothesis test is two-sided, H₁ is not equal to H₀ must be selected.",
+    "alternative": "Whether you believe that the alternative hypothesis (H₁) will be smaller, larger or not equal to the null hypothesis (H₀).",
     "confidence": "The probability of detecting a true negative. That is, detecting that there is not a statistically significant difference between the control and the treatment, when this difference indeed does not exists. A rule of thumb is to use 95%.",
     "power": "The probability of detecting a true positive. That is, detecting that there is a statistically significant difference between the control and the treatment, when this difference indeed exists. A rule of thumb is to use 80%.",
     "control_users": "The number of users in the control group.",
@@ -610,7 +612,7 @@ description = {
     "control_conversions": "The number of users in the control group that converted. For example, if the control group received an email, the conversions could the number of users that clicked in an ad inside it.",
     "treatment_conversions": "The number of users in the treatment group that converted. For example, if the treatment group received an email, the conversions could the number of users that clicked in an ad inside it.",
     "control_ratio": "The percentage of users from the entire experiment who are part of the control group.",
-    "treatment_ratio": "The percentage of users from the entire experiment who are part of the treatment group.",
+    "treatment_ratio": "The percentage of users from the entire experiment who are part of the treatment group. This value is calculated automatically from one minus the control ratio.",
     "size_file": "The file must have a header as the first row, and one of the columns must have the values of the metric of interest for every respective unique user.",
     "significance_file": "The file must have a header as the first row, and one of the columns must have the values of the metric of interest for every respective unique user. Another column must contain the labels that marks users who participated in the control or treatment groups.",
     "measurement": "Select the column with the measurements.",
