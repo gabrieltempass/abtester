@@ -7,7 +7,7 @@ from PIL import Image
 import pages as pg
 
 
-# Set browser tab title, favicon and menu options
+# Set browser tab title, favicon and initial sidebar state
 st.set_page_config(
     page_title="abtester",
     page_icon=Image.open("images/icon.png"),
@@ -18,7 +18,7 @@ pages = ["Size", "Significance", "GitHub"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "images/icon_white.svg")
 urls = {
-    "GitHub": "https://github.com/gabrieltempass/ab-tester"
+    "GitHub": "https://github.com/gabrieltempass/abtester"
 }
 styles = {
     "nav": {"background-color": "rgb(66, 135, 245)"},
@@ -30,6 +30,7 @@ options = {
     "show_sidebar": False,
 }
 
+# Get the active page from a navigation bar component
 page = st_navbar(
     pages,
     selected="Size",
@@ -40,25 +41,21 @@ page = st_navbar(
     options=options,
 )
 
+# Make CSS adjustments
 st.html(
     """
     <style>
+        /* Match the slider font style to the rest of the app */
         div[data-testid="stThumbValue"],
         div[data-testid="stTickBarMin"],
         div[data-testid="stTickBarMax"] {
             font-family: "Source Sans Pro", sans-serif;
             font-size: 16px;
         }
-        div[data-testid="stToolbar"] {
-            visibility: hidden;
-        }
         /* Prevent layout shift caused by scrollbars
         https://github.com/streamlit/streamlit/issues/8504 */
         section.main {
             overflow-y: scroll;
-        }
-        footer {
-            visibility: hidden;
         }
     </style>
     """
@@ -70,4 +67,5 @@ functions = {
 }
 go_to = functions.get(page)
 if go_to:
+    # Switch to the active page
     go_to()
