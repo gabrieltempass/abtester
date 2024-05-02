@@ -18,7 +18,7 @@ Since the p-value is
 {% else %}
  fails to be
 {% endif %}
- rejected. The difference of
+ rejected. The observed difference of
 {% if i.test == "Proportions" %}
  {{ (100 * s.observed_diff)|prettify_number(sign="+") }} p.p. ({{ (100 * s.observed_diff / s.control_prop)|prettify_number(sign="+") }}%),
 {% elif i.test == "Means" %}
