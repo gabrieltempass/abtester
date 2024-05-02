@@ -3,8 +3,8 @@ import numpy as np
 from statsmodels.stats.proportion import proportions_ztest
 
 # Define the parameters
-control_users = {{ i.control_users }}
-treatment_users = {{ i.treatment_users }}
+control_subjects = {{ i.control_users }}
+treatment_subjects = {{ i.treatment_users }}
 control_conversions = {{ i.control_conversions }}
 treatment_conversions = {{ i.treatment_conversions }}
 alternative = "{{ i.alternative }}"
@@ -13,7 +13,7 @@ alpha = 1 - confidence
 
 # Calculate the p-value
 count = np.array([treatment_conversions, control_conversions])
-nobs = np.array([treatment_users, control_users])
+nobs = np.array([treatment_subjects, control_subjects])
 tstat, p_value = proportions_ztest(
     count=count,
     nobs=nobs,

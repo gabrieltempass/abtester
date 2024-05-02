@@ -12,10 +12,10 @@ confidence = {{ i.confidence }}
 alpha = 1 - confidence
 iterations = {{ i.iterations }}
 
-# Get the measurements and count the users
+# Get the measurements and count the subjects
 measurements = df["{{ i.alias['Measurement'] }}"]
-control_users = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"].shape[0]
-treatment_users = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"].shape[0]
+control_subjects = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"].shape[0]
+treatment_subjects = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Treatment'] }}"].shape[0]
 
 # Calculate the observed difference
 control_mean = df[df["{{ i.alias['Group'] }}"] == "{{ i.alias['Control'] }}"]["{{ i.alias['Measurement'] }}"].mean()
@@ -36,8 +36,8 @@ for _ in range(iterations):
     perm_diffs.append(
         permutation(
             measurements,
-            control_users,
-            treatment_users
+            control_subjects,
+            treatment_subjects
         )
     )
 

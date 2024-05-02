@@ -40,7 +40,7 @@
     <div class="box">
       <p>
         <strong>Control</strong></br>
-        <span>Users: {{ s.control_n|prettify_number(0) }} ({{ (100 * (s.control_n / (s.control_n + s.treatment_n)))|prettify_number }}%)</span></br>
+        <span>Subjects: {{ s.control_n|prettify_number(0) }} ({{ (100 * (s.control_n / (s.control_n + s.treatment_n)))|prettify_number }}%)</span></br>
         <span>Mean: {{ s.control_mean|prettify_number }}</span></br>
         <span>Standard deviation: {{ s.control_std|prettify_number }}</span>
       </p>
@@ -48,7 +48,7 @@
     <div class="box">
       <p>
         <strong>Treatment</strong></br>
-        <span>Users: {{ s.treatment_n|prettify_number(0) }} ({{ (100 * (s.treatment_n / (s.control_n + s.treatment_n)))|prettify_number }}%)</span></br>
+        <span>Subjects: {{ s.treatment_n|prettify_number(0) }} ({{ (100 * (s.treatment_n / (s.control_n + s.treatment_n)))|prettify_number }}%)</span></br>
         <span>Mean: {{ s.treatment_mean|prettify_number }}</span></br>
         <span>Standard deviation: {{ s.treatment_std|prettify_number }}</span>
       </p>
