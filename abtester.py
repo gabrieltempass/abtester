@@ -7,7 +7,7 @@ from PIL import Image
 import pages as pg
 
 
-# Set browser tab title, favicon and initial sidebar state
+# Set the browser tab title, favicon and initial sidebar state.
 st.set_page_config(
     page_title="abtester",
     page_icon=Image.open("images/icon.png"),
@@ -30,7 +30,7 @@ options = {
     "show_sidebar": False,
 }
 
-# Get the active page from a navigation bar component
+# Get the active page from a navigation bar component.
 page = st_navbar(
     pages,
     selected="Size",
@@ -41,7 +41,7 @@ page = st_navbar(
     options=options,
 )
 
-# Make CSS adjustments
+# Make CSS adjustments.
 st.html(
     """
     <style>
@@ -61,11 +61,12 @@ st.html(
     """
 )
 
+# Map page names to functions with their respective content.
 functions = {
-    "Size": pg.show_size,
-    "Significance": pg.show_significance,
+    "Size": pg.size,
+    "Significance": pg.significance,
 }
-go_to = functions.get(page)
-if go_to:
-    # Switch to the active page
-    go_to()
+show_page = functions.get(page)
+if show_page:
+    # Display the content of the active page.
+    show_page()
