@@ -6,7 +6,7 @@ from source.statistics import calculate_size
 from source.results import show_result
 
 
-def show_size():
+def size():
 
     st.header("Sample size")
     st.write(
@@ -18,14 +18,14 @@ def show_size():
         """
     )
     add_spaces(1)
-    st.subheader("Parameters")
 
+    st.subheader("Parameters")
     inputs = get_size_inputs()
     add_calculate_button()
     wait_file(inputs)
+    add_spaces(1)
 
     if inputs.test == "Proportions" or inputs.file is not None:
-        add_spaces(1)
         st.subheader("Results")
         statistics = calculate_size(inputs)
         show_result(i=inputs, s=statistics)

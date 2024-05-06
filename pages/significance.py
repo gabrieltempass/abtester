@@ -6,7 +6,7 @@ from source.statistics import evaluate_signif
 from source.results import show_result
 
 
-def show_significance():
+def significance():
 
     st.header("Statistical significance")
     st.write(
@@ -18,14 +18,14 @@ def show_significance():
         """
     )
     add_spaces(1)
-    st.subheader("Parameters")
 
+    st.subheader("Parameters")
     inputs = get_signif_inputs()
     add_calculate_button()
     wait_file(inputs)
+    add_spaces(1)
 
     if inputs.test == "Proportions" or inputs.file is not None:
-        add_spaces(1)
         st.subheader("Results")
         statistics = evaluate_signif(inputs)
         show_result(i=inputs, s=statistics)
