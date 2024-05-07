@@ -2,41 +2,33 @@
 
 # abtester
 
-A web application to help design and evaluate the results of A/B tests.
+A web application that helps you design and evaluate the results of A/B tests.
 
-## Useful links
+[![Overview](https://github.com/gabrieltempass/abtester/raw/main/images/overview.png)](https://abtester.app)
 
-- A/B Tester: https://abtester.app
-- Report a bug or request a feature: [https://github.com/gabrieltempass/ab-tester/issues/new](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20issue%20title%20here&body=Your%20issue%20description%20here)
+### Calculate the ideal sample size
 
-## How to run locally
+Samples too small may lead to inconclusive results,
+while too large may have unnecessary costs and risks.
+Find the right size with abtester.
 
-1. Clone the git repository:
+[![Overview](https://github.com/gabrieltempass/abtester/raw/main/images/sample_size.png)](https://abtester.app)
 
-```
-git clone git@github.com:gabrieltempass/ab-tester.git
-```
+### Analyze the statistical significance
+In a properly designed A/B test, a difference between the groups is either due to a real effect or to random chance. Calculate the probability of each case and if the difference is statistically significant.
 
-2. Go to the project's directory.
-3. Create the environment:
+[![Overview](https://github.com/gabrieltempass/abtester/raw/main/images/statistical_significance.png)](https://abtester.app)
 
-```
-pipenv install
-```
+## Contributing
 
-4. Activate the environment:
-
-```
-pipenv shell
-```
-
-5. Run the application:
-
-```
-streamlit run streamlit_app.py
-```
+You are welcome to help develop abtester! There are
+multiple ways to contribute, such as [reporting a bug](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20bug%20report%20title%20here&body=Your%20bug%20report%20description%20here)
+or [requesting a feature](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20feature%20request%20title%20here&body=Your%20feature%20request%20description%20here).
+You can also just [ask a question](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20question%20title%20here&body=Your%20question%20description%20here),
+or join the discussions in the [community forum](https://discord.gg/RAt8XbRrKc).
+To submit code for a pull request, make sure to read the
+[guide on how to contribute](https://github.com/gabrieltempass/abtester/blob/main/CONTRIBUTING.md).
 
 ## Contact
 
-If you would like to provide feedback, learn more about the A/B Tester, or anything else, feel free to send an email to:
-contact@abtester.app
+If you would like to provide feedback, learn more about abtester, or anything else, send an email to <contact@abtester.app>.

@@ -130,3 +130,6 @@ dmypy.json
 
 # macOS custom attributes of the folders
 .DS_Store
+
+# Pixelmator Pro
+images/*.pxd
