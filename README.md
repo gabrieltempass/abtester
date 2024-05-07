@@ -31,4 +31,4 @@ To submit code for a pull request, make sure to read the
 
 ## Contact
 
-If you would like to provide feedback, learn more about abtester, or anything else, send an email to <contact@abtester.app>.
+If you would like to provide feedback, learn more about abtester, or anything else, please send an email to <contact@abtester.app>.
