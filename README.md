@@ -23,9 +23,9 @@ In a properly designed A/B test, a difference between the groups is either due t
 
 You are welcome to help develop abtester! There are
 multiple ways to contribute, such as [reporting a bug](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20bug%20report%20title%20here&body=Your%20bug%20report%20description%20here)
-or [requesting a feature](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20feature%20request%20title%20here&body=Your%20feature%20request%20description%20here).
-You can also just [ask a question](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20question%20title%20here&body=Your%20question%20description%20here),
-or join the discussions in the [community forum](https://discord.gg/RAt8XbRrKc).
+or [requesting a feature](https://github.com/gabrieltempass/abtester/discussions/categories/ideas).
+You can also just [ask a question](https://github.com/gabrieltempass/abtester/discussions/categories/q-a),
+or [join the discussions](https://github.com/gabrieltempass/abtester/discussions) with the community.
 To submit code for a pull request, make sure to read the
 [guide on how to contribute](https://github.com/gabrieltempass/abtester/blob/main/CONTRIBUTING.md).
 

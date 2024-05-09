@@ -3,10 +3,10 @@
 Thanks for your interest in helping improve abtester! This
 guide is for people who want to contribute code to the project. There are other
 ways to contribute, such as [reporting a bug](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20bug%20report%20title%20here&body=Your%20bug%20report%20description%20here)
-or [requesting a feature](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20feature%20request%20title%20here&body=Your%20feature%20request%20description%20here).
-You can also just [ask a question](https://github.com/gabrieltempass/ab-tester/issues/new?title=Your%20question%20title%20here&body=Your%20question%20description%20here),
-or join the discussions in the [community forum](https://discord.gg/RAt8XbRrKc).
-Note that we have a [code of conduct](https://github.com/gabrieltempass/abtester/blob/main/CODE_OF_CONDUCT.md),
+or [requesting a feature](https://github.com/gabrieltempass/abtester/discussions/categories/ideas).
+You can also just [ask a question](https://github.com/gabrieltempass/abtester/discussions/categories/q-a),
+or [join the discussions](https://github.com/gabrieltempass/abtester/discussions) with the community.
+Note that we have a [code of conduct](https://github.com/gabrieltempass/abtester/discussions),
 please follow it in all your interactions with the project.
 
 ## Before starting
