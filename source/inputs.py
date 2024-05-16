@@ -2,21 +2,6 @@ import pandas as pd
 import streamlit as st
 
 
-def percentage(number):
-    return number / 100
-
-
-def get_test():
-    test = st.radio(
-        label="Test",
-        options=("Proportions", "Means"),
-        index=0,
-        horizontal=True,
-        help=description["test"],
-    )
-    return test
-
-
 class ExperimentInputs:
     def __init__(self):
         # Review this part
@@ -26,14 +11,14 @@ class ExperimentInputs:
         self.alternative = st.radio(
             label="Alternative",
             options=("smaller", "larger", "two-sided"),
-            format_func=lambda x: {
+            format_func=lambda option: {
                 "smaller": "Smaller than the null",
                 "larger": "Larger than the null",
                 "two-sided": "Not equal to the null",
-            }.get(x),
+            }.get(option),
             captions=("One-sided", "One-sided", "Two-sided"),
             index=2,
-            help=description["alternative"],
+            help=texts["alternative"],
             horizontal=True,
         )
 
@@ -45,7 +30,7 @@ class ExperimentInputs:
                 max_value=99,
                 value=95,
                 format="%d%%",
-                help=description["confidence"],
+                help=texts["confidence"],
             )
         )
 
@@ -65,7 +50,7 @@ class ExperimentInputs:
             label="Method",
             options=options,
             index=index,
-            help=description["method"],
+            help=texts["method"],
             horizontal=True,
         )
 
@@ -74,7 +59,7 @@ class ExperimentInputs:
                 label="Iterations",
                 options=[1000, 2000, 5000, 10000, 20000, 50000, 100000],
                 value=10000,
-                help=description["iterations"],
+                help=texts["iterations"],
             )
 
     def get_file(self, description, requirements, path, file_names):
@@ -152,7 +137,7 @@ class ExperimentInputs:
                 df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
-                    description=description["measurement"],
+                    text=texts["measurement"],
                     df=df,
                     alias=alias,
                     standard="Measurement",
@@ -177,7 +162,7 @@ class ExperimentInputs:
                 df, alias = self.get_column(
                     label="Group column",
                     columns=columns,
-                    description=description["group"],
+                    text=texts["group"],
                     df=df,
                     alias=alias,
                     standard="Group",
@@ -190,7 +175,7 @@ class ExperimentInputs:
                 df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
-                    description=description["measurement"],
+                    text=texts["measurement"],
                     df=df,
                     alias=alias,
                     standard="Measurement",
@@ -203,7 +188,7 @@ class ExperimentInputs:
                 measurement_df, alias = self.get_column(
                     label="Measurement column",
                     columns=columns,
-                    description=description["measurement"],
+                    text=texts["measurement"],
                     df=df,
                     alias=alias,
                     standard="Measurement",
@@ -211,7 +196,7 @@ class ExperimentInputs:
                 group_df, alias = self.get_column(
                     label="Group column",
                     columns=columns,
-                    description=description["group"],
+                    text=texts["group"],
                     df=df,
                     alias=alias,
                     standard="Group",
@@ -263,14 +248,14 @@ class ExperimentInputs:
             self.alias = alias
 
     @staticmethod
-    def get_column(df, alias, label, columns, description, standard):
+    def get_column(df, alias, label, columns, text, standard):
         if "User ID" in columns:
             columns.remove("User ID")
         column = st.selectbox(
             label=label,
             options=columns,
             index=None,
-            help=description,
+            help=text,
         )
         if column is None:
             alias.update({standard: standard})
@@ -333,7 +318,7 @@ class ExperimentInputs:
         st.write(requirements)
         df_format = pd.read_csv(f"{path}format.csv")
         ExperimentInputs.show_dataframe(df_format)
-        st.write(text["download_to_try"])
+        st.write(texts["download_to_try"])
 
         i = 1
         for display, file_name in file_names.items():
@@ -360,7 +345,7 @@ class SampleSizeInputs(ExperimentInputs):
                 value=10.0,
                 step=0.1,
                 format="%.1f",
-                help=description["sensitivity"],
+                help=texts["sensitivity"],
             )
         )
 
@@ -372,7 +357,7 @@ class SampleSizeInputs(ExperimentInputs):
                 max_value=99,
                 value=80,
                 format="%d%%",
-                help=description["power"],
+                help=texts["power"],
             )
         )
 
@@ -386,7 +371,7 @@ class SampleSizeInputs(ExperimentInputs):
                 value=50.0,
                 step=1.0,
                 format="%.1f",
-                help=description["control_ratio"],
+                help=texts["control_ratio"],
             )
         )
         self.treatment_ratio = percentage(
@@ -397,7 +382,7 @@ class SampleSizeInputs(ExperimentInputs):
                 value=100.0 - self.control_ratio * 100,
                 step=1.0,
                 format="%.1f",
-                help=description["treatment_ratio"],
+                help=texts["treatment_ratio"],
                 disabled=True,
             )
         )
@@ -417,7 +402,7 @@ class PropSizeInputs(SampleSizeInputs):
                 value=15.0,
                 step=0.1,
                 format="%.1f",
-                help=description["control_proportion"],
+                help=texts["control_proportion"],
             )
         )
 
@@ -448,7 +433,7 @@ class StatSignifInputs(ExperimentInputs):
             control = col_1.selectbox(
                 label="Control label",
                 options=labels,
-                help=description["control"],
+                help=texts["control"],
                 index=None,
             )
 
@@ -462,7 +447,7 @@ class StatSignifInputs(ExperimentInputs):
             treatment = col_2.selectbox(
                 label="Treatment label",
                 options=labels,
-                help=description["treatment"],
+                help=texts["treatment"],
                 index=index,
                 disabled=True,
             )
@@ -487,14 +472,14 @@ class PropSignifInputs(StatSignifInputs):
             min_value=1,
             value=30000,
             step=1,
-            help=description["control_users"]
+            help=texts["control_users"]
         )
         self.treatment_users = col_2.number_input(
             label="Treatment subjects",
             min_value=1,
             value=30000,
             step=1,
-            help=description["treatment_users"]
+            help=texts["treatment_users"]
         )
 
     def get_conversions(self):
@@ -504,14 +489,14 @@ class PropSignifInputs(StatSignifInputs):
             min_value=0,
             value=1202,
             step=1,
-            help=description["control_conversions"]
+            help=texts["control_conversions"]
         )
         self.treatment_conversions = col_2.number_input(
             label="Treatment conversions",
             min_value=0,
             value=1298,
             step=1,
-            help=description["treatment_conversions"]
+            help=texts["treatment_conversions"]
         )
 
 
@@ -521,13 +506,26 @@ class MeanSignifInputs(StatSignifInputs):
         self.test = "Means"
 
 
+def percentage(number):
+    return number / 100
+
+
+def get_test():
+    return st.radio(
+        label="Test",
+        options=("Proportions", "Means"),
+        index=0,
+        horizontal=True,
+        help=texts["test"],
+    )
+
+
 def get_size_inputs():
     test = get_test()
     if test == "Proportions":
-        inputs = get_prop_size_inputs()
-    elif test == "Means":
-        inputs = get_mean_size_inputs()
-    return inputs
+        return get_prop_size_inputs()
+    if test == "Means":
+        return get_mean_size_inputs()
 
 
 def get_prop_size_inputs():
@@ -550,8 +548,8 @@ def get_mean_size_inputs():
     inputs.get_power()
     inputs.get_ratios()
     inputs.get_file(
-        requirements=text["size_requirements"],
-        description=description["size_file"],
+        requirements=texts["size_requirements"],
+        description=texts["size_file"],
         path="datasets/sample_size/",
         file_names={
             "dataset A": "dataset_a.csv",
@@ -566,10 +564,9 @@ def get_mean_size_inputs():
 def get_signif_inputs():
     test = get_test()
     if test == "Proportions":
-        inputs = get_prop_signif_inputs()
-    elif test == "Means":
-        inputs = get_mean_signif_inputs()
-    return inputs
+        return get_prop_signif_inputs()
+    if test == "Means":
+        return get_mean_signif_inputs()
 
 
 def get_prop_signif_inputs():
@@ -587,8 +584,8 @@ def get_mean_signif_inputs():
     inputs.get_alternative()
     inputs.get_confidence()
     inputs.get_file(
-        requirements=text["significance_requirements"],
-        description=description["significance_file"],
+        requirements=texts["significance_requirements"],
+        description=texts["significance_file"],
         path="datasets/statistical_significance/",
         file_names={
             "dataset 1": "dataset_1.csv",
@@ -600,31 +597,163 @@ def get_mean_signif_inputs():
     return inputs
 
 
-description = {
-    "test": "If the test compares two proportions or two means, both having independent samples.\n\nA proportions test is when the subject data can be expressed in binary values. Such as the conversions of a web page. When the user converts it is one, otherwise it is zero. Averaging the users measurements produces a proportion, e.g. a 27% clickthrough rate.\n\nA means test is when the subject data is continuous. Such as the time spent in a web page. Averaging the users measurements produces a mean, e.g. a session duration of 49 seconds.",
-    "control_proportion": "The expected conversion rate for the future control group in the test. To set this value, you could use similar historical data. However, if that is not available, make a guess based on your experience.",
-    "sensitivity": "The minimum effect size that you want to be able to detect. For example, a sensitivity of 10% means you want to be capable of detecting at least a 10% difference between the control and the treatment.",
-    "alternative": "Whether the alternative hypothesis is smaller, larger or not equal to the null hypothesis. In other words, if you want to test whether the treatment measurements decreases, increases or is just different in relation to the control.",
-    "confidence": "The probability of detecting that there is not a statistically significant difference, between the control and the treatment, when the difference is indeed not real. Also known as the probability of detecting a true negative.\n\nSelecting a 95% confidence level is the same as selecting a 5% significance level (the probability of detecting a false positive), which some are more familiar with.",
-    "power": "The probability of detecting that there is a statistically significant difference, between the control and the treatment, when the difference is indeed real. Also known as the probability of detecting a true positive.",
-    "control_users": "The number of subjects in the control group.",
-    "treatment_users": "The number of subjects in the treatment group.",
-    "control_conversions": "The number of subjects in the control group that converted.",
-    "treatment_conversions": "The number of subjects in the treatment group that converted.",
-    "control_ratio": "The percentage of subjects from the entire experiment who are part of the control group.",
-    "treatment_ratio": "The percentage of subjects from the entire experiment who are part of the treatment group.\n\nThis value is automatically calculated from the control ratio.",
-    "size_file": "The file with measurements that are expected to be similar to those of the future control group.",
-    "significance_file": "The file with the measurements collected in the experiment.",
-    "measurement": "The column with the measurement for every subject.",
-    "group": "The column that classifies subjects as being part of the control or the treatment group.",
-    "control": "The label that classifies the subjects who participated in the control group.",
-    "treatment": "The label that classifies the subjects who participated in the treatment group.",
-    "method": "The frequentist or computational statistical technique that performs the calculations.",
-    "iterations": "How many resampling combinations of the control and treatment groups the permutation performs. The higher the number, the more accurate the p-value tends to be. However, it also takes more time to be calculated.",
-}
-
-text = {
-    "size_requirements": "The file must have a header as the first row, and a column with the measurement for every subject. Here is an example:",
-    "significance_requirements": "The file must have a header as the first row, a column with the measurement for every subject, and another column that classifies subjects as being part of the control or the treatment group. Here is an example:",
-    "download_to_try": "Don't have a CSV file available? Download one of the sample datasets below and try it out.",
+texts = {
+    "test": (
+        """
+        If the test compares two proportions or two means, both having
+        independent samples.
+        
+        A proportions test is when the subject data can be expressed in binary
+        values. Such as the conversions of a web page. When the user converts
+        it is one, otherwise it is zero. Averaging the users measurements
+        produces a proportion, e.g. a 27% clickthrough rate.
+        
+        A means test is when the subject data is continuous. Such as the time
+        spent in a web page. Averaging the users measurements produces a mean,
+        e.g. a session duration of 49 seconds.
+        """
+    ),
+    "control_proportion": (
+        """
+        The expected conversion rate for the future control group in the test.
+        To set this value, you could use similar historical data. However, if
+        that is not available, make a guess based on your experience.
+        """
+    ),
+    "sensitivity": (
+        """
+        The minimum effect size that you want to be able to detect. For
+        example, a sensitivity of 10% means you want to be capable of detecting
+        at least a 10% difference between the control and the treatment.
+        """
+    ),
+    "alternative": (
+        """
+        Whether the alternative hypothesis is smaller, larger or not equal to
+        the null hypothesis. In other words, if you want to test whether the
+        treatment measurements decreases, increases or is just different in
+        relation to the control.
+        """
+    ),
+    "confidence": (
+        """
+        The probability of detecting that there is not a statistically
+        significant difference, between the control and the treatment, when the
+        difference is indeed not real. Also known as the probability of
+        detecting a true negative.
+        
+        Selecting a 95% confidence level is the same as selecting a 5%
+        significance level (the probability of detecting a false positive),
+        which some are more familiar with.
+        """
+    ),
+    "power": (
+        """
+        The probability of detecting that there is a statistically significant
+        difference, between the control and the treatment, when the difference
+        is indeed real. Also known as the probability of detecting a true
+        positive.
+        """
+    ),
+    "control_users": (
+        """
+        The number of subjects in the control group.
+        """
+    ),
+    "treatment_users": (
+        """
+        The number of subjects in the treatment group.
+        """
+    ),
+    "control_conversions": (
+        """
+        The number of subjects in the control group that converted.
+        """
+    ),
+    "treatment_conversions": (
+        """
+        The number of subjects in the treatment group that converted.
+        """
+    ),
+    "control_ratio": (
+        """
+        The percentage of subjects from the entire experiment who are part of
+        the control group.
+        """
+    ),
+    "treatment_ratio": (
+        """
+        The percentage of subjects from the entire experiment who are part of
+        the treatment group.
+        
+        This value is automatically calculated from the control ratio.
+        """
+    ),
+    "size_file": (
+        """
+        The file with measurements that are expected to be similar to those of
+        the future control group.
+        """
+    ),
+    "significance_file": (
+        """
+        The file with the measurements collected in the experiment.
+        """
+    ),
+    "size_requirements": (
+        """
+        The file must have a header as the first row, and a column with the
+        measurement for every subject. Here is an example:
+        """
+    ),
+    "significance_requirements": (
+        """
+        The file must have a header as the first row, a column with the
+        measurement for every subject, and another column that classifies
+        subjects as being part of the control or the treatment group. Here is
+        an example:
+        """
+    ),
+    "download_to_try": (
+        """
+        Don't have a CSV file available? Download one of the sample datasets
+        below and try it out.
+        """
+    ),
+    "measurement": (
+        """
+        The column with the measurement for every subject.
+        """
+    ),
+    "group": (
+        """
+        The column that classifies subjects as being part of the control or the
+        treatment group.
+        """
+    ),
+    "control": (
+        """
+        The label that classifies the subjects who participated in the control
+        group.
+        """
+    ),
+    "treatment": (
+        """
+        The label that classifies the subjects who participated in the
+        treatment group.
+        """
+    ),
+    "method": (
+        """
+        The frequentist or computational statistical technique that performs
+        the calculations.
+        """
+    ),
+    "iterations": (
+        """
+        How many resampling combinations of the control and treatment groups
+        the permutation performs. The higher the number, the more accurate the
+        p-value tends to be. However, it also takes more time to be calculated.
+        """
+    ),
 }
