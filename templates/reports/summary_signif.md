@@ -1,10 +1,4 @@
-**The difference
-{% if s.p_value <= s.alpha %}
- is
-{% else %}
- is not
-{% endif %}
- statistically significant.**
+**The difference {% if s.p_value <= s.alpha %}is{% else %}is not{% endif %} statistically significant.**
 
 Since the p-value is
 {% if s.p_value <= s.alpha %}
