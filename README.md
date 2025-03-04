@@ -4,7 +4,7 @@
 
 A web application that helps you design and evaluate the results of A/B tests.
 
-[![Overview](https://github.com/gabrieltempass/abtester/raw/main/images/overview.png)](https://abtester.app)
+[![Overview](https://github.com/gabrieltempass/abthttps://github.com/gabrieltempass/abtester/issues/12ester/raw/main/images/overview.png)](https://abtester.app)
 
 ### Calculate the ideal sample size
 
